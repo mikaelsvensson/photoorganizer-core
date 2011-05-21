@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database xmlns="http://photoorganizer.info/database">
+	<tagdefinitions>
+		<integernumber id="1" name="rating" canbeappliedtoimageregion="false" />
+		<text id="2" name="private comment" canbeappliedtoimageregion="false" />
+		<realnumber id="3" name="aperture" canbeappliedtoimageregion="false" />
+		<realnumber id="4" name="retail price" canbeappliedtoimageregion="false" />
+		<realnumber id="5" name="price for friends" canbeappliedtoimageregion="false" />
+		<keyword id="6" name="nature" canbeappliedtoimageregion="true">
+			<keyword id="7" name="flower" canbeappliedtoimageregion="true" />
+		</keyword>
+		<keyword id="8" name="city" canbeappliedtoimageregion="true">
+			<keyword id="9" name="pavement" canbeappliedtoimageregion="true" synonyms="10" />
+			<keyword id="10" name="sidewalk" canbeappliedtoimageregion="true" synonyms="9" />
+		</keyword>
+	</tagdefinitions>
+	<images>
+		<image url="pic_0001.jpg">
+			<tag-integernumber tagdefinition-id="1" value="3" />
+			<tag-text tagdefinition-id="2">This image didn't turn out as good as I had hoped.</tag-text>
+			<tag-realnumber tagdefinition-id="3" value="2.8" />
+			<tag-keyword tagdefinition-id="7" />
+			<tag-keyword tagdefinition-id="9" region="10% 5% 70% 70%" />
+		</image>
+	</images>
+</database>

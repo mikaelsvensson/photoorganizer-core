@@ -1,6 +1,8 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Keyword;
+import info.photoorganizer.metadata.CoreTagDefinition;
+import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.TagDefinition;
 
 import java.io.IOException;
 
@@ -16,16 +18,40 @@ public class DatabaseManagerTest
         {
             {
                 Database database = DatabaseManager.getInstance().getDatabase();
-                Keyword keyword = new Keyword("demo");
-                database.getRootKeyword().addChild(keyword);
-                database.store();
+                KeywordTagDefinition keyword = new KeywordTagDefinition("demo");
+                database.getTagDefinitions().add(keyword);
+                DatabaseManager.getInstance().saveDatabase();
             }
             {
                 Database database = DatabaseManager.getInstance().getDatabase();
-                Keyword root = database.getRootKeyword();
-                Keyword keyword = root.getChildByName("demo");
-                root.removeChild(keyword);
-                database.store();
+                TagDefinition keyword = database.getTagDefinitionByName("demo");
+                database.removeTagDefinition(keyword);
+                DatabaseManager.getInstance().saveDatabase();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        Assert.assertTrue(true);
+    }
+    
+    @Test
+    public void addSynonyms()
+    {
+        try
+        {
+            {
+                Database database = DatabaseManager.getInstance().getDatabase();
+                
+                KeywordTagDefinition jfk = new KeywordTagDefinition("JKF");
+                KeywordTagDefinition johnFKennedy = new KeywordTagDefinition("John F Kennedy");
+                johnFKennedy.addSynonym(jfk);
+                
+                database.getTagDefinitions().add(johnFKennedy);
+                database.getTagDefinitions().add(jfk);
+
+                DatabaseManager.getInstance().saveDatabase();
             }
         }
         catch (IOException e)

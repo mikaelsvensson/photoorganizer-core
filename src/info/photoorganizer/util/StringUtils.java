@@ -1,6 +1,6 @@
 package info.photoorganizer.util;
 
-import info.photoorganizer.metadata.Keyword;
+import info.photoorganizer.metadata.TagDefinition;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class StringUtils
 {
@@ -111,9 +112,23 @@ public class StringUtils
         return join(list, null, ignoreEmpty, Character.MIN_VALUE);
     }
     
+    public static String join(Object[] list, char glue, boolean ignoreEmpty)
+    {
+        return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
+    }
+    public static String join(Object[] list, char glue)
+    {
+        return join(list, glue, true, Character.MIN_VALUE);
+    }
+    
     public static String join(Object[] list, String glue, boolean ignoreEmpty)
     {
         return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
+    }
+    
+    public static String join(Object[] list, String glue)
+    {
+        return join(list, glue, true, Character.MIN_VALUE);
     }
     
     public static String join(Object[] list, char glue, boolean ignoreEmpty, char quotationCharacter)
@@ -234,6 +249,18 @@ public class StringUtils
             }
         }
         return c;
+    }
+    
+    public static String[] split(String sentence, char separator)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(sentence, String.valueOf(separator));
+        String[] res = new String[tokenizer.countTokens()];
+        int i = 0;
+        while (tokenizer.hasMoreTokens())
+        {
+            res[i++] = tokenizer.nextToken();
+        }
+        return res;
     }
     
     public static List<WordInfo> split(String sentence, char wordSeparatorCharacter, char quotationCharacter, boolean includeQuotationCharacter)

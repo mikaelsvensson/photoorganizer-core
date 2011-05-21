@@ -23,6 +23,14 @@ public abstract class ConfigurationProperty<T extends Object>
             return (new File(System.getProperty("user.home"), "photoorganizer-database.xml")).getAbsolutePath();
         }
     });
+    public final static ConfigurationPropertyString dbPath = new ConfigurationPropertyString(new DefaultValueReader<String>()
+    {
+        @Override
+        public String get()
+        {
+            return (new File(System.getProperty("user.home"), "photoorganizer-db.xml")).getAbsolutePath();
+        }
+    });
     
     /*
      * ACTUAL CODE

@@ -1,8 +1,8 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Keyword;
+import info.photoorganizer.database.xml.elementhandlers.DatabaseObjectHandler;
 import info.photoorganizer.metadata.Location;
-import info.photoorganizer.util.StringUtils;
+import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
@@ -13,12 +13,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -33,7 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
+@Deprecated
+public class DatabaseXMLStorageStrategy /*implements DatabaseStorageStrategy*/
 {
     private static final String ATTRIBUTENAME_CITY = "city";
     private static final String ATTRIBUTENAME_COUNTRY = "country";
@@ -94,62 +93,62 @@ public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
         }
     }
     
-    public static Database databaseFromElement(Element element, DatabaseStorageStrategy storageStrategy)
-    {
-        Database db = new Database(storageStrategy);
-        HashMap<UUID, List<UUID>> collectedSynonyms = new HashMap<UUID, List<UUID>>();
-        
-        db.setName(element.getAttribute(ATTRIBUTENAME_NAME));
-        
-        Element keywordsEl = XMLUtilities.getNamedChild(element, ELEMENTNAME_KEYWORDS);
-        if (null != keywordsEl)
-        {
-            for (Element keywordEl : XMLUtilities.getNamedChildren(NAMESPACE, keywordsEl, ELEMENTNAME_KEYWORD))
-            {
-                db.getRootKeyword().addChild(keywordFromElement(keywordEl, collectedSynonyms));
-            }
-        }
-        
-        for (Entry<UUID, List<UUID>> entry : collectedSynonyms.entrySet())
-        {
-            Keyword keyword = db.getRootKeyword().getChildById(entry.getKey(), true);
-            for (UUID synonymId : entry.getValue())
-            {
-                keyword.addSynonym(db.getRootKeyword().getChildById(synonymId, true));
-            }
-        }
-        
-        return db;
-    }
+//    public static Database databaseFromElement(Element element, DatabaseStorageStrategy storageStrategy)
+//    {
+//        Database db = new Database(storageStrategy);
+//        HashMap<UUID, List<UUID>> collectedSynonyms = new HashMap<UUID, List<UUID>>();
+//        
+//        db.setName(element.getAttribute(ATTRIBUTENAME_NAME));
+//        
+//        Element keywordsEl = XMLUtilities.getNamedChild(element, ELEMENTNAME_KEYWORDS);
+//        if (null != keywordsEl)
+//        {
+//            for (Element keywordEl : XMLUtilities.getNamedChildren(NAMESPACE, keywordsEl, ELEMENTNAME_KEYWORD))
+//            {
+//                db.getRootTag().addChild(keywordFromElement(keywordEl, collectedSynonyms));
+//            }
+//        }
+//        
+//        for (Entry<UUID, List<UUID>> entry : collectedSynonyms.entrySet())
+//        {
+//            Tag keyword = db.getRootTag().getChildById(entry.getKey(), true);
+//            for (UUID synonymId : entry.getValue())
+//            {
+//                keyword.addSynonym(db.getRootTag().getChildById(synonymId, true));
+//            }
+//        }
+//        
+//        return db;
+//    }
     
     public static Element databaseToElement(Database item, Document owner)
     {
-        Element el = owner.createElementNS(NAMESPACE, ELEMENTNAME_DATABASE);
+        Element el = DatabaseObjectHandler.createElement(ELEMENTNAME_DATABASE, owner);
         
         el.setAttribute(ATTRIBUTENAME_NAME, item.getName());
         
         Element keywordsEl = owner.createElementNS(NAMESPACE, ELEMENTNAME_KEYWORDS);
         el.appendChild(keywordsEl);
         
-        for (Keyword k : item.getRootKeyword().getChildren())
-        {
-            keywordsEl.appendChild(keywordToElement(k, owner));
-        }
+//        for (TagDefinition k : item.getRootKeyword().getChildren())
+//        {
+//            keywordsEl.appendChild(keywordToElement(k, owner));
+//        }
         return el;
     }
     
-    public static Keyword keywordFromElement(Element element, Map<UUID, List<UUID>> collectedSynonyms)
+    public static TagDefinition keywordFromElement(Element element, Map<UUID, List<UUID>> collectedSynonyms)
     {
         String name = element.getAttribute(ATTRIBUTENAME_NAME);
         UUID id = getIdFromString(element.getAttribute(ATTRIBUTENAME_ID));
         
-        Keyword k = new Keyword(name, id);
+        TagDefinition k = new TagDefinition(name, id);
         
-        Element locEl = XMLUtilities.getNamedChild(element, ELEMENTNAME_LOCATION);
-        if (locEl != null)
-        {
-            k.setLocation(locationFromElement(locEl));
-        }
+//        Element locEl = XMLUtilities.getNamedChild(element, ELEMENTNAME_LOCATION);
+//        if (locEl != null)
+//        {
+//            k.setLocation(locationFromElement(locEl));
+//        }
 
         String synonyms = element.getAttribute(ATTRIBUTENAME_SYNONYMS);
         StringTokenizer tokens = new StringTokenizer(synonyms);
@@ -164,20 +163,20 @@ public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
         
         for (Element el : XMLUtilities.getNamedChildren(NAMESPACE, element, ELEMENTNAME_KEYWORD))
         {
-            k.addChild(keywordFromElement(el, collectedSynonyms));
+//            k.addChild(keywordFromElement(el, collectedSynonyms));
         }
         return k;
     }
     
-    public static Element keywordToElement(Keyword item, Document owner)
+    public static Element keywordToElement(TagDefinition item, Document owner)
     {
         Element el = null;
         
-        Location loc = item.getLocation();
-        if (loc != null)
-        {
-            el.appendChild(locationToElement(loc, owner));
-        }
+//        Location loc = item.getLocation();
+//        if (loc != null)
+//        {
+//            el.appendChild(locationToElement(loc, owner));
+//        }
         
         el.setAttribute(ATTRIBUTENAME_NAME, item.getName());
         
@@ -187,25 +186,25 @@ public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
             el.setAttribute(ATTRIBUTENAME_ID, id);
         }
         
-        StringBuilder synonyms = new StringBuilder();
-        for (Keyword synonym : item.getSynonyms())
-        {
-            if (synonyms.length() > 0)
-            {
-                synonyms.append(' ');
-            }
-            synonyms.append(getStringFromId(synonym.getId()));
-        }
+//        StringBuilder synonyms = new StringBuilder();
+//        for (Tag synonym : item.getSynonyms())
+//        {
+//            if (synonyms.length() > 0)
+//            {
+//                synonyms.append(' ');
+//            }
+//            synonyms.append(getStringFromId(synonym.getId()));
+//        }
+//        
+//        if (synonyms.length() > 0)
+//        {
+//            el.setAttribute(ATTRIBUTENAME_SYNONYMS, synonyms.toString());
+//        }
         
-        if (synonyms.length() > 0)
-        {
-            el.setAttribute(ATTRIBUTENAME_SYNONYMS, synonyms.toString());
-        }
-        
-        for (Keyword k : item.getChildren())
-        {
-            el.appendChild(keywordToElement(k, owner));
-        }
+//        for (Keyword k : item.getChildren())
+//        {
+//            el.appendChild(keywordToElement(k, owner));
+//        }
         return el;
     }
     
@@ -245,7 +244,7 @@ public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
     
     public static Element locationToElement(Location loc, Document owner)
     {
-        Element el = owner.createElementNS(NAMESPACE, ELEMENTNAME_LOCATION);
+        Element el = DatabaseObjectHandler.createElement(ELEMENTNAME_LOCATION, owner);
         
         el.setAttribute(ATTRIBUTENAME_CITY, loc.getCity());
         el.setAttribute(ATTRIBUTENAME_COUNTRY, loc.getCountry());
@@ -329,53 +328,51 @@ public class DatabaseXMLStorageStrategy implements DatabaseStorageStrategy
         return doc;
     }
 
-    @Override
-    public Database load()
-    {
-        Document document = getDocument();
-        if (null != document)
-        {
-            Database database = databaseFromElement(document.getDocumentElement(), this);
-//            addSynonymsToDatabase(document, database);
-            return database;
-        }
-        return null;
-    }
+//    public Database load()
+//    {
+//        Document document = getDocument();
+//        if (null != document)
+//        {
+//            Database database = databaseFromElement(document.getDocumentElement(), this);
+////            addSynonymsToDatabase(document, database);
+//            return database;
+//        }
+//        return null;
+//    }
     
-    @Override
-    public void store(Database db) throws IOException
-    {
-        Document document = getDocument();
-        if (null != document)
-        {
-            Element newDocRoot = databaseToElement(db, document);
-            document.replaceChild(newDocRoot, document.getDocumentElement());
-            //addSynonymsToDocument(db, document);
-            if (isValidDocument(document))
-            {
-                File f = getDatabaseFile();
-                XMLUtilities.documentToFile(document, f, XMLUtilities.UTF_8);
-            }
-            else
-            {
-                throw new IOException("Database contains data that is not allowed according to the XML schema.");
-            }
-        }
-    }
+//    public void store(Database db) throws IOException
+//    {
+//        Document document = getDocument();
+//        if (null != document)
+//        {
+//            Element newDocRoot = databaseToElement(db, document);
+//            document.replaceChild(newDocRoot, document.getDocumentElement());
+//            addSynonymsToDocument(db, document);
+//            if (isValidDocument(document))
+//            {
+//                File f = getDatabaseFile();
+//                XMLUtilities.documentToFile(document, f, XMLUtilities.UTF_8);
+//            }
+//            else
+//            {
+//                throw new IOException("Database contains data that is not allowed according to the XML schema.");
+//            }
+//        }
+//    }
     
     private void addSynonymsToDocument(Database database, Document document)
     {
-        for (Keyword k : database.getRootKeyword().getDescendants())
-        {
-            Element element = document.getElementById(ID_PREFIX + k.getId());
-            
-            String rawIds = StringUtils.join(k.getSynonymIds(), Keyword.DEFAULT_KEYWORD_SEPARATOR, true, Keyword.DEFAULT_KEYWORD_QUOTATION_MARK);
-            if (rawIds != null && rawIds.length() > 0)
-            {
-                String synonyms = ID_PREFIX + rawIds.replace(" ", " " + ID_PREFIX);
-                element.setAttribute(ATTRIBUTENAME_SYNONYMS, synonyms);
-            }
-        }
+//        for (TagDefinition k : database.getRootKeyword().getDescendants())
+//        {
+//            Element element = document.getElementById(ID_PREFIX + k.getId());
+//            
+//            String rawIds = StringUtils.join(k.getSynonymIds(), Tag.DEFAULT_KEYWORD_SEPARATOR, true, Tag.DEFAULT_KEYWORD_QUOTATION_MARK);
+//            if (rawIds != null && rawIds.length() > 0)
+//            {
+//                String synonyms = ID_PREFIX + rawIds.replace(" ", " " + ID_PREFIX);
+//                element.setAttribute(ATTRIBUTENAME_SYNONYMS, synonyms);
+//            }
+//        }
     }
     
 //    private void addSynonymsToDatabase(Document document, Database database)

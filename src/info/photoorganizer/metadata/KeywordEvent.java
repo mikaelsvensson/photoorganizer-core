@@ -1,21 +1,14 @@
 package info.photoorganizer.metadata;
 
-import java.util.EventObject;
 
-public class KeywordEvent extends EventObject
+public class KeywordEvent extends TagEvent
 {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     
-    private Keyword[] targets = null;
     private int[] targetIndices = null;
-
-    public Keyword[] getTargets()
-    {
-        return targets;
-    }
 
     public int[] getTargetIndices()
     {
@@ -27,19 +20,18 @@ public class KeywordEvent extends EventObject
         super(source);
     }
     
-    public KeywordEvent(Object source, Keyword target)
+    public KeywordEvent(Object source, KeywordTagDefinition target)
     {
-        super(source);
-        targets = new Keyword[] { target };
+        super(source, target);
         targetIndices = new int[] { getSource().getIndexOfChild(target) };
     }
     
     @Override
-    public Keyword getSource()
+    public KeywordTagDefinition getSource()
     {
-        if (source instanceof Keyword)
+        if (source instanceof KeywordTagDefinition)
         {
-            return (Keyword) source;
+            return (KeywordTagDefinition) source;
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Keyword;
+import info.photoorganizer.metadata.KeywordTagDefinition;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -8,6 +8,7 @@ import java.util.Calendar;
 import org.junit.Assert;
 import org.junit.Test;
 
+@Deprecated
 public class DatabaseStorageTest
 {
     @Test
@@ -34,7 +35,7 @@ public class DatabaseStorageTest
         {
             DatabaseStorageContext context = new DatabaseStorageContext(DatabaseStoragePolicy.newDefaultStrategy());
             Database database = context.load();
-            database.getRootKeyword().addChild(new Keyword("nyckelord som skapades "
+            database.getTagDefinitions().add(new KeywordTagDefinition("nyckelord som skapades "
                     + Calendar.getInstance().getTime().toLocaleString()));
             context.store(database);
         }

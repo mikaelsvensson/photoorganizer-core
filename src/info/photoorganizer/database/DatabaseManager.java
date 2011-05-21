@@ -1,6 +1,9 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Keyword;
+import info.photoorganizer.metadata.CoreTagDefinition;
+import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.TagDefinition;
+import info.photoorganizer.util.I18n;
 
 import java.io.IOException;
 
@@ -55,14 +58,11 @@ public class DatabaseManager
     
     private void initDatabase(Database db)
     {
-        if (db.getRootKeyword().getChildCount() == 0)
-        {
-            System.out.println("Database keyword list is empty. Adding default keywords to database.");
-            
-            db.getRootKeyword().addChild(new Keyword("People"));
-            db.getRootKeyword().addChild(new Keyword("Locations"));
-            db.getRootKeyword().addChild(new Keyword("Objects"));
-        }
+        System.out.println("Database keyword list is empty. Adding default keywords to database.");
+        
+        db.getTagDefinitions().add(new KeywordTagDefinition("People"));
+        db.getTagDefinitions().add(new KeywordTagDefinition("Locations"));
+        db.getTagDefinitions().add(new KeywordTagDefinition("Objects"));
     }
 
     public void saveDatabase() throws IOException

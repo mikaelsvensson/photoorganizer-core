@@ -1,5 +1,7 @@
 package info.photoorganizer.util;
 
+import info.photoorganizer.database.DatabaseStorageException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,7 +14,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,14 +40,16 @@ import org.xml.sax.SAXException;
 
 public class XMLUtilities
 {
-    public static final Charset UTF_8 = Charset.forName("UTF-8");
-    private static Transformer _transformer = null;
     private static DocumentBuilder _documentBuilder = null;
+    private static Transformer _transformer = null;
+    public static final Charset UTF_8 = Charset.forName("UTF-8");
     static
     {
         try
         {
-            _documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            _documentBuilder = factory.newDocumentBuilder();
             _transformer = TransformerFactory.newInstance().newTransformer();
             // _transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         }
@@ -66,47 +74,6 @@ public class XMLUtilities
     {
         Document doc = _documentBuilder.newDocument();
         doc.appendChild(doc.createElement(rootElementName));
-        return doc;
-    }
-
-    public static String documentToString(Document doc)
-    {
-        StreamResult sr = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(doc);
-        try
-        {
-            _transformer.transform(source, sr);
-        }
-        catch (TransformerException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return sr.getWriter().toString();
-    }
-
-    public static void documentToFile(Document doc, File file, Charset charset) throws IOException
-    {
-        StreamResult sr = new StreamResult(new OutputStreamWriter(new FileOutputStream(file), charset));
-        DOMSource source = new DOMSource(doc);
-        try
-        {
-            _transformer.transform(source, sr);
-        }
-        catch (TransformerException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public static Document documentFromString(String str)
-    {
-        Document doc = null;
-        if (null != _documentBuilder && str != null)
-        {
-            doc = documentFromReader(new StringReader(str));
-        }
         return doc;
     }
 
@@ -148,12 +115,89 @@ public class XMLUtilities
         }
         return doc;
     }
+
+    public static Document documentFromString(String str)
+    {
+        Document doc = null;
+        if (null != _documentBuilder && str != null)
+        {
+            doc = documentFromReader(new StringReader(str));
+        }
+        return doc;
+    }
+
+    public static void documentToFile(Document doc, File file, Charset charset) throws IOException
+    {
+        StreamResult sr = new StreamResult(new OutputStreamWriter(new FileOutputStream(file), charset));
+        DOMSource source = new DOMSource(doc);
+        try
+        {
+            _transformer.transform(source, sr);
+        }
+        catch (TransformerException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static String documentToString(Document doc)
+    {
+        StreamResult sr = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        try
+        {
+            _transformer.transform(source, sr);
+        }
+        catch (TransformerException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return sr.getWriter().toString();
+    }
+    
+    public static boolean getBooleanAttribute(Element el, String attr)
+    {
+        return Boolean.parseBoolean(el.getAttribute(attr));
+    }
+    
+    public static int getIntegerAttribute(Element el, String attr, int defaultValue) throws DatabaseStorageException
+    {
+        try
+        {
+            if (el.hasAttribute(attr))
+            {
+                return Integer.parseInt(el.getAttribute(attr));
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new DatabaseStorageException("Attribute value is not a valid integer.", e);
+        }
+    }
+    
+    public static Element getNamedChild(Element parent, String childElementName)
+    {
+        List<Element> children = getNamedChildren(parent, childElementName);
+        if (children.size() == 1)
+        {
+            return children.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
     
     public static List<Element> getNamedChildren(Element parent, String... childElementNames)
     {
         return getNamedChildren(null, parent, childElementNames);
     }
-    
     public static List<Element> getNamedChildren(String namespaceURI, Element parent, String... childElementNames)
     {
         List<Element> res = new ArrayList<Element>();
@@ -176,19 +220,6 @@ public class XMLUtilities
             }
         }
         return res;
-    }
-    
-    public static Element getNamedChild(Element parent, String childElementName)
-    {
-        List<Element> children = getNamedChildren(parent, childElementName);
-        if (children.size() == 1)
-        {
-            return children.get(0);
-        }
-        else
-        {
-            return null;
-        }
     }
     
     /**
@@ -220,6 +251,103 @@ public class XMLUtilities
             for (int i=0; i < elements.getLength(); i++)
             {
                 res.add((Element) elements.item(i));
+            }
+        }
+        return res;
+    }
+    
+    public static String getTextAttribute(Element el, String attr, String defaultValue)
+    {
+        if (el.hasAttribute(attr))
+        {
+            return el.getAttribute(attr);
+        }
+        else
+        {
+            return defaultValue;
+        }
+    }
+    
+    public static UUID getUUIDAttribute(Element el, String attr)
+    {
+        try
+        {
+            return UUID.fromString(el.getAttribute(attr));
+        }
+        catch (IllegalArgumentException e)
+        {
+            return null;
+        }
+    }
+    
+    public static UUID[] getUUIDsAttribute(Element el, String attr)
+    {
+        String value = el.getAttribute(attr);
+        String[] ids = StringUtils.split(value, ' ');
+        UUID[] res = new UUID[ids.length];
+        int i=0;
+        for (String id : ids)
+        {
+            try
+            {
+                res[i++] = UUID.fromString(id);
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+        }
+        return res;
+    }
+    
+    public static void setBooleanAttribute(Element el, String attr, boolean value)
+    {
+        el.setAttribute(attr, Boolean.toString(value));
+    }
+    
+    public static void setTextAttribute(Element el, String attr, String value)
+    {
+        el.setAttribute(attr, value);
+    }
+    
+    public static void setIntegerAttribute(Element el, String attr, int value)
+    {
+        el.setAttribute(attr, Integer.toString(value));
+    }
+    
+    public static void setUUIDAttribute(Element el, String attr, UUID value)
+    {
+        if (value != null)
+        {
+            el.setAttribute(attr, value.toString());
+        }
+    }
+    
+    public static void setUUIDsAttribute(Element el, String attr, UUID[] values)
+    {
+        if (values != null)
+        {
+            el.setAttribute(attr, StringUtils.join(values, ' '));
+        }
+    }
+    
+    public static void appendChildren(Element el, Iterable<Element> children)
+    {
+        for (Element child : children)
+        {
+            el.appendChild(child);
+        }
+    }
+
+    public static Iterable<Element> getChildElements(Element el)
+    {
+        LinkedList<Element> res = new LinkedList<Element>();
+        NodeList childNodes = el.getChildNodes();
+        for (int i=0; i < childNodes.getLength(); i++)
+        {
+            Node item = childNodes.item(i);
+            if (item.getNodeType() == Node.ELEMENT_NODE)
+            {
+                res.add((Element) item);
             }
         }
         return res;
