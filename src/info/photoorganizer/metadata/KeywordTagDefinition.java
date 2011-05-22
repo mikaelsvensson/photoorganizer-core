@@ -52,7 +52,7 @@ public class KeywordTagDefinition extends TagDefinition
     {
         
         @Override
-        public void tagChanged(TagEvent event)
+        public void tagChanged(TagDefinitionEvent event)
         {
             fireChangedEvent(event);
         }
@@ -378,7 +378,7 @@ public class KeywordTagDefinition extends TagDefinition
     public void setLocation(Location location)
     {
         this.location = location;
-        fireChangedEvent(new TagEvent(this));
+        fireChangedEvent(new TagDefinitionEvent(this));
     }
 
 }

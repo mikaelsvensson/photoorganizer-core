@@ -1,7 +1,7 @@
 package info.photoorganizer.metadata;
 
 
-public interface KeywordEventListener extends TagEventListener
+public interface KeywordEventListener extends TagDefinitionEventListener
 {
     void keywordInserted(KeywordEvent event);
     void keywordDeleted(KeywordEvent event);

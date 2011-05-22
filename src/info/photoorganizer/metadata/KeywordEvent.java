@@ -1,7 +1,7 @@
 package info.photoorganizer.metadata;
 
 
-public class KeywordEvent extends TagEvent
+public class KeywordEvent extends TagDefinitionEvent
 {
     /**
      * 

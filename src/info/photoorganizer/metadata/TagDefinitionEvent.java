@@ -2,7 +2,7 @@ package info.photoorganizer.metadata;
 
 import java.util.EventObject;
 
-public class TagEvent extends EventObject
+public class TagDefinitionEvent extends EventObject
 {
     /**
      * 
@@ -16,12 +16,12 @@ public class TagEvent extends EventObject
         return targets;
     }
 
-    public TagEvent(Object source)
+    public TagDefinitionEvent(Object source)
     {
         super(source);
     }
     
-    public TagEvent(Object source, TagDefinition target)
+    public TagDefinitionEvent(Object source, TagDefinition target)
     {
         super(source);
         targets = new TagDefinition[] { target };

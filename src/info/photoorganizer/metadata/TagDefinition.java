@@ -16,10 +16,10 @@ public class TagDefinition extends DatabaseObject
 {
     
     
-    private Event<TagEventListener, TagEvent> _tagChangedEvent = new Event<TagEventListener, TagEvent>(
-            new EventExecuter<TagEventListener, TagEvent>()
+    private Event<TagDefinitionEventListener, TagDefinitionEvent> _tagChangedEvent = new Event<TagDefinitionEventListener, TagDefinitionEvent>(
+            new EventExecuter<TagDefinitionEventListener, TagDefinitionEvent>()
             {
-                public void fire(TagEventListener listener, TagEvent event)
+                public void fire(TagDefinitionEventListener listener, TagDefinitionEvent event)
                 {
                     listener.tagChanged(event);
                 }
@@ -44,19 +44,19 @@ public class TagDefinition extends DatabaseObject
         this.name = name;
     }
     
-    public void addTagEventListener(TagEventListener listener)
+    public void addTagEventListener(TagDefinitionEventListener listener)
     {
         _tagChangedEvent.addListener(listener);
     }
     
-    protected void fireChangedEvent(TagEvent event)
+    protected void fireChangedEvent(TagDefinitionEvent event)
     {
         _tagChangedEvent.fire(event);
     }
 
     protected void fireChangedEvent()
     {
-        fireChangedEvent(new TagEvent(this));
+        fireChangedEvent(new TagDefinitionEvent(this));
     }
 
     public String getName()
@@ -69,7 +69,7 @@ public class TagDefinition extends DatabaseObject
         return applicableToImageRegion;
     }
 
-    public void removeTagEventListener(TagEventListener listener)
+    public void removeTagEventListener(TagDefinitionEventListener listener)
     {
         _tagChangedEvent.removeListener(listener);
     }
