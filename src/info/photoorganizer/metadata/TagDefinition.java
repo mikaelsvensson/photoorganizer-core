@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class TagDefinition extends DatabaseObject 
+public abstract class TagDefinition extends DatabaseObject 
 {
     
     

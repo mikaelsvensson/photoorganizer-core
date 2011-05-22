@@ -1,13 +1,12 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.xml.XMLDatabaseConverter;
-import info.photoorganizer.metadata.ValueTagDefinition;
+import info.photoorganizer.metadata.ValueTag;
 
-import org.w3c.dom.Element;
-
-public abstract class ValueTagDefinitionHandler<T extends ValueTagDefinition> extends TagDefinitionHandler<T>
+public abstract class ValueTagHandler<T extends ValueTag> extends TagHandler<T>
 {
-    public ValueTagDefinitionHandler(Class<T> cls, XMLDatabaseConverter converter)
+
+    private ValueTagHandler(Class<T> cls, XMLDatabaseConverter converter)
     {
         super(cls, converter);
     }

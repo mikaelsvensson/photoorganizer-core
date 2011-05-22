@@ -136,13 +136,13 @@ public class DatabaseXMLStorageStrategy /*implements DatabaseStorageStrategy*/
 //        }
         return el;
     }
-    
+    /*
     public static TagDefinition keywordFromElement(Element element, Map<UUID, List<UUID>> collectedSynonyms)
     {
         String name = element.getAttribute(ATTRIBUTENAME_NAME);
         UUID id = getIdFromString(element.getAttribute(ATTRIBUTENAME_ID));
         
-        TagDefinition k = new TagDefinition(name, id);
+//        TagDefinition k = new TagDefinition(name, id);
         
 //        Element locEl = XMLUtilities.getNamedChild(element, ELEMENTNAME_LOCATION);
 //        if (locEl != null)
@@ -165,9 +165,9 @@ public class DatabaseXMLStorageStrategy /*implements DatabaseStorageStrategy*/
         {
 //            k.addChild(keywordFromElement(el, collectedSynonyms));
         }
-        return k;
+//        return k;
     }
-    
+    */
     public static Element keywordToElement(TagDefinition item, Document owner)
     {
         Element el = null;

@@ -52,6 +52,10 @@ public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTa
                 }
             }
         }
+        
+        _synonyms = null;
+        
+        super.postProcess(db);
     }
     
     private KeywordTagDefinition getById(UUID id)
@@ -70,6 +74,8 @@ public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTa
     public void preProcess()
     {
         _synonyms = new HashMap<KeywordTagDefinition, UUID[]>();
+        
+        super.preProcess();
     }
 
     @Override

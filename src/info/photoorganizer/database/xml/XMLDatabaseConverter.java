@@ -3,10 +3,16 @@ package info.photoorganizer.database.xml;
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseHandler;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseObjectHandler;
+import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
+import info.photoorganizer.database.xml.elementhandlers.ImageHandler;
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.util.XMLUtilities;
 
@@ -17,25 +23,33 @@ import org.w3c.dom.Element;
 
 public class XMLDatabaseConverter
 {
-    private final DatabaseObjectHandler[] HANDLERS = new DatabaseObjectHandler[] { 
-            new DatabaseHandler(this), 
+    private final ElementHandler[] HANDLERS = new ElementHandler[] { 
+            new ImageHandler(this),
+            
+            new KeywordTagHandler(this),
+            new TextTagHandler(this),
+            new IntegerNumberTagHandler(this),
+            new RealNumberTagHandler(this),
+            
             new KeywordTagDefinitionHandler(this),
             new TextTagDefinitionHandler(this),
             new IntegerNumberTagDefinitionHandler(this),
-            new RealNumberTagDefinitionHandler(this)
+            new RealNumberTagDefinitionHandler(this),
+            
+            new DatabaseHandler(this) 
             };
     
-    public <T extends DatabaseObject> T fromElement(Element el, Class<T> cls)
+    public <T extends Object> T fromElement(Element el, Class<T> cls)
     {
         DatabaseObject res = null;
         String name = el.getLocalName();
-        for (DatabaseObjectHandler handler : HANDLERS)
+        for (ElementHandler handler : HANDLERS)
         {
             if (handler.getDatabaseObjectClass().getSimpleName().equals(name))
             {
                 try
                 {
-                    if (handler.getDatabaseObjectClass().isAssignableFrom(cls))
+                    if (cls.isAssignableFrom(handler.getDatabaseObjectClass()))
                     {
                         res = (DatabaseObject) handler.getDatabaseObjectClass().newInstance();
                         handler.readElement(res, el);
@@ -57,7 +71,7 @@ public class XMLDatabaseConverter
     
     private void postProcessHandlers(Database db)
     {
-        for (DatabaseObjectHandler handler : HANDLERS)
+        for (ElementHandler handler : HANDLERS)
         {
             handler.postProcess(db);
         }
@@ -65,15 +79,15 @@ public class XMLDatabaseConverter
     
     private void preProcessHandlers()
     {
-        for (DatabaseObjectHandler handler : HANDLERS)
+        for (ElementHandler handler : HANDLERS)
         {
             handler.preProcess();
         }
     }
 
-    public Element toElement(Document owner, DatabaseObject o)
+    public Element toElement(Document owner, Object o)
     {
-        for (DatabaseObjectHandler handler : HANDLERS)
+        for (ElementHandler handler : HANDLERS)
         {
             Element el = handler.createElement(o, owner);
             if (el != null)
@@ -84,7 +98,7 @@ public class XMLDatabaseConverter
         return null;
     }
     
-    public <T extends DatabaseObject> Iterable<T> fromElementChildren(Element el, Class<T> cls)
+    public <T extends Object> Iterable<T> fromElementChildren(Element el, Class<T> cls)
     {
         LinkedList<T> res = new LinkedList<T>();
      
@@ -98,10 +112,10 @@ public class XMLDatabaseConverter
         return res;
     }
     
-    public Iterable<Element> toElements(Document owner, Iterable<? extends DatabaseObject> objects)
+    public Iterable<Element> toElements(Document owner, Iterable<? extends Object> objects)
     {
         LinkedList<Element> res = new LinkedList<Element>();
-        for (DatabaseObject o : objects)
+        for (Object o : objects)
         {
             res.add(toElement(owner, o));
         }

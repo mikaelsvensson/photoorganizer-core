@@ -1,7 +1,12 @@
 package info.photoorganizer.metadata;
 
-public class Tag<T extends TagDefinition>
+public abstract class Tag<T extends TagDefinition>
 {
+    public void setDefinition(T definition)
+    {
+        _definition = definition;
+    }
+
     private T _definition = null;
 
     private ImageRegion _region = null;

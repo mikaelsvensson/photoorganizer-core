@@ -12,6 +12,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,13 +164,13 @@ public class XMLUtilities
         return Boolean.parseBoolean(el.getAttribute(attr));
     }
     
-    public static int getIntegerAttribute(Element el, String attr, int defaultValue) throws DatabaseStorageException
+    public static Double getDoubleAttribute(Element el, String attr, Double defaultValue) throws DatabaseStorageException
     {
         try
         {
             if (el.hasAttribute(attr))
             {
-                return Integer.parseInt(el.getAttribute(attr));
+                return Double.valueOf(el.getAttribute(attr));
             }
             else
             {
@@ -177,7 +179,26 @@ public class XMLUtilities
         }
         catch (NumberFormatException e)
         {
-            throw new DatabaseStorageException("Attribute value is not a valid integer.", e);
+            throw new DatabaseStorageException("Attribute value is not a valid double-precision value.", e);
+        }
+    }
+    
+    public static Integer getIntegerAttribute(Element el, String attr, Integer defaultValue) throws DatabaseStorageException
+    {
+        try
+        {
+            if (el.hasAttribute(attr))
+            {
+                return Integer.valueOf(el.getAttribute(attr));
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new DatabaseStorageException("Attribute value is not a valid integer value.", e);
         }
     }
     
@@ -268,6 +289,23 @@ public class XMLUtilities
         }
     }
     
+    public static URL getURLAttribute(Element el, String attr, URL defaultValue)
+    {
+        if (el.hasAttribute(attr))
+        {
+            try
+            {
+                return new URL(el.getAttribute(attr));
+            }
+            catch (MalformedURLException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return defaultValue;
+    }
+    
     public static UUID getUUIDAttribute(Element el, String attr)
     {
         try
@@ -304,14 +342,30 @@ public class XMLUtilities
         el.setAttribute(attr, Boolean.toString(value));
     }
     
+    public static void setURLAttribute(Element el, String attr, URL url)
+    {
+        el.setAttribute(attr, url.toString());
+    }
+    
     public static void setTextAttribute(Element el, String attr, String value)
     {
         el.setAttribute(attr, value);
     }
     
-    public static void setIntegerAttribute(Element el, String attr, int value)
+    public static void setIntegerAttribute(Element el, String attr, Integer value)
     {
-        el.setAttribute(attr, Integer.toString(value));
+        if (null != value)
+        {
+            el.setAttribute(attr, value.toString());
+        }
+    }
+    
+    public static void setDoubleAttribute(Element el, String attr, Double value)
+    {
+        if (null != value)
+        {
+            el.setAttribute(attr, value.toString());
+        }
     }
     
     public static void setUUIDAttribute(Element el, String attr, UUID value)

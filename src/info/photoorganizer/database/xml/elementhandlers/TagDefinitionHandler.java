@@ -6,7 +6,7 @@ import info.photoorganizer.util.XMLUtilities;
 
 import org.w3c.dom.Element;
 
-public class TagDefinitionHandler<T extends TagDefinition> extends DatabaseObjectHandler<T>
+public abstract class TagDefinitionHandler<T extends TagDefinition> extends DatabaseObjectHandler<T>
 {
     public TagDefinitionHandler(Class<T> cls, XMLDatabaseConverter converter)
     {

@@ -12,16 +12,16 @@ public class TextTagDefinitionHandler extends ValueTagDefinitionHandler<TextTagD
         super(TextTagDefinition.class, converter);
     }
 
-    @Override
-    public void readElement(TextTagDefinition o, Element el)
-    {
-        super.readElement(o, el);
-    }
-
-    @Override
-    public void writeElement(TextTagDefinition o, Element el)
-    {
-        super.writeElement(o, el);
-    }
+//    @Override
+//    public void readElement(TextTagDefinition o, Element el)
+//    {
+//        super.readElement(o, el);
+//    }
+//
+//    @Override
+//    public void writeElement(TextTagDefinition o, Element el)
+//    {
+//        super.writeElement(o, el);
+//    }
 
 }

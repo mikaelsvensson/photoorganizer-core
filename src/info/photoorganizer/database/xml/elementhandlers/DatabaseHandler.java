@@ -1,13 +1,12 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import java.util.Iterator;
-
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.xml.XMLDatabaseConverter;
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
+
+import java.util.Iterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -17,6 +16,7 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     private static final String ATTRIBUTENAME_NAME = "name";
 
     private static final String ELEMENTNAME_TAGDEFINITIONS = "TagDefinitions";
+    private static final String ELEMENTNAME_IMAGES = "Images";
 
     public DatabaseHandler(XMLDatabaseConverter converter)
     {
@@ -29,11 +29,9 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         
         o.setName(XMLUtilities.getTextAttribute(el, ATTRIBUTENAME_NAME, "untitled"));
         
-        Iterator<TagDefinition> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_TAGDEFINITIONS), TagDefinition.class).iterator();
-        while (i.hasNext())
-        {
-            o.getTagDefinitions().add(i.next());
-        }
+        readTagDefinitionElements(o, el);
+        
+        readImageElements(o, el);
         
 //        Iterator<KeywordTagDefinition> keywords = _converter.fromElementChildren(el, KeywordTagDefinition.class).iterator();
 //        if (keywords.hasNext())
@@ -42,6 +40,24 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
 //        }
         
         super.readElement(o, el);
+    }
+
+    private void readTagDefinitionElements(Database o, Element el)
+    {
+        Iterator<TagDefinition> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_TAGDEFINITIONS), TagDefinition.class).iterator();
+        while (i.hasNext())
+        {
+            o.getTagDefinitions().add(i.next());
+        }
+    }
+
+    private void readImageElements(Database o, Element el)
+    {
+        Iterator<Image> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_IMAGES), Image.class).iterator();
+        while (i.hasNext())
+        {
+            o.getImages().add(i.next());
+        }
     }
     
     @Override
@@ -54,6 +70,10 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         Element tagDefinitionsEl = createElement(ELEMENTNAME_TAGDEFINITIONS, owner);
         el.appendChild(tagDefinitionsEl);
         XMLUtilities.appendChildren(tagDefinitionsEl, _converter.toElements(owner, o.getTagDefinitions()));
+        
+        Element imagesEl = createElement(ELEMENTNAME_IMAGES, owner);
+        el.appendChild(imagesEl);
+        XMLUtilities.appendChildren(imagesEl, _converter.toElements(owner, o.getImages()));
         
         
 //        KeywordTagDefinition rootKeyword = o.getRootKeyword();

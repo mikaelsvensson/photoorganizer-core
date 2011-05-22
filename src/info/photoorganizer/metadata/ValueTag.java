@@ -1,7 +1,7 @@
 package info.photoorganizer.metadata;
 
 
-public class ValueTag<V extends Object, T extends ValueTagDefinition> extends Tag<T>
+public abstract class ValueTag<V extends Object, T extends ValueTagDefinition> extends Tag<T>
 {
     
     public ValueTag(T definition)

@@ -2,7 +2,7 @@ package info.photoorganizer.metadata;
 
 import java.util.UUID;
 
-public class ValueTagDefinition extends TagDefinition
+public abstract class ValueTagDefinition extends TagDefinition
 {
     
     public ValueTagDefinition()

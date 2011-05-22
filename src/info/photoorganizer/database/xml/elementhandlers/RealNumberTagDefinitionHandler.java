@@ -12,16 +12,16 @@ public class RealNumberTagDefinitionHandler extends ValueTagDefinitionHandler<Re
         super(RealNumberTagDefinition.class, converter);
     }
 
-    @Override
-    public void readElement(RealNumberTagDefinition o, Element el)
-    {
-        super.readElement(o, el);
-    }
-
-    @Override
-    public void writeElement(RealNumberTagDefinition o, Element el)
-    {
-        super.writeElement(o, el);
-    }
+//    @Override
+//    public void readElement(RealNumberTagDefinition o, Element el)
+//    {
+//        super.readElement(o, el);
+//    }
+//
+//    @Override
+//    public void writeElement(RealNumberTagDefinition o, Element el)
+//    {
+//        super.writeElement(o, el);
+//    }
 
 }

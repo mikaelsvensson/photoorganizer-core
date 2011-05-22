@@ -2,6 +2,7 @@ package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.CoreTagDefinition;
 import info.photoorganizer.metadata.DatabaseObject;
+import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 
@@ -34,6 +35,7 @@ public class Database extends DatabaseObject
 //    private KeywordTagDefinition rootKeyword = null;
     
     private List<TagDefinition> _tagDefinitions = new LinkedList<TagDefinition>();
+    private List<Image> _images = new LinkedList<Image>();
     private static List<TagDefinition> _coreTagDefinitions = new LinkedList<TagDefinition>();
     
     static
@@ -44,6 +46,11 @@ public class Database extends DatabaseObject
         }
     }
     
+    public List<Image> getImages()
+    {
+        return _images;
+    }
+
     public List<TagDefinition> getTagDefinitions()
     {
         return getTagDefinitions(false);

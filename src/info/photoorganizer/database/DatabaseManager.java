@@ -9,6 +9,10 @@ import java.io.IOException;
 
 public class DatabaseManager
 {
+    public static final String KEYWORD_OBJECTS = "Objects";
+    public static final String KEYWORD_LOCATIONS = "Locations";
+    public static final String KEYWORD_PEOPLE = "People";
+    
     private static volatile DatabaseManager dbMngr = null;
 //    private static DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 //    private static DocumentBuilder docBuilder = null;
@@ -60,9 +64,9 @@ public class DatabaseManager
     {
         System.out.println("Database keyword list is empty. Adding default keywords to database.");
         
-        db.getTagDefinitions().add(new KeywordTagDefinition("People"));
-        db.getTagDefinitions().add(new KeywordTagDefinition("Locations"));
-        db.getTagDefinitions().add(new KeywordTagDefinition("Objects"));
+        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_PEOPLE));
+        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_LOCATIONS));
+        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_OBJECTS));
     }
 
     public void saveDatabase() throws IOException

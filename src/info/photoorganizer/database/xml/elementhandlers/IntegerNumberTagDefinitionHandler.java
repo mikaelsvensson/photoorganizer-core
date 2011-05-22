@@ -12,16 +12,16 @@ public class IntegerNumberTagDefinitionHandler extends ValueTagDefinitionHandler
         super(IntegerNumberTagDefinition.class, converter);
     }
 
-    @Override
-    public void readElement(IntegerNumberTagDefinition o, Element el)
-    {
-        super.readElement(o, el);
-    }
-
-    @Override
-    public void writeElement(IntegerNumberTagDefinition o, Element el)
-    {
-        super.writeElement(o, el);
-    }
+//    @Override
+//    public void readElement(IntegerNumberTagDefinition o, Element el)
+//    {
+//        super.readElement(o, el);
+//    }
+//
+//    @Override
+//    public void writeElement(IntegerNumberTagDefinition o, Element el)
+//    {
+//        super.writeElement(o, el);
+//    }
 
 }
