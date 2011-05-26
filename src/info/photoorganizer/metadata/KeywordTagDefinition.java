@@ -1,5 +1,7 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.util.Event;
 import info.photoorganizer.util.Event.EventExecuter;
 import info.photoorganizer.util.StringUtils;
@@ -14,7 +16,7 @@ import java.util.UUID;
 public class KeywordTagDefinition extends TagDefinition
 {
 
-    public static final KeywordTagDefinition ROOT_KEYWORD = new KeywordTagDefinition("root keyword", UUID.fromString("f4840997-b116-43e6-8256-6fbaefb63b3d"));
+//    public static final KeywordTagDefinition ROOT_KEYWORD = new KeywordTagDefinition("root keyword", UUID.fromString("f4840997-b116-43e6-8256-6fbaefb63b3d"));
 //  public static final KeywordTagDefinition EVENTS = new KeywordTagDefinition("events", UUID.fromString("8a432af2-6601-4810-bc83-caf82e2930e1"));
 //  public static final KeywordTagDefinition LOCATIONS = new KeywordTagDefinition("locations", UUID.fromString("e3fa5f30-673c-435c-b5fa-a9a67f27abd1"));
 //  public static final KeywordTagDefinition OBJECTS = new KeywordTagDefinition("objects", UUID.fromString("7203b041-6a98-4e35-ae47-9f2723517c01"));
@@ -24,28 +26,28 @@ public class KeywordTagDefinition extends TagDefinition
     
     public static final char DEFAULT_KEYWORD_SEPARATOR = ' ';
     
-    public KeywordTagDefinition(String name, UUID id, KeywordTagDefinition parent)
+    public KeywordTagDefinition(String name, UUID id, KeywordTagDefinition parent, DatabaseStorageStrategy storageContext)
     {
-        super(name, id);
+        super(name, id, storageContext);
         if (null != parent)
         {
             parent.addChild(this);
         }
     }
 
-    public KeywordTagDefinition(String name, UUID id)
+    public KeywordTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(name, id);
+        super(name, id, storageContext);
     }
 
-    public KeywordTagDefinition(String name)
+    public KeywordTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
-        super(name);
+        super(name, storageContext);
     }
     
-    public KeywordTagDefinition()
+    public KeywordTagDefinition(DatabaseStorageStrategy storageContext)
     {
-        super();
+        super(storageContext);
     }
 
     private final KeywordEventListener _childListener = new KeywordEventListener()
@@ -104,7 +106,7 @@ public class KeywordTagDefinition extends TagDefinition
 
     private List<KeywordTagDefinition> children = new ArrayList<KeywordTagDefinition>(); 
     private KeywordTagDefinition parent = null;
-    private Set<KeywordTagDefinition> _synonyms = new HashSet<KeywordTagDefinition>();
+    private Set<UUID> _synonyms = new HashSet<UUID>();
     private Location location = null;
 
     public void addChild(KeywordTagDefinition tag)
@@ -299,14 +301,6 @@ public class KeywordTagDefinition extends TagDefinition
         }
     }
     
-    public void remove()
-    {
-        if (parent != null)
-        {
-            parent.removeChild(this);
-        }
-    }
-    
     public void removeChild(KeywordTagDefinition keyword)
     {
         KeywordEvent event = new KeywordEvent(this, keyword); // Before remove(...) so that the current child index can be computed.
@@ -323,10 +317,12 @@ public class KeywordTagDefinition extends TagDefinition
         _keywordStructureChangedEvent.removeListener(listener);
     }
     
-    public void addSynonym(KeywordTagDefinition keyword)
+    public void addSynonym(UUID synonymId)
     {
-        _synonyms.add(keyword);
-        keyword._synonyms.add(this);
+        _synonyms.add(synonymId);
+        
+        KeywordTagDefinition synonym = (KeywordTagDefinition) getStorageStrategy().getTagDefinition(synonymId);
+        synonym._synonyms.add(getId());
     }
 
     public Location getLocation()
@@ -338,9 +334,9 @@ public class KeywordTagDefinition extends TagDefinition
     {
         UUID[] ids = new UUID[_synonyms.size()];
         int i = 0;
-        for (TagDefinition s : _synonyms)
+        for (UUID s : _synonyms)
         {
-            ids[i++] = s.getId();
+            ids[i++] = s;
         }
         return ids;
     }
@@ -362,9 +358,10 @@ public class KeywordTagDefinition extends TagDefinition
 
     public void removeAllSynonyms()
     {
-        for (KeywordTagDefinition s : _synonyms)
+        for (UUID s : _synonyms)
         {
-            s._synonyms.remove(this);
+            KeywordTagDefinition synonym = (KeywordTagDefinition) getStorageStrategy().getTagDefinition(s);
+            synonym._synonyms.remove(this);
         }
         _synonyms.clear();
     }
@@ -379,6 +376,20 @@ public class KeywordTagDefinition extends TagDefinition
     {
         this.location = location;
         fireChangedEvent(new TagDefinitionEvent(this));
+    }
+
+    public void store() throws DatabaseStorageException
+    {
+        getStorageStrategy().storeTagDefinition(this);
+    }
+    
+    public void remove() throws DatabaseStorageException
+    {
+        if (parent != null)
+        {
+            parent.removeChild(this);
+            getStorageStrategy().removeTagDefinition(this);
+        }
     }
 
 }

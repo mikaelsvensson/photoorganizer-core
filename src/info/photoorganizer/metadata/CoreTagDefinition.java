@@ -2,10 +2,10 @@ package info.photoorganizer.metadata;
 
 import info.photoorganizer.util.I18n;
 
-import java.util.UUID;
-
+@Deprecated
 public enum CoreTagDefinition
 {
+    /*
     APERTURE(RealNumberTagDefinition.APERTURE),
     CAMERA(TextTagDefinition.CAMERA),
     COMMENT(TextTagDefinition.COMMENT),
@@ -13,7 +13,9 @@ public enum CoreTagDefinition
     RATING(IntegerNumberTagDefinition.RATING),
     SHUTTER_SPEED(RealNumberTagDefinition.SHUTTER_SPEED), 
     ROOT_KEYWORD(KeywordTagDefinition.ROOT_KEYWORD);
+    */
 
+    ;
     public TagDefinition getDefinition()
     {
         return _definition;

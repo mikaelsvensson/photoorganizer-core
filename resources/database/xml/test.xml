@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Database xmlns="http://photoorganizer.info/database"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://photoorganizer.info/database schema.xsd ">
+	<TagDefinitions>
+		<RealNumberTagDefinition id="id-36d86990-728a-4b3d-ab6c-ab6daadb7d3e"
+			name="aperture" />
+		<TextTagDefinition id="id-1622289b-f013-4243-960d-110b4da681c6"
+			name="camera" />
+		<TextTagDefinition id="id-646e958d-1d34-4d4d-be88-40f1680c6005"
+			name="comment" />
+		<TextTagDefinition id="id-ee43022f-aa37-4b29-b5a2-27d07aa388a5"
+			name="date taken" />
+		<IntegerNumberTagDefinition id="id-26be7a9d-1ef8-4d5c-b32b-2258cf761a8b"
+			name="rating" />
+		<RealNumberTagDefinition id="id-e54d8495-81b9-48b4-a106-0f8d6d4780ca"
+			name="shutter speed" />
+		<KeywordTagDefinition id="id-f4840997-b116-43e6-8256-6fbaefb63b3d"
+			name="root keyword" />
+		<KeywordTagDefinition id="id-ab014f5b-3ac7-484d-8604-444606e56bde"
+			name="People" />
+		<KeywordTagDefinition id="id-697391ab-ca2c-4082-8efa-db9dbbde36bf"
+			name="Locations" />
+		<KeywordTagDefinition id="id-d9ec96c6-3800-4d3a-91dc-e23f33e5b862"
+			name="Objects" />
+		<KeywordTagDefinition id="id-efdae686-cfaa-41b4-ad6e-8578a007f8d9"
+			name="John F Kennedy" synonyms="id-7322ee08-1ebe-4d74-91a4-41210722c8bc" />
+		<KeywordTagDefinition id="id-7322ee08-1ebe-4d74-91a4-41210722c8bc"
+			name="JKF" synonyms="id-efdae686-cfaa-41b4-ad6e-8578a007f8d9" />
+	</TagDefinitions>
+	<Images>
+		<Image url="http://demo/test.jpg">
+			<KeywordTag tagdefinition="id-d9ec96c6-3800-4d3a-91dc-e23f33e5b862" />
+			<TextTag tagdefinition="id-646e958d-1d34-4d4d-be88-40f1680c6005">a flower</TextTag>
+		</Image>
+	</Images>
+</Database>

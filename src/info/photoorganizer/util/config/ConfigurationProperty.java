@@ -2,6 +2,8 @@ package info.photoorganizer.util.config;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
@@ -23,12 +25,22 @@ public abstract class ConfigurationProperty<T extends Object>
             return (new File(System.getProperty("user.home"), "photoorganizer-database.xml")).getAbsolutePath();
         }
     });
-    public final static ConfigurationPropertyString dbPath = new ConfigurationPropertyString(new DefaultValueReader<String>()
+    
+    public final static ConfigurationPropertyURL dbPath = new ConfigurationPropertyURL(new DefaultValueReader<URL>()
     {
         @Override
-        public String get()
+        public URL get()
         {
-            return (new File(System.getProperty("user.home"), "photoorganizer-db.xml")).getAbsolutePath();
+            try
+            {
+                return (new File(System.getProperty("user.home"), "photoorganizer-db.xml")).toURI().toURL();
+            }
+            catch (MalformedURLException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
         }
     });
     

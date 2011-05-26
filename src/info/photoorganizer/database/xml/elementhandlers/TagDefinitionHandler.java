@@ -1,6 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
+import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
@@ -8,9 +8,9 @@ import org.w3c.dom.Element;
 
 public abstract class TagDefinitionHandler<T extends TagDefinition> extends DatabaseObjectHandler<T>
 {
-    public TagDefinitionHandler(Class<T> cls, XMLDatabaseConverter converter)
+    public TagDefinitionHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(cls, converter);
+        super(cls, storageStrategy);
     }
 
     private static String ATTRIBUTENAME_NAME = "name";

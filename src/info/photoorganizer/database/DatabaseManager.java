@@ -1,11 +1,6 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.CoreTagDefinition;
-import info.photoorganizer.metadata.KeywordTagDefinition;
-import info.photoorganizer.metadata.TagDefinition;
-import info.photoorganizer.util.I18n;
-
-import java.io.IOException;
+import java.net.URL;
 
 public class DatabaseManager
 {
@@ -39,43 +34,59 @@ public class DatabaseManager
         }
     }
     */
-    private DatabaseStorageContext context = new DatabaseStorageContext(DatabaseStoragePolicy.newDefaultStrategy());
+//    private DatabaseStorageContext context = new DatabaseStorageContext(DatabaseStoragePolicy.getStrategy(ConfigurationProperty.dbPath.get()));
     
     protected DatabaseManager()
     {
         
     }
     
+    public Database openDatabase(URL databaseUrl)
+    {
+        DatabaseStorageStrategy strategy = DatabaseStoragePolicy.getStrategy(databaseUrl);
+        if (null != strategy)
+        {
+            return new Database(strategy);
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
 //    private Document doc = null;
     
     private Database db = null;
     
-    public Database getDatabase()
-    {
-        if (null == db)
-        {
-            db = context.load();
-            initDatabase(db);
-        }
-        return db;
-    }
+//    public DatabaseStorageContext getContext()
+//    {
+//        return context;
+//    }
+//    public Database getDatabase()
+//    {
+//        if (null == db)
+//        {
+//            db = context.load();
+//            initDatabase(db);
+//        }
+//        return db;
+//    }
     
-    private void initDatabase(Database db)
-    {
-        System.out.println("Database keyword list is empty. Adding default keywords to database.");
-        
-        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_PEOPLE));
-        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_LOCATIONS));
-        db.getTagDefinitions().add(new KeywordTagDefinition(KEYWORD_OBJECTS));
-    }
+//    private void initDatabase(Database db)
+//    {
+//        System.out.println("Database keyword list is empty. Adding default keywords to database.");
+//        db.createRootKeyword(KEYWORD_PEOPLE).store();
+//        db.createRootKeyword(KEYWORD_LOCATIONS).store();
+//        db.createRootKeyword(KEYWORD_OBJECTS).store();
+//    }
 
-    public void saveDatabase() throws IOException
-    {
-        if (db != null)
-        {
-            context.store(db);
-        }
-    }
+//    public void saveDatabase() throws IOException
+//    {
+//        if (db != null)
+//        {
+//            context.store(db);
+//        }
+//    }
     /*
     public Document getDocument()
     {
@@ -148,5 +159,15 @@ public class DatabaseManager
         }
         return dbMngr;
     }
+
+//    public KeywordTagDefinition createKeywordTagDefinition(String string)
+//    {
+//        return new KeywordTagDefinition(context);
+//    }
+//
+//    public Image createImage()
+//    {
+//        return new Image(context);
+//    }
 
 }

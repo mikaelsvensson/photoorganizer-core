@@ -3,7 +3,6 @@ package info.photoorganizer.database;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseObjectHandler;
 import info.photoorganizer.metadata.Location;
 import info.photoorganizer.metadata.TagDefinition;
-import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.io.BufferedOutputStream;
@@ -12,10 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.xml.XMLConstants;

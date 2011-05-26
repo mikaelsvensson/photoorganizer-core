@@ -1,15 +1,10 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.util.Event;
 import info.photoorganizer.util.Event.EventExecuter;
-import info.photoorganizer.util.StringUtils;
-import info.photoorganizer.util.UUIDUtilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public abstract class TagDefinition extends DatabaseObject 
@@ -28,19 +23,19 @@ public abstract class TagDefinition extends DatabaseObject
     private boolean applicableToImageRegion = false;
     private String name = null;
 
-    public TagDefinition()
+    public TagDefinition(DatabaseStorageStrategy storageContext)
     {
-        this(null, null);
+        this(null, null, storageContext);
     }
 
-    public TagDefinition(String name)
+    public TagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
-        this(name, null);
+        this(name, null, storageContext);
     }
 
-    public TagDefinition(String name, UUID id)
+    public TagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(id);
+        super(id, storageContext);
         this.name = name;
     }
     
@@ -90,5 +85,10 @@ public abstract class TagDefinition extends DatabaseObject
     public String toString()
     {
         return name;
+    }
+
+    public void remove() throws DatabaseStorageException
+    {
+        getStorageStrategy().removeTagDefinition(this);
     }
 }

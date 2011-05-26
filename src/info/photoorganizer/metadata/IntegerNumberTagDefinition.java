@@ -1,26 +1,31 @@
 package info.photoorganizer.metadata;
 
-import java.util.UUID;
+import info.photoorganizer.database.DatabaseStorageStrategy;
 
-import org.w3c.dom.Element;
+import java.util.UUID;
 
 public class IntegerNumberTagDefinition extends ValueTagDefinition
 {
-    public static final IntegerNumberTagDefinition RATING = new IntegerNumberTagDefinition("rating", UUID.fromString("26be7a9d-1ef8-4d5c-b32b-2258cf761a8b"));
+//    public static final IntegerNumberTagDefinition RATING = new IntegerNumberTagDefinition("rating", UUID.fromString("26be7a9d-1ef8-4d5c-b32b-2258cf761a8b"));
 
-    public IntegerNumberTagDefinition()
+    public IntegerNumberTagDefinition(DatabaseStorageStrategy storageContext)
     {
-        super();
+        super(storageContext);
+        // TODO Auto-generated constructor stub
     }
 
-    public IntegerNumberTagDefinition(String name, UUID id)
+    public IntegerNumberTagDefinition(String name,
+            DatabaseStorageStrategy storageContext)
     {
-        super(name, id);
+        super(name, storageContext);
+        // TODO Auto-generated constructor stub
     }
 
-    public IntegerNumberTagDefinition(String name)
+    public IntegerNumberTagDefinition(String name, UUID id,
+            DatabaseStorageStrategy storageContext)
     {
-        super(name);
+        super(name, id, storageContext);
+        // TODO Auto-generated constructor stub
     }
 
 }

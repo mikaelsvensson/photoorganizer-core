@@ -1,12 +1,13 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.CoreTagDefinition;
+import info.photoorganizer.metadata.DefaultTagDefinition;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.metadata.TextTag;
 import info.photoorganizer.metadata.TextTagDefinition;
+import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,29 +17,53 @@ import org.junit.Test;
 
 public class DatabaseManagerTest
 {
+    private static final String KEYWORD_NAME = "demo";
+
     @Test
     public void addRemoveKeyword()
     {
+        addKeyword();
+        removeKeyword();
+        
+        Assert.assertTrue(true);
+    }
+    
+    public void addKeyword()
+    {
+        Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            {
-                Database database = DatabaseManager.getInstance().getDatabase();
-                KeywordTagDefinition keyword = new KeywordTagDefinition("demo");
-                database.getTagDefinitions().add(keyword);
-                DatabaseManager.getInstance().saveDatabase();
-            }
-            {
-                Database database = DatabaseManager.getInstance().getDatabase();
-                TagDefinition keyword = database.getTagDefinitionByName("demo");
-                database.removeTagDefinition(keyword);
-                DatabaseManager.getInstance().saveDatabase();
-            }
+            KeywordTagDefinition keyword = database.createRootKeyword(KEYWORD_NAME);
+            keyword.store();
         }
-        catch (IOException e)
+        catch (DatabaseStorageException e)
         {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Assert.assertTrue(true);
+        finally
+        {
+            database.close();
+        }
+    }
+    
+    public void removeKeyword()
+    {
+        Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
+        try
+        {
+            TagDefinition keyword = database.getTagDefinition(KEYWORD_NAME);
+            keyword.remove();
+        }
+        catch (DatabaseStorageException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        finally
+        {
+            database.close();
+        }
     }
     
     @Test
@@ -47,24 +72,25 @@ public class DatabaseManagerTest
         try
         {
             {
-                Database database = DatabaseManager.getInstance().getDatabase();
+                Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
                 
-                KeywordTagDefinition jfk = new KeywordTagDefinition("JKF");
-                KeywordTagDefinition johnFKennedy = new KeywordTagDefinition("John F Kennedy");
-                johnFKennedy.addSynonym(jfk);
+                KeywordTagDefinition jfk = database.createRootKeyword("JKF");
+                KeywordTagDefinition johnFKennedy = database.createRootKeyword("John F Kennedy");
+                johnFKennedy.addSynonym(jfk.getId());
                 
-                database.getTagDefinitions().add(johnFKennedy);
-                database.getTagDefinitions().add(jfk);
+                jfk.store();
+                johnFKennedy.store();
 
-                DatabaseManager.getInstance().saveDatabase();
+//                DatabaseManager.getInstance().saveDatabase();
+                
+                Assert.assertTrue(true);
             }
         }
-        catch (IOException e)
+        catch (DatabaseStorageException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Assert.assertTrue(true);
     }
     
     @Test
@@ -73,18 +99,18 @@ public class DatabaseManagerTest
         try
         {
             {
-                Database database = DatabaseManager.getInstance().getDatabase();
+                Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
                 
-                Image img = new Image();
+                Image img = database.createImage();
                 img.setUrl(new URL("http://demo/test.jpg"));
                 
-                TagDefinition tagDefinition = database.getTagDefinitionByName(DatabaseManager.KEYWORD_OBJECTS);
+                TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
                 if (tagDefinition instanceof KeywordTagDefinition)
                 {
                     img.getTags().add(new KeywordTag((KeywordTagDefinition) tagDefinition));
                 }
                 
-                TagDefinition commentTagDefinition = database.getTagDefinitionById(CoreTagDefinition.COMMENT.getDefinition().getId());
+                TagDefinition commentTagDefinition = database.getTagDefinition(DefaultTagDefinition.COMMENT.getId());
                 if (commentTagDefinition instanceof TextTagDefinition)
                 {
                     TextTag commentTag = new TextTag((TextTagDefinition) commentTagDefinition);
@@ -93,9 +119,11 @@ public class DatabaseManagerTest
                     img.getTags().add(commentTag);
                 }
                 
-                database.getImages().add(img);
+                img.store();
                 
-                DatabaseManager.getInstance().saveDatabase();
+//                DatabaseManager.getInstance().saveDatabase();
+                
+                Assert.assertTrue(true);
             }
         }
         catch (IOException e)
@@ -103,7 +131,11 @@ public class DatabaseManagerTest
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Assert.assertTrue(true);
+        catch (DatabaseStorageException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
     }
 }

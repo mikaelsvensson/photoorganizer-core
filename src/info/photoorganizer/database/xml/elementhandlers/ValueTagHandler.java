@@ -1,14 +1,14 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
+import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.ValueTag;
 
 public abstract class ValueTagHandler<T extends ValueTag> extends TagHandler<T>
 {
 
-    private ValueTagHandler(Class<T> cls, XMLDatabaseConverter converter)
+    private ValueTagHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(cls, converter);
+        super(cls, storageStrategy);
     }
 
 //    @Override

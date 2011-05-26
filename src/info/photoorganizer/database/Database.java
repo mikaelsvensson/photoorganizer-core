@@ -6,8 +6,6 @@ import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,14 +13,14 @@ import java.util.UUID;
 
 public class Database extends DatabaseObject
 {
-    public Database()
+    public Database(DatabaseStorageStrategy storageContext)
     {
-        this(null);
+        this(null, storageContext);
     }
     
-    public Database(UUID id)
+    public Database(UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(id);
+        super(id, storageContext);
 //        setRootKeyword(null);
         initTagDefinitions();
     }
@@ -46,6 +44,27 @@ public class Database extends DatabaseObject
         }
     }
     
+    public Iterator<Image> getImages()
+    {
+        return getStorageStrategy().getImages();
+    }
+    
+    public Iterator<TagDefinition> getTagDefinitions()
+    {
+        return getStorageStrategy().getTagDefinitions();
+    }
+    
+    public TagDefinition getTagDefinition(String name)
+    {
+        return getStorageStrategy().getTagDefinition(name);
+    }
+    
+    public TagDefinition getTagDefinition(UUID id)
+    {
+        return getStorageStrategy().getTagDefinition(id);
+    }
+    
+    /*
     public List<Image> getImages()
     {
         return _images;
@@ -125,7 +144,7 @@ public class Database extends DatabaseObject
             ((KeywordTagDefinition)toBeRemoved).remove();
         }
     }
-    
+    */
     private String name = null;
 
     public String getName()
@@ -137,7 +156,17 @@ public class Database extends DatabaseObject
     {
         this.name = name;
     }
-
+    
+    public KeywordTagDefinition createRootKeyword(String name)
+    {
+        return new KeywordTagDefinition(name, getStorageStrategy());
+    }
+    
+    public Image createImage()
+    {
+        return new Image(getStorageStrategy());
+    }
+    
 //    public KeywordTagDefinition getRootKeyword()
 //    {
 //        return rootKeyword;
@@ -156,5 +185,9 @@ public class Database extends DatabaseObject
 //        }
 //        return null;
 //    }
-    
+
+    public void close()
+    {
+        getStorageStrategy().close();
+    }
  }

@@ -1,6 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
+import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.util.XMLUtilities;
@@ -11,9 +11,9 @@ import org.w3c.dom.Element;
 
 public class ImageHandler extends ElementHandler<Image>
 {
-    public ImageHandler(XMLDatabaseConverter converter)
+    public ImageHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(Image.class, converter);
+        super(Image.class, storageStrategy);
     }
 
     private static String ATTRIBUTENAME_URL = "url";
@@ -23,7 +23,7 @@ public class ImageHandler extends ElementHandler<Image>
     {
         o.setUrl(XMLUtilities.getURLAttribute(el, ATTRIBUTENAME_URL, null));
         
-        Iterator<Tag> i = _converter.fromElementChildren(el, Tag.class).iterator();
+        Iterator<Tag> i = _storageStrategy.fromElementChildren(el, Tag.class).iterator();
         while (i.hasNext())
         {
             o.getTags().add(i.next());
@@ -37,9 +37,15 @@ public class ImageHandler extends ElementHandler<Image>
     {
         XMLUtilities.setURLAttribute(el, ATTRIBUTENAME_URL, o.getUrl());
         
-        XMLUtilities.appendChildren(el, _converter.toElements(el.getOwnerDocument(), o.getTags()));
+        XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getTags()));
 
         super.writeElement(o, el);
+    }
+
+    @Override
+    public Image createObject(Element el)
+    {
+        return new Image(_storageStrategy);
     }
 
 }

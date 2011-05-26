@@ -1,33 +1,40 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import java.util.UUID;
-
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
+import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
-import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.ImageRegion;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
+import java.util.UUID;
+
 import org.w3c.dom.Element;
 
 public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
 {
-    private static String ATTRIBUTENAME_DEFINITION = "tagdefinition";
+    public static String ATTRIBUTENAME_DEFINITION = "tagdefinition";
 
     private static final String ATTRIBUTENAME_REGION = "region";
 
-    public TagHandler(Class<T> cls, XMLDatabaseConverter converter)
+    public TagHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(cls, converter);
+        super(cls, storageStrategy);
     }
     
     @Override
     public void readElement(T o, Element el)
     {
-        UUID uuid = XMLUtilities.getUUIDAttribute(el, ATTRIBUTENAME_DEFINITION);
         
+        TagDefinition tagDefinition = _storageStrategy.getTagDefinition(el, ATTRIBUTENAME_DEFINITION);
+        o.setDefinition(tagDefinition);
+        if (tagDefinition.isApplicableToImageRegion())
+        {
+            o.setRegion(ImageRegion.valueOf(el.getAttribute(ATTRIBUTENAME_REGION)));
+        }
+        
+        /*
+        UUID uuid = XMLUtilities.getUUIDAttribute(el, ATTRIBUTENAME_DEFINITION);
         if (null != uuid)
         {
             DatabaseObject databaseObject = _processedObjects.get(uuid);
@@ -42,7 +49,7 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
                 }
             }
         }
-        
+        */
         super.readElement(o, el);
     }
     

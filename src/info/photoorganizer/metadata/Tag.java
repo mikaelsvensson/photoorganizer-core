@@ -31,4 +31,10 @@ public abstract class Tag<T extends TagDefinition>
     {
         _region = region;
     }
+
+    @Override
+    public String toString()
+    {
+        return _definition.getName() + " (" + getClass().getSimpleName() + ")";
+    }
 }

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://photoorganizer.info/database" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:po="http://photoorganizer.info/database">
+
+    
+    
+    <complexType name="IntegerNumberTag">
+    	<complexContent>
+    		<extension base="po:ValueTag">
+    			<attribute name="value" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="IntegerNumberTagDefinition">
+    	<complexContent>
+    		<extension base="po:ValueTagDefinition"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="KeywordTag">
+    	<complexContent>
+    		<extension base="po:Tag"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="KeywordTagDefinition">
+    	<complexContent>
+    		<extension base="po:TagDefinition">
+    			<sequence>
+    				<element name="KeywordTagDefinition"
+    					type="po:KeywordTagDefinition" maxOccurs="unbounded" minOccurs="0">
+    				</element>
+    			</sequence>
+    			<attribute name="synonyms" type="IDREFS"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="RealNumberTag">
+    	<complexContent>
+    		<extension base="po:ValueTag">
+    			<attribute name="value" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="RealNumberTagDefinition">
+    	<complexContent>
+    		<extension base="po:ValueTagDefinition"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="Tag" abstract="true">
+    	<simpleContent>
+    		<extension base="string">
+    			<attribute name="tagdefinition" type="IDREF"></attribute>
+    			<attribute name="region" type="string"></attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+    <complexType name="TagDefinition" abstract="true">
+    	<complexContent>
+    		<extension base="po:DatabaseObject">
+    			<attribute name="name" type="string" use="required"></attribute>
+    			<attribute name="applicabletoimageregion" type="boolean" use="optional"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="TextTag">
+    	<complexContent>
+    		<extension base="po:ValueTag">
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="TextTagDefinition">
+    	<complexContent>
+    		<extension base="po:ValueTagDefinition"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="ValueTag" abstract="true">
+    	<complexContent>
+    		<extension base="po:Tag"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="ValueTagDefinition">
+    	<complexContent>
+    		<extension base="po:TagDefinition"></extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="Database">
+    	<complexContent>
+    		<extension base="po:DatabaseObject">
+    			<sequence>
+
+                    <element name="TagDefinitions" type="po:TagDefinitions" maxOccurs="1" minOccurs="0">
+    					</element>
+                    <element name="Images" type="po:Images" maxOccurs="1" minOccurs="0">
+    					</element>
+                </sequence>
+    			<attribute name="name" type="string" use="optional"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <complexType name="DatabaseObject">
+    	<attribute name="id" type="ID"></attribute>
+    </complexType>
+
+    <complexType name="Image">
+    	<complexContent>
+    		<extension base="po:DatabaseObject">
+    			<sequence maxOccurs="unbounded" minOccurs="0">
+                    <choice>
+                    	<element name="KeywordTag"
+                    		type="po:KeywordTag">
+                    	</element>
+                    	<element name="RealNumberTag"
+                    		type="po:RealNumberTag">
+                    	</element>
+                    	<element name="IntegerNumberTag"
+                    		type="po:IntegerNumberTag">
+                    	</element>
+                    	<element name="TextTag" type="po:TextTag"></element>
+                    </choice>
+    			</sequence>
+    			<attribute name="url" type="string"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <element name="Database" type="po:Database"></element>
+
+
+
+
+
+
+    <complexType name="Images">
+    	<sequence>
+    		<element name="Image" type="po:Image" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="TagDefinitions">
+    	<sequence maxOccurs="unbounded" minOccurs="0">
+    		<choice>
+    			<element name="KeywordTagDefinition" type="po:KeywordTagDefinition"></element>
+    			<element name="IntegerNumberTagDefinition"
+    				type="po:IntegerNumberTagDefinition">
+    			</element>
+    			<element name="RealNumberTagDefinition" type="po:RealNumberTagDefinition"></element>
+    			<element name="TextTagDefinition" type="po:TextTagDefinition"></element>
+    		</choice>
+    	</sequence>
+    </complexType>
+</schema>

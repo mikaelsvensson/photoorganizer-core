@@ -1,5 +1,8 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.DatabaseStorageStrategy;
+
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,14 +14,14 @@ public class Image extends DatabaseObject
     private List<Tag<? extends TagDefinition>> _tags = new LinkedList<Tag<? extends TagDefinition>>();
     private URL _url = null;
 
-    public Image()
+    public Image(DatabaseStorageStrategy storageContext)
     {
-        super(null);
+        super(null, storageContext);
     }
     
-    public Image(UUID id)
+    public Image(UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(id);
+        super(id, storageContext);
     }
 
     public List<Tag<? extends TagDefinition>> getTags()
@@ -34,6 +37,11 @@ public class Image extends DatabaseObject
     public void setUrl(URL url)
     {
         _url = url;
+    }
+
+    public void store() throws DatabaseStorageException
+    {
+        getStorageStrategy().storeImage(this);
     }
 
 }

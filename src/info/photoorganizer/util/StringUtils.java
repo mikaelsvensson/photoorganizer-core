@@ -1,7 +1,5 @@
 package info.photoorganizer.util;
 
-import info.photoorganizer.metadata.TagDefinition;
-
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;

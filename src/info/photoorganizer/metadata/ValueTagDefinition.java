@@ -1,23 +1,25 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.database.DatabaseStorageStrategy;
+
 import java.util.UUID;
 
 public abstract class ValueTagDefinition extends TagDefinition
 {
     
-    public ValueTagDefinition()
+    public ValueTagDefinition(DatabaseStorageStrategy storageContext)
     {
-        super();
+        super(storageContext);
     }
 
-    public ValueTagDefinition(String name)
+    public ValueTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
-        super(name);
+        super(name, storageContext);
     }
 
-    public ValueTagDefinition(String name, UUID id)
+    public ValueTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(name, id);
+        super(name, id, storageContext);
     }
     
 }

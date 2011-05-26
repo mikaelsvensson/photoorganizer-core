@@ -1,28 +1,22 @@
 package info.photoorganizer.database.xml;
 
 import info.photoorganizer.database.Database;
-import info.photoorganizer.database.xml.elementhandlers.DatabaseHandler;
-import info.photoorganizer.database.xml.elementhandlers.DatabaseObjectHandler;
-import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
-import info.photoorganizer.database.xml.elementhandlers.ImageHandler;
-import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
-import info.photoorganizer.metadata.DatabaseObject;
-import info.photoorganizer.util.XMLUtilities;
 
-import java.util.LinkedList;
+import java.util.Iterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class XMLDatabaseConverter
+public class XMLDatabaseConverter_old
 {
+    private XMLDatabaseStorageStrategy _strategy = null;
+    
+    public XMLDatabaseConverter_old(XMLDatabaseStorageStrategy strategy)
+    {
+        super();
+        _strategy = strategy;
+    }
+    /*
     private final ElementHandler[] HANDLERS = new ElementHandler[] { 
             new ImageHandler(this),
             
@@ -38,9 +32,11 @@ public class XMLDatabaseConverter
             
             new DatabaseHandler(this) 
             };
-    
+    */
     public <T extends Object> T fromElement(Element el, Class<T> cls)
     {
+        return _strategy.fromElement(el, cls);
+        /*
         DatabaseObject res = null;
         String name = el.getLocalName();
         for (ElementHandler handler : HANDLERS)
@@ -51,7 +47,9 @@ public class XMLDatabaseConverter
                 {
                     if (cls.isAssignableFrom(handler.getDatabaseObjectClass()))
                     {
-                        res = (DatabaseObject) handler.getDatabaseObjectClass().newInstance();
+                        Constructor<? extends Object> constructor = handler.getDatabaseObjectClass().getDeclaredConstructor(DatabaseStorageStrategy.class);
+                        res = (DatabaseObject) constructor.newInstance(_strategy);
+                        //res = (DatabaseObject) handler.getDatabaseObjectClass().newInstance();
                         handler.readElement(res, el);
                         return (T) res;
                     }
@@ -64,11 +62,32 @@ public class XMLDatabaseConverter
                 {
                     e.printStackTrace();
                 }
+                catch (SecurityException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (NoSuchMethodException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (IllegalArgumentException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (InvocationTargetException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         return null;
+        */
     }
-    
+    /*
     private void postProcessHandlers(Database db)
     {
         for (ElementHandler handler : HANDLERS)
@@ -84,9 +103,11 @@ public class XMLDatabaseConverter
             handler.preProcess();
         }
     }
-
+    */
     public Element toElement(Document owner, Object o)
     {
+        return _strategy.toElement(owner, o);
+        /*
         for (ElementHandler handler : HANDLERS)
         {
             Element el = handler.createElement(o, owner);
@@ -96,10 +117,13 @@ public class XMLDatabaseConverter
             }
         }
         return null;
+        */
     }
     
     public <T extends Object> Iterable<T> fromElementChildren(Element el, Class<T> cls)
     {
+        return _strategy.fromElementChildren(el, cls);
+        /*
         LinkedList<T> res = new LinkedList<T>();
      
         if (null != el)
@@ -110,23 +134,40 @@ public class XMLDatabaseConverter
             }
         }
         return res;
+        */
     }
     
     public Iterable<Element> toElements(Document owner, Iterable<? extends Object> objects)
     {
+        return _strategy.toElements(owner, objects);
+        /*
         LinkedList<Element> res = new LinkedList<Element>();
         for (Object o : objects)
         {
             res.add(toElement(owner, o));
         }
         return res;
+        */
+    }
+    
+    public Iterable<Element> toElements(Document owner, Iterator<? extends Object> objects)
+    {
+        return _strategy.toElements(owner, objects);
+        /*
+        LinkedList<Element> res = new LinkedList<Element>();
+        while (objects.hasNext())
+        {
+            res.add(toElement(owner, objects.next()));
+        }
+        return res;
+        */
     }
 
     public Database fromDocument(Document doc)
     {
-        preProcessHandlers();
+//        preProcessHandlers();
         Database db = fromElement(doc.getDocumentElement(), Database.class);
-        postProcessHandlers(db);
+//        postProcessHandlers(db);
         return db;
     }
     

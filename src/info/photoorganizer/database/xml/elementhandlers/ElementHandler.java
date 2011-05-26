@@ -1,7 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.Database;
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
 
@@ -12,7 +11,7 @@ import java.util.UUID;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ElementHandler<T extends Object>
+public abstract class ElementHandler<T extends Object>
 {
     
     protected Map<UUID, DatabaseObject> _processedObjects = null;
@@ -27,15 +26,15 @@ public class ElementHandler<T extends Object>
         return createElement(name, elementInDocument.getOwnerDocument());
     }
 
-    protected XMLDatabaseConverter _converter = null;
+    protected XMLDatabaseStorageStrategy _storageStrategy = null;
 
     private Class<T> _objectClass = null;
 
-    public ElementHandler(Class<T> objectClass, XMLDatabaseConverter converter)
+    public ElementHandler(Class<T> objectClass, XMLDatabaseStorageStrategy storageStrategy)
     {
         super();
         _objectClass = objectClass;
-        _converter = converter;
+        _storageStrategy = storageStrategy;
     }
 
     public Element createElement(T o, Document owner)
@@ -66,6 +65,8 @@ public class ElementHandler<T extends Object>
     {
         _processedObjects = new HashMap<UUID, DatabaseObject>();
     }
+    
+    public abstract T createObject(Element el);
 
     public void readElement(T o, Element el)
     {

@@ -1,11 +1,14 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.util.UUIDUtilities;
 
 import java.util.UUID;
 
 public class DatabaseObject
 {
+    private DatabaseStorageStrategy _storageStrategy = null;
+    
     @Override
     public int hashCode()
     {
@@ -37,10 +40,16 @@ public class DatabaseObject
 
     private UUID id = null;
 
-    public DatabaseObject(UUID id)
+    public DatabaseObject(UUID id, DatabaseStorageStrategy storageStrategy)
     {
         super();
         this.id = (id != null ? id : UUIDUtilities.generateUuid());
+        this._storageStrategy = storageStrategy;
+    }
+
+    protected DatabaseStorageStrategy getStorageStrategy()
+    {
+        return _storageStrategy;
     }
 
     public UUID getId()
@@ -52,5 +61,6 @@ public class DatabaseObject
     {
         this.id = id;
     }
+
 
 }

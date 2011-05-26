@@ -1,13 +1,8 @@
 package info.photoorganizer.util.command;
 
 
-import java.awt.Component;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
-
-import javax.swing.AbstractButton;
 
 public class CommandManager
 {

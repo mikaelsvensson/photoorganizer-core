@@ -1,12 +1,8 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.Database;
-import info.photoorganizer.database.xml.XMLDatabaseConverter;
-import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.TagDefinition;
+import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.util.XMLUtilities;
-
-import java.util.Iterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,12 +11,12 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
 {
     private static final String ATTRIBUTENAME_NAME = "name";
 
-    private static final String ELEMENTNAME_TAGDEFINITIONS = "TagDefinitions";
-    private static final String ELEMENTNAME_IMAGES = "Images";
+    public static final String ELEMENTNAME_TAGDEFINITIONS = "TagDefinitions";
+    public static final String ELEMENTNAME_IMAGES = "Images";
 
-    public DatabaseHandler(XMLDatabaseConverter converter)
+    public DatabaseHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(Database.class, converter);
+        super(Database.class, storageStrategy);
     }
 
     @Override
@@ -29,9 +25,9 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         
         o.setName(XMLUtilities.getTextAttribute(el, ATTRIBUTENAME_NAME, "untitled"));
         
-        readTagDefinitionElements(o, el);
+//        readTagDefinitionElements(o, el);
         
-        readImageElements(o, el);
+//        readImageElements(o, el);
         
 //        Iterator<KeywordTagDefinition> keywords = _converter.fromElementChildren(el, KeywordTagDefinition.class).iterator();
 //        if (keywords.hasNext())
@@ -42,23 +38,23 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         super.readElement(o, el);
     }
 
-    private void readTagDefinitionElements(Database o, Element el)
-    {
-        Iterator<TagDefinition> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_TAGDEFINITIONS), TagDefinition.class).iterator();
-        while (i.hasNext())
-        {
-            o.getTagDefinitions().add(i.next());
-        }
-    }
+//    private void readTagDefinitionElements(Database o, Element el)
+//    {
+//        Iterator<TagDefinition> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_TAGDEFINITIONS), TagDefinition.class).iterator();
+//        while (i.hasNext())
+//        {
+//            o.getTagDefinitions().add(i.next());
+//        }
+//    }
 
-    private void readImageElements(Database o, Element el)
-    {
-        Iterator<Image> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_IMAGES), Image.class).iterator();
-        while (i.hasNext())
-        {
-            o.getImages().add(i.next());
-        }
-    }
+//    private void readImageElements(Database o, Element el)
+//    {
+//        Iterator<Image> i = _converter.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_IMAGES), Image.class).iterator();
+//        while (i.hasNext())
+//        {
+//            o.getImages().add(i.next());
+//        }
+//    }
     
     @Override
     public void writeElement(Database o, Element el)
@@ -69,11 +65,11 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         
         Element tagDefinitionsEl = createElement(ELEMENTNAME_TAGDEFINITIONS, owner);
         el.appendChild(tagDefinitionsEl);
-        XMLUtilities.appendChildren(tagDefinitionsEl, _converter.toElements(owner, o.getTagDefinitions()));
+        XMLUtilities.appendChildren(tagDefinitionsEl, _storageStrategy.toElements(owner, o.getTagDefinitions()));
         
         Element imagesEl = createElement(ELEMENTNAME_IMAGES, owner);
         el.appendChild(imagesEl);
-        XMLUtilities.appendChildren(imagesEl, _converter.toElements(owner, o.getImages()));
+        XMLUtilities.appendChildren(imagesEl, _storageStrategy.toElements(owner, o.getImages()));
         
         
 //        KeywordTagDefinition rootKeyword = o.getRootKeyword();
@@ -83,6 +79,12 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
 //        }
         
         super.writeElement(o, el);
+    }
+
+    @Override
+    public Database createObject(Element el)
+    {
+        return new Database(_storageStrategy);
     }
     
 }
