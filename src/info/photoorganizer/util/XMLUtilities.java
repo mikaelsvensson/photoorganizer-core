@@ -303,36 +303,36 @@ public class XMLUtilities
         return defaultValue;
     }
     
-    public static UUID getUUIDAttribute(Element el, String attr)
-    {
-        try
-        {
-            return UUID.fromString(el.getAttribute(attr));
-        }
-        catch (IllegalArgumentException e)
-        {
-            return null;
-        }
-    }
-    
-    public static UUID[] getUUIDsAttribute(Element el, String attr)
-    {
-        String value = el.getAttribute(attr);
-        String[] ids = StringUtils.split(value, ' ');
-        UUID[] res = new UUID[ids.length];
-        int i=0;
-        for (String id : ids)
-        {
-            try
-            {
-                res[i++] = UUID.fromString(id);
-            }
-            catch (IllegalArgumentException e)
-            {
-            }
-        }
-        return res;
-    }
+//    public static UUID getUUIDAttribute(Element el, String attr)
+//    {
+//        try
+//        {
+//            return UUID.fromString(el.getAttribute(attr));
+//        }
+//        catch (IllegalArgumentException e)
+//        {
+//            return null;
+//        }
+//    }
+//    
+//    public static UUID[] getUUIDsAttribute(Element el, String attr)
+//    {
+//        String value = el.getAttribute(attr);
+//        String[] ids = StringUtils.split(value, ' ');
+//        UUID[] res = new UUID[ids.length];
+//        int i=0;
+//        for (String id : ids)
+//        {
+//            try
+//            {
+//                res[i++] = UUID.fromString(id);
+//            }
+//            catch (IllegalArgumentException e)
+//            {
+//            }
+//        }
+//        return res;
+//    }
     
     public static void setBooleanAttribute(Element el, String attr, boolean value)
     {
@@ -365,21 +365,29 @@ public class XMLUtilities
         }
     }
     
-    public static void setUUIDAttribute(Element el, String attr, UUID value)
-    {
-        if (value != null)
-        {
-            el.setAttribute(attr, value.toString());
-        }
-    }
-    
-    public static void setUUIDsAttribute(Element el, String attr, UUID[] values)
-    {
-        if (values != null)
-        {
-            el.setAttribute(attr, StringUtils.join(values, ' '));
-        }
-    }
+//    public static void setUUIDAttribute(Element el, String attr, UUID value)
+//    {
+//        if (value != null)
+//        {
+//            el.setAttribute(attr, value.toString());
+//        }
+//        else
+//        {
+//            el.removeAttribute(attr);
+//        }
+//    }
+//    
+//    public static void setUUIDsAttribute(Element el, String attr, UUID[] values)
+//    {
+//        if (values != null && values.length > 0)
+//        {
+//            el.setAttribute(attr, StringUtils.join(values, ' '));
+//        }
+//        else
+//        {
+//            el.removeAttribute(attr);
+//        }
+//    }
     
     public static void appendChildren(Element el, Iterable<Element> children)
     {

@@ -186,7 +186,7 @@ public class Database extends DatabaseObject
 //        return null;
 //    }
 
-    public void close()
+    public void close() throws DatabaseStorageException
     {
         getStorageStrategy().close();
     }

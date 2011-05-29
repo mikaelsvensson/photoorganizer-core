@@ -43,7 +43,15 @@ public class DatabaseManagerTest
         }
         finally
         {
-            database.close();
+            try
+            {
+                database.close();
+            }
+            catch (DatabaseStorageException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
     
@@ -62,69 +70,84 @@ public class DatabaseManagerTest
         }
         finally
         {
-            database.close();
+            try
+            {
+                database.close();
+            }
+            catch (DatabaseStorageException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
     
     @Test
     public void addSynonyms()
     {
+        Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            {
-                Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
-                
-                KeywordTagDefinition jfk = database.createRootKeyword("JKF");
-                KeywordTagDefinition johnFKennedy = database.createRootKeyword("John F Kennedy");
-                johnFKennedy.addSynonym(jfk.getId());
-                
-                jfk.store();
-                johnFKennedy.store();
+            
+            KeywordTagDefinition jfk = database.createRootKeyword("JKF");
+            KeywordTagDefinition johnFKennedy = database.createRootKeyword("John F Kennedy");
+            
+            KeywordTagDefinition.addSynonym(jfk, johnFKennedy, false);
+            
+            jfk.store();
+            johnFKennedy.store();
 
 //                DatabaseManager.getInstance().saveDatabase();
-                
-                Assert.assertTrue(true);
-            }
+            
         }
         catch (DatabaseStorageException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        finally
+        {
+            try
+            {
+                database.close();
+            }
+            catch (DatabaseStorageException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        Assert.assertTrue(true);
     }
     
     @Test
     public void addImage()
     {
+        Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
+            Image img = database.createImage();
+            img.setUrl(new URL("http://demo/test.jpg"));
+            
+            TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
+            if (tagDefinition instanceof KeywordTagDefinition)
             {
-                Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
-                
-                Image img = database.createImage();
-                img.setUrl(new URL("http://demo/test.jpg"));
-                
-                TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
-                if (tagDefinition instanceof KeywordTagDefinition)
-                {
-                    img.getTags().add(new KeywordTag((KeywordTagDefinition) tagDefinition));
-                }
-                
-                TagDefinition commentTagDefinition = database.getTagDefinition(DefaultTagDefinition.COMMENT.getId());
-                if (commentTagDefinition instanceof TextTagDefinition)
-                {
-                    TextTag commentTag = new TextTag((TextTagDefinition) commentTagDefinition);
-                    commentTag.setValue("a flower");
-                    
-                    img.getTags().add(commentTag);
-                }
-                
-                img.store();
-                
-//                DatabaseManager.getInstance().saveDatabase();
-                
-                Assert.assertTrue(true);
+                img.addTag(new KeywordTag((KeywordTagDefinition) tagDefinition));
             }
+            
+            TagDefinition commentTagDefinition = database.getTagDefinition(DefaultTagDefinition.COMMENT.getId());
+            if (commentTagDefinition instanceof TextTagDefinition)
+            {
+                TextTag commentTag = new TextTag((TextTagDefinition) commentTagDefinition);
+                commentTag.setValue("a flower");
+                
+                img.addTag(commentTag);
+            }
+            
+            img.store();
+            
+//                DatabaseManager.getInstance().saveDatabase();
+            
         }
         catch (IOException e)
         {
@@ -136,6 +159,18 @@ public class DatabaseManagerTest
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+        finally
+        {
+            try
+            {
+                database.close();
+            }
+            catch (DatabaseStorageException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        Assert.assertTrue(true);
     }
 }

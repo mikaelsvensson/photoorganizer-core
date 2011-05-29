@@ -1,8 +1,10 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.Database;
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
+import info.photoorganizer.util.XMLUtilities;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +52,11 @@ public abstract class ElementHandler<T extends Object>
             return null;
         }
     }
+    
+    protected Element createElement()
+    {
+        return _storageStrategy.createElement(_objectClass.getSimpleName());
+    }
 
     public Class<T> getDatabaseObjectClass()
     {
@@ -74,6 +81,32 @@ public abstract class ElementHandler<T extends Object>
 
     public void writeElement(T o, Element el)
     {
+    }
+    
+    public abstract void storeElement(T o) throws DatabaseStorageException;
+    
+    protected void storeElementInRoot(T o, String rootElementName) throws DatabaseStorageException
+    {
+        if (o instanceof DatabaseObject)
+        {
+            Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), rootElementName);
+            
+            Element newElement = createElement();
+            Element currentEl = _storageStrategy.getDatabaseObjectElement((DatabaseObject) o);
+            if (currentEl != null)
+            {
+                rootKeywordContainerEl.replaceChild(newElement, currentEl);
+            }
+            else
+            {
+                rootKeywordContainerEl.appendChild(newElement);
+            }
+            writeElement(o, newElement);
+        }
+        else
+        {
+            throw new DatabaseStorageException("Implementation only supports DatabaseObject instances.");
+        }
     }
 
 }

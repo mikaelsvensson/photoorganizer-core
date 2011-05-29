@@ -20,7 +20,7 @@ public abstract class DatabaseObjectHandler<T extends DatabaseObject> extends El
     @Override
     public void readElement(T o, Element el)
     {
-        UUID uuid = XMLUtilities.getUUIDAttribute(el, ATTRIBUTENAME_ID);
+        UUID uuid = _storageStrategy.getUUIDAttribute(el, ATTRIBUTENAME_ID);
         o.setId(uuid);
         
         //_processedObjects.put(uuid, o);
@@ -31,7 +31,7 @@ public abstract class DatabaseObjectHandler<T extends DatabaseObject> extends El
     @Override
     public void writeElement(T o, Element el)
     {
-        XMLUtilities.setUUIDAttribute(el, ATTRIBUTENAME_ID, o.getId());
+        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_ID, o.getId());
         
         super.writeElement(o, el);
     }

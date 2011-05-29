@@ -4,6 +4,7 @@ import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
 
 import java.net.URL;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +25,19 @@ public class Image extends DatabaseObject
         super(id, storageContext);
     }
 
-    public List<Tag<? extends TagDefinition>> getTags()
+    public Iterator<Tag<? extends TagDefinition>> getTags()
     {
-        return _tags;
+        return _tags.iterator();
+    }
+    
+    public void addTag(Tag<? extends TagDefinition> tag)
+    {
+        _tags.add(tag);
+    }
+    
+    public void removeTag(Tag<? extends TagDefinition> tag)
+    {
+        _tags.remove(tag);
     }
 
     public URL getUrl()
@@ -43,5 +54,21 @@ public class Image extends DatabaseObject
     {
         getStorageStrategy().storeImage(this);
     }
-
+    
+    public void remove() throws DatabaseStorageException
+    {
+        getStorageStrategy().removeImage(this);
+    }
+    
+    public boolean hasTag(TagDefinition tagDefinition)
+    {
+        for (Tag<? extends TagDefinition> tag : _tags)
+        {
+            if (tag.getDefinition().equals(tagDefinition))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

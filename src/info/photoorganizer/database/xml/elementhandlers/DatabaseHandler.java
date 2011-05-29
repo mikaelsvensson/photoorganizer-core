@@ -1,6 +1,9 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
+import javax.naming.OperationNotSupportedException;
+
 import info.photoorganizer.database.Database;
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.util.XMLUtilities;
 
@@ -59,7 +62,7 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     @Override
     public void writeElement(Database o, Element el)
     {
-        XMLUtilities.setUUIDAttribute(el, ATTRIBUTENAME_NAME, o.getId());
+        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_NAME, o.getId());
         
         Document owner = el.getOwnerDocument();
         
@@ -85,6 +88,12 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     public Database createObject(Element el)
     {
         return new Database(_storageStrategy);
+    }
+
+    @Override
+    public void storeElement(Database o) throws DatabaseStorageException
+    {
+        throw new DatabaseStorageException("Feature to store database not implemented. Store each database item, such as keyword definitions and images, separately.");
     }
     
 }

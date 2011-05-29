@@ -1,6 +1,7 @@
 package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 
 import java.util.Iterator;
@@ -12,19 +13,19 @@ public interface DatabaseStorageStrategy
     public Iterator<TagDefinition> getTagDefinitions();
 	public TagDefinition getTagDefinition(UUID id);
 	public TagDefinition getTagDefinition(String name);
+	public <T extends TagDefinition> T getTagDefinition(UUID id, Class<T> type);
+	public <T extends TagDefinition> T getTagDefinition(String name, Class<T> type);
 	
-	public void addTagDefinition(TagDefinition tag) throws DatabaseStorageException;
-	public void removeTagDefinition(TagDefinition tag) throws DatabaseStorageException;
+	public void addTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
+	public void removeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
+	public void storeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
 	
 	public void addImage(Image img) throws DatabaseStorageException;
 	public void removeImage(Image img) throws DatabaseStorageException;
-	
-	public void storeTagDefinition(TagDefinition tag) throws DatabaseStorageException;
 	public void storeImage(Image img) throws DatabaseStorageException;
 	
 	public Iterator<Image> getImages();
+	public Iterator<Image> getImagesWithTag(TagDefinition tagDefinition);
 	
-	public void close();
-//    public void store(Database db) throws IOException;
-//    public Database load();
+	public void close() throws DatabaseStorageException;
 }

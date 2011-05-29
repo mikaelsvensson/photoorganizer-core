@@ -2,6 +2,7 @@ package info.photoorganizer.database.xml;
 
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseManager;
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.config.ConfigurationProperty;
@@ -29,7 +30,15 @@ public class ImagesIteratorTest
         }
         finally
         {
-            database.close();
+            try
+            {
+                database.close();
+            }
+            catch (DatabaseStorageException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         
     }

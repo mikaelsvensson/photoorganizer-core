@@ -10,7 +10,7 @@ public class DatabaseStorageContext
 {
     private DatabaseStorageStrategy strategy = null;
 
-    public void close()
+    public void close() throws DatabaseStorageException
     {
         strategy.close();
     }

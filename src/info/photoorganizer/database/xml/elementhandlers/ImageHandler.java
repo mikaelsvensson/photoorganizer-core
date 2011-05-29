@@ -1,5 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.Tag;
@@ -9,7 +10,7 @@ import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
-public class ImageHandler extends ElementHandler<Image>
+public class ImageHandler extends DatabaseObjectHandler<Image>
 {
     public ImageHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
@@ -26,7 +27,7 @@ public class ImageHandler extends ElementHandler<Image>
         Iterator<Tag> i = _storageStrategy.fromElementChildren(el, Tag.class).iterator();
         while (i.hasNext())
         {
-            o.getTags().add(i.next());
+            o.addTag(i.next());
         }
         
         super.readElement(o, el);
@@ -46,6 +47,25 @@ public class ImageHandler extends ElementHandler<Image>
     public Image createObject(Element el)
     {
         return new Image(_storageStrategy);
+    }
+
+    @Override
+    public void storeElement(Image o) throws DatabaseStorageException
+    {
+        storeElementInRoot(o, DatabaseHandler.ELEMENTNAME_IMAGES);
+//        Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_IMAGES);
+//        
+//        Element newElement = createElement();
+//        Element currentEl = _storageStrategy.getDatabaseObjectElement(o);
+//        if (currentEl != null)
+//        {
+//            rootKeywordContainerEl.replaceChild(newElement, currentEl);
+//        }
+//        else
+//        {
+//            rootKeywordContainerEl.appendChild(newElement);
+//        }
+//        writeElement(o, newElement);
     }
 
 }

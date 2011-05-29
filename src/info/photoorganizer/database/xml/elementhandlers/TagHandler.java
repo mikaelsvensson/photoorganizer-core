@@ -1,5 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.ImageRegion;
@@ -56,7 +57,7 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
     @Override
     public void writeElement(T o, Element el)
     {
-        XMLUtilities.setUUIDAttribute(el, ATTRIBUTENAME_DEFINITION, o.getDefinition().getId());
+        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_DEFINITION, o.getDefinition().getId());
         
         ImageRegion region = o.getRegion();
         if (o.getDefinition().isApplicableToImageRegion() && region != null)
@@ -65,6 +66,12 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
         }
         
         super.writeElement(o, el);
+    }
+
+    @Override
+    public void storeElement(T o) throws DatabaseStorageException
+    {
+        throw new DatabaseStorageException("One can not invoke storeElement directly for tags. Invoke storeElement for the tag's image instead.");
     }
 
 }

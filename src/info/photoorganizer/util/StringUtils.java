@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -85,24 +86,54 @@ public class StringUtils
         return res;
     }
     
-    public static String join(Collection<? extends Object> list, boolean ignoreEmpty)
+    public static String join(Iterator<? extends Object> list, boolean ignoreEmpty)
     {
-        return join(list.toArray(), null, ignoreEmpty, Character.MIN_VALUE);
+        return join(list, null, ignoreEmpty, Character.MIN_VALUE);
     }
     
-    public static String join(Collection<? extends Object> list, char glue, char quotationCharacter)
+    public static String join(Iterator<? extends Object> list, char glue)
     {
-        return join(list.toArray(), String.valueOf(glue), true, quotationCharacter);
+        return join(list, String.valueOf(glue), true, Character.MIN_VALUE);
     }
     
-    public static String join(Collection<? extends Object> list, String glue, char quotationCharacter)
+    public static String join(Iterator<? extends Object> list, char glue, char quotationCharacter)
     {
-        return join(list.toArray(), glue, true, quotationCharacter);
+        return join(list, String.valueOf(glue), true, quotationCharacter);
     }
     
-    public static String join(Collection<? extends Object> list, String glue)
+    public static String join(Iterator<? extends Object> list, String glue)
     {
-        return join(list.toArray(), glue, true, Character.MIN_VALUE);
+        return join(list, glue, true, Character.MIN_VALUE);
+    }
+    
+    public static String join(Iterator<? extends Object> list, String glue, char quotationCharacter)
+    {
+        return join(list, glue, true, quotationCharacter);
+    }
+    
+    public static String join(Iterator<? extends Object> list, char glue, boolean ignoreEmpty)
+    {
+        return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
+    }
+    
+    public static String join(Iterator<? extends Object> list, char glue, boolean ignoreEmpty, char quotationCharacter)
+    {
+        return join(list, String.valueOf(glue), ignoreEmpty, quotationCharacter);
+    }
+    
+    public static String join(Iterator<? extends Object> list, String glue, boolean ignoreEmpty)
+    {
+        return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
+    }
+    
+    public static String join(Iterator<? extends Object> list, String glue, boolean ignoreEmpty, char quotationCharacter)
+    {
+        StringBuilder sb = new StringBuilder();
+        while (list.hasNext())
+        {
+            join_addToBuffer(sb, list.next(), glue, ignoreEmpty, quotationCharacter);
+        }
+        return sb.toString();
     }
     
     public static String join(Object[] list, boolean ignoreEmpty)
@@ -110,23 +141,14 @@ public class StringUtils
         return join(list, null, ignoreEmpty, Character.MIN_VALUE);
     }
     
-    public static String join(Object[] list, char glue, boolean ignoreEmpty)
-    {
-        return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
-    }
     public static String join(Object[] list, char glue)
     {
         return join(list, glue, true, Character.MIN_VALUE);
     }
     
-    public static String join(Object[] list, String glue, boolean ignoreEmpty)
+    public static String join(Object[] list, char glue, boolean ignoreEmpty)
     {
         return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
-    }
-    
-    public static String join(Object[] list, String glue)
-    {
-        return join(list, glue, true, Character.MIN_VALUE);
     }
     
     public static String join(Object[] list, char glue, boolean ignoreEmpty, char quotationCharacter)
@@ -139,34 +161,56 @@ public class StringUtils
         return join(list, String.valueOf(glue), true, quotationCharacter);
     }
     
+    public static String join(Object[] list, String glue)
+    {
+        return join(list, glue, true, Character.MIN_VALUE);
+    }
+    
+    public static String join(Object[] list, String glue, boolean ignoreEmpty)
+    {
+        return join(list, glue, ignoreEmpty, Character.MIN_VALUE);
+    }
+    
     public static String join(Object[] list, String glue, boolean ignoreEmpty, char quotationCharacter)
     {
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
         for (Object o : list)
         {
-            if (null != o)
+            join_addToBuffer(sb, o, glue, ignoreEmpty, quotationCharacter);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Object[] list, String glue, char quotationCharacter)
+    {
+        return join(list, glue, true, quotationCharacter);
+    }
+
+    private static void join_addToBuffer(StringBuilder sb,
+            Object o,
+            String glue,
+            boolean ignoreEmpty,
+            char quotationCharacter)
+    {
+        if (null != o)
+        {
+            String value = o.toString();
+            if ((ignoreEmpty && value.length() > 0) || !ignoreEmpty)
             {
-                String value = o.toString();
-                if ((ignoreEmpty && value.length() > 0) || !ignoreEmpty)
+                if (sb.length() > 0 && glue != null)
                 {
-                    if (!first && glue != null)
-                    {
-                        sb.append(glue);
-                    }
-                    if (value.indexOf(glue) >= 0 && quotationCharacter > 0)
-                    {
-                        sb.append(quotationCharacter).append(value).append(quotationCharacter);
-                    }
-                    else
-                    {
-                        sb.append(value);
-                    }
-                    first = false;
+                    sb.append(glue);
+                }
+                if (value.indexOf(glue) >= 0 && quotationCharacter > 0)
+                {
+                    sb.append(quotationCharacter).append(value).append(quotationCharacter);
+                }
+                else
+                {
+                    sb.append(value);
                 }
             }
         }
-        return sb.toString();
     }
     
     public static String repeatChar(char c, int num)
@@ -181,74 +225,6 @@ public class StringUtils
         for (int i=0; i < num; i++, sb.append(c));
     }
     
-    public static Boolean toBoolean(String value)
-    {
-        String inputLower = value.toLowerCase();
-        if (inputLower.equals("yes") || inputLower.equals("y") || inputLower.equals("true") || inputLower.equals("t"))
-        {
-            return Boolean.TRUE;
-        }
-        else if (inputLower.equals("no") || inputLower.equals("n") || inputLower.equals("false") || inputLower.equals("f"))
-        {
-            return Boolean.FALSE;
-        }
-        return null;
-    }
-
-    public static Calendar toDate(String value)
-    {
-        DateFormat[] formats = new DateFormat[]
-        {
-                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT),
-                DateFormat.getDateInstance(DateFormat.SHORT),
-                new SimpleDateFormat("yyyy-MM")
-        };
-
-        Calendar c = null;
-        Date d = null;
-        for (DateFormat formatter : formats)
-        {
-            try
-            {
-                d = formatter.parse(value);
-                break;
-            }
-            catch (ParseException e)
-            {
-            }
-        }
-        if (null != d)
-        {
-            c = Calendar.getInstance();
-            c.setTime(d);
-        }
-        else if (value.startsWith("+") && value.length() >= 2)
-        {
-            int field = Calendar.DAY_OF_MONTH;
-            boolean fieldSpecified = true;
-            switch (value.charAt(value.length()-1))
-            {
-            case 'h': field = Calendar.HOUR_OF_DAY; break;
-            case 'd': field = Calendar.DAY_OF_MONTH; break;
-            case 'w': field = Calendar.WEEK_OF_YEAR; break;
-            case 'm': field = Calendar.MONTH; break;
-            case 'y': field = Calendar.YEAR; break;
-            default: fieldSpecified = false;
-            }
-            
-            try
-            {
-                int number = Integer.parseInt(value.substring(1, value.length() - (fieldSpecified ? 1 : 0)));
-                c = Calendar.getInstance();
-                c.add(field, number);
-            }
-            catch (NumberFormatException e)
-            {
-            }
-        }
-        return c;
-    }
-    
     public static String[] split(String sentence, char separator)
     {
         StringTokenizer tokenizer = new StringTokenizer(sentence, String.valueOf(separator));
@@ -260,7 +236,7 @@ public class StringUtils
         }
         return res;
     }
-    
+
     public static List<WordInfo> split(String sentence, char wordSeparatorCharacter, char quotationCharacter, boolean includeQuotationCharacter)
     {
         List<WordInfo> res = new ArrayList<WordInfo>();
@@ -320,5 +296,73 @@ public class StringUtils
             res.add(new WordInfo(sentence.substring(wordStart), wordStart, sentence.length() - 1));
         }
         return res;
+    }
+    
+    public static Boolean toBoolean(String value)
+    {
+        String inputLower = value.toLowerCase();
+        if (inputLower.equals("yes") || inputLower.equals("y") || inputLower.equals("true") || inputLower.equals("t"))
+        {
+            return Boolean.TRUE;
+        }
+        else if (inputLower.equals("no") || inputLower.equals("n") || inputLower.equals("false") || inputLower.equals("f"))
+        {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+    
+    public static Calendar toDate(String value)
+    {
+        DateFormat[] formats = new DateFormat[]
+        {
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT),
+                DateFormat.getDateInstance(DateFormat.SHORT),
+                new SimpleDateFormat("yyyy-MM")
+        };
+
+        Calendar c = null;
+        Date d = null;
+        for (DateFormat formatter : formats)
+        {
+            try
+            {
+                d = formatter.parse(value);
+                break;
+            }
+            catch (ParseException e)
+            {
+            }
+        }
+        if (null != d)
+        {
+            c = Calendar.getInstance();
+            c.setTime(d);
+        }
+        else if (value.startsWith("+") && value.length() >= 2)
+        {
+            int field = Calendar.DAY_OF_MONTH;
+            boolean fieldSpecified = true;
+            switch (value.charAt(value.length()-1))
+            {
+            case 'h': field = Calendar.HOUR_OF_DAY; break;
+            case 'd': field = Calendar.DAY_OF_MONTH; break;
+            case 'w': field = Calendar.WEEK_OF_YEAR; break;
+            case 'm': field = Calendar.MONTH; break;
+            case 'y': field = Calendar.YEAR; break;
+            default: fieldSpecified = false;
+            }
+            
+            try
+            {
+                int number = Integer.parseInt(value.substring(1, value.length() - (fieldSpecified ? 1 : 0)));
+                c = Calendar.getInstance();
+                c.add(field, number);
+            }
+            catch (NumberFormatException e)
+            {
+            }
+        }
+        return c;
     }
 }

@@ -1,18 +1,13 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.Database;
+import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
 import org.w3c.dom.Element;
 
-public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTagDefinition>
+public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTagDefinition>
 {
     public KeywordTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
@@ -22,64 +17,125 @@ public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTa
     private static String ATTRIBUTENAME_NAME = "name";
     private static String ATTRIBUTENAME_SYNONYMS = "synonyms";
     
-    private Map<KeywordTagDefinition, UUID[]> _synonyms = null;
+//    private Map<KeywordTagDefinition, UUID[]> _synonyms = null;
 
     @Override
     public void readElement(KeywordTagDefinition o, Element el)
     {
         o.setName(XMLUtilities.getTextAttribute(el, ATTRIBUTENAME_NAME, "untitled"));
         
-        
-        for (UUID uuid : XMLUtilities.getUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS))
-        {
-            o.addSynonym(uuid);
-        }
-        //_synonyms.put(o, null);
+        o.setSynonymIds(_storageStrategy.getUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS));
         
         o.addChildren(_storageStrategy.fromElementChildren(el, KeywordTagDefinition.class));
         
         super.readElement(o, el);
     }
     
-    @Override
-    public void postProcess(Database db)
-    {
-        for (Entry<KeywordTagDefinition, UUID[]> entry : _synonyms.entrySet())
-        {
-            KeywordTagDefinition k = entry.getKey();
-            for (UUID synonymId : entry.getValue())
-            {
-                KeywordTagDefinition synonym = getById(synonymId);
-                if (null != synonym)
-                {
-                    k.addSynonym(synonymId);
-                }
-            }
-        }
-        
-        _synonyms = null;
-        
-        super.postProcess(db);
-    }
-    
-    private KeywordTagDefinition getById(UUID id)
-    {
-        for (KeywordTagDefinition def : _synonyms.keySet())
-        {
-            if (def.getId().equals(id))
-            {
-                return def;
-            }
-        }
-        return null;
-    }
+//    @Override
+//    public void postProcess(Database db)
+//    {
+//        for (Entry<KeywordTagDefinition, UUID[]> entry : _synonyms.entrySet())
+//        {
+//            KeywordTagDefinition k = entry.getKey();
+//            for (UUID synonymId : entry.getValue())
+//            {
+//                KeywordTagDefinition synonym = getById(synonymId);
+//                if (null != synonym)
+//                {
+//                    k.addSynonym(synonymId);
+//                }
+//            }
+//        }
+//        
+//        _synonyms = null;
+//        
+//        super.postProcess(db);
+//    }
+//    
+//    private KeywordTagDefinition getById(UUID id)
+//    {
+//        for (KeywordTagDefinition def : _synonyms.keySet())
+//        {
+//            if (def.getId().equals(id))
+//            {
+//                return def;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    public void preProcess()
+//    {
+//        _synonyms = new HashMap<KeywordTagDefinition, UUID[]>();
+//        
+//        super.preProcess();
+//    }
 
     @Override
-    public void preProcess()
+    public void storeElement(KeywordTagDefinition o) throws DatabaseStorageException
     {
-        _synonyms = new HashMap<KeywordTagDefinition, UUID[]>();
+        /*
+         * if (keyword has parent)
+         *   if (parent keyword is in dom tree)
+         *     create element for this keyword
+         *     append element to parent
+         *     fill element with data, including child keyword data
+         *   else
+         *     store parent keyword
+         * else
+         *   create element for this keyword
+         *   if (keyword is in dom tree)
+         *     replace element in document
+         *   else
+         *     add element to document as root keyword
+         *   fill element with data, including child keyword data
+         */
         
-        super.preProcess();
+        KeywordTagDefinition parent = o.getParent();
+        if (parent != null)
+        {
+            Element parentEl = _storageStrategy.getDatabaseObjectElement(parent);
+            if (parentEl != null)
+            {
+                Element element = createElement();
+                parentEl.appendChild(element);
+                writeElement(o, element);
+            }
+            else
+            {
+                storeElement(parent);
+            }
+        }
+        else
+        {
+            super.storeElement(o);
+        }
+        /*
+        if (parent.isDirty())
+        {
+            storeElement(parent);
+        }
+        else
+        {
+            Element element = createElement();
+            writeElement(o, element);
+            
+            Element parent = null;
+            if (parent == null)
+            {
+                // Store as root keyword.
+                parent = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_TAGDEFINITIONS);
+            }
+            else
+            {
+                // Store as child keyword.
+                parent = _storageStrategy.getDatabaseObjectElement(parent);
+            }
+            parent.appendChild(element);
+        }
+        super.storeElement(o);
+        */
     }
 
     @Override
@@ -87,7 +143,7 @@ public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTa
     {
         XMLUtilities.setTextAttribute(el, ATTRIBUTENAME_NAME, o.getName());
        
-        XMLUtilities.setUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS, o.getSynonymIds());
+        _storageStrategy.setUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS, o.getSynonymIds());
         
         XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getChildren()));
         
@@ -98,6 +154,16 @@ public class KeywordTagDefinitionHandler extends DatabaseObjectHandler<KeywordTa
     public KeywordTagDefinition createObject(Element el)
     {
         return new KeywordTagDefinition(_storageStrategy);
+    }
+
+    @Override
+    public void remove(KeywordTagDefinition o) throws DatabaseStorageException
+    {
+        for (KeywordTagDefinition child : o.getChildren())
+        {
+            child.remove();
+        }
+        super.remove(o);
     }
 
 }
