@@ -3,12 +3,16 @@ package info.photoorganizer.database.xml;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseHandler;
+import info.photoorganizer.database.xml.elementhandlers.DatetimeTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.DatetimeTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
 import info.photoorganizer.database.xml.elementhandlers.ImageHandler;
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
+import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagDefinitionHandler;
+import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.TagDefinitionHandler;
@@ -16,7 +20,6 @@ import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler
 import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.XMLUtilities;
@@ -29,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -44,7 +46,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
@@ -121,11 +122,15 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
                 new TextTagHandler(this),
                 new IntegerNumberTagHandler(this),
                 new RealNumberTagHandler(this),
+                new RationalNumberTagHandler(this),
+                new DatetimeTagHandler(this),
                 
                 KEYWORD_TAG_DEFINITION_HANDLER,
                 new TextTagDefinitionHandler(this),
                 new IntegerNumberTagDefinitionHandler(this),
                 new RealNumberTagDefinitionHandler(this),
+                new RationalNumberTagDefinitionHandler(this),
+                new DatetimeTagDefinitionHandler(this),
                 
                 new DatabaseHandler(this) 
                 };

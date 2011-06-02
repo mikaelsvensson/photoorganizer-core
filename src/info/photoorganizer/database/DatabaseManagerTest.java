@@ -10,6 +10,8 @@ import info.photoorganizer.metadata.TextTagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -127,7 +129,7 @@ public class DatabaseManagerTest
         try
         {
             Image img = database.createImage();
-            img.setUrl(new URL("http://demo/test.jpg"));
+            img.setURI(new URI("http://demo/test.jpg"));
             
             TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
             if (tagDefinition instanceof KeywordTagDefinition)
@@ -149,12 +151,12 @@ public class DatabaseManagerTest
 //                DatabaseManager.getInstance().saveDatabase();
             
         }
-        catch (IOException e)
+        catch (DatabaseStorageException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (DatabaseStorageException e)
+        catch (URISyntaxException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -103,6 +103,40 @@ public class KeywordTagDefinition extends TagDefinition
     private KeywordTagDefinition parent = null;
     private Set<UUID> _synonyms = new HashSet<UUID>();
     private Location location = null;
+    
+    public boolean isDescendantOf(TagDefinition possibleAncestor)
+    {
+        for (KeywordTagDefinition current = this.parent; current != null; current = current.parent)
+        {
+            if (current.equals(possibleAncestor))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isAncestorTo(TagDefinition possibleDescendant)
+    {
+        for (KeywordTagDefinition descendant : getDescendants())
+        {
+            if (descendant.equals(possibleDescendant))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isChildOf(KeywordTagDefinition possibleParent)
+    {
+        return parent.equals(possibleParent);
+    }
+    
+    public boolean isParentOf(KeywordTagDefinition possibleChild)
+    {
+        return children.contains(possibleChild);
+    }
 
     public void addChild(KeywordTagDefinition tag)
     {
@@ -333,6 +367,7 @@ public class KeywordTagDefinition extends TagDefinition
         {
             _synonyms.add(synonymId);
         }
+        fireChangedEvent();
     }
     
     public static void addSynonym(KeywordTagDefinition valueA, KeywordTagDefinition value1, boolean autoSave) throws DatabaseStorageException
@@ -406,8 +441,9 @@ public class KeywordTagDefinition extends TagDefinition
 
     public void setLocation(Location location)
     {
+        if (equals(this.location, location)) return;
         this.location = location;
-        fireChangedEvent(new TagDefinitionEvent(this));
+        fireChangedEvent();
     }
 
     public void store() throws DatabaseStorageException

@@ -13,19 +13,16 @@ public class TextTagDefinition extends ValueTagDefinition
     public TextTagDefinition(DatabaseStorageStrategy storageContext)
     {
         super(storageContext);
-        // TODO Auto-generated constructor stub
     }
+    
     public TextTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
         super(name, storageContext);
-        // TODO Auto-generated constructor stub
-    }
-    public TextTagDefinition(String name, UUID id,
-            DatabaseStorageStrategy storageContext)
-    {
-        super(name, id, storageContext);
-        // TODO Auto-generated constructor stub
     }
 
+    public TextTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
+    {
+        super(name, id, storageContext);
+    }
 
 }

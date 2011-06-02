@@ -1,13 +1,24 @@
 package info.photoorganizer.metadata;
 
 import info.photoorganizer.database.DatabaseStorageStrategy;
+import info.photoorganizer.util.Event;
 import info.photoorganizer.util.UUIDUtilities;
+import info.photoorganizer.util.Event.EventExecuter;
 
 import java.util.UUID;
 
 public class DatabaseObject
 {
     private DatabaseStorageStrategy _storageStrategy = null;
+    
+    private Event<DatabaseObjectEventListener, DatabaseObjectEvent> _changedEvent = new Event<DatabaseObjectEventListener, DatabaseObjectEvent>(
+            new EventExecuter<DatabaseObjectEventListener, DatabaseObjectEvent>()
+            {
+                public void fire(DatabaseObjectEventListener listener, DatabaseObjectEvent event)
+                {
+                    listener.databaseObjectChanged(event);
+                }
+            });
     
     @Override
     public int hashCode()
@@ -59,8 +70,19 @@ public class DatabaseObject
 
     public void setId(UUID id)
     {
+        if (equals(this.id, id)) return;
         this.id = id;
+        fireChangedEvent();
     }
-
+    
+    protected void fireChangedEvent()
+    {
+        _changedEvent.fire(new DatabaseObjectEvent(this));
+    }
+    
+    protected boolean equals(Object a, Object b)
+    {
+        return (a == null && b == null) || (a != null && a.equals(b));
+    }
 
 }

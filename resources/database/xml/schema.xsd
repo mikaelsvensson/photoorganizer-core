@@ -128,9 +128,13 @@
                     		type="po:IntegerNumberTag">
                     	</element>
                     	<element name="TextTag" type="po:TextTag"></element>
+                    	<element name="RationalNumberTag"
+                    		type="po:RationalNumberTag">
+                    	</element>
+                    	<element name="DatetimeTag" type="po:DatetimeTag"></element>
                     </choice>
     			</sequence>
-    			<attribute name="url" type="string"></attribute>
+    			<attribute name="uri" type="string"></attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -151,13 +155,52 @@
     <complexType name="TagDefinitions">
     	<sequence maxOccurs="unbounded" minOccurs="0">
     		<choice>
-    			<element name="KeywordTagDefinition" type="po:KeywordTagDefinition"></element>
+    			<element name="KeywordTagDefinition"
+    				type="po:KeywordTagDefinition">
+    			</element>
     			<element name="IntegerNumberTagDefinition"
     				type="po:IntegerNumberTagDefinition">
     			</element>
-    			<element name="RealNumberTagDefinition" type="po:RealNumberTagDefinition"></element>
-    			<element name="TextTagDefinition" type="po:TextTagDefinition"></element>
+    			<element name="RealNumberTagDefinition"
+    				type="po:RealNumberTagDefinition">
+    			</element>
+    			<element name="TextTagDefinition"
+    				type="po:TextTagDefinition">
+    			</element>
+    			<element name="RationalNumberTagDefinition"
+    				type="po:RationalNumberTagDefinition">
+    			</element>
+    			<element name="DatetimeTagDefinition" type="po:DatetimeTagDefinition"></element>
     		</choice>
     	</sequence>
+    </complexType>
+
+    <complexType name="RationalNumberTag">
+    	<simpleContent>
+    		<extension base="po:ValueTag">
+    			<attribute name="numerator" type="long"></attribute>
+    			<attribute name="denominator" type="long"></attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+    <complexType name="RationalNumberTagDefinition">
+    	<complexContent>
+    		<extension base="po:ValueTagDefinition"></extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="DatetimeTag">
+    	<simpleContent>
+    		<extension base="po:ValueTag">
+    			<attribute name="value" type="dateTime"></attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+    
+    <complexType name="DatetimeTagDefinition">
+    	<complexContent>
+    		<extension base="po:ValueTagDefinition"></extension>
+    	</complexContent>
     </complexType>
 </schema>

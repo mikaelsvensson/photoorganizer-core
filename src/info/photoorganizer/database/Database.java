@@ -1,18 +1,23 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.CoreTagDefinition;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
+import info.photoorganizer.util.FileIdentifier;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 public class Database extends DatabaseObject
 {
+    private static final double FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD = 1.0;
+
     public Database(DatabaseStorageStrategy storageContext)
     {
         this(null, storageContext);
@@ -21,32 +26,34 @@ public class Database extends DatabaseObject
     public Database(UUID id, DatabaseStorageStrategy storageContext)
     {
         super(id, storageContext);
-//        setRootKeyword(null);
-        initTagDefinitions();
-    }
-    
-    private void initTagDefinitions()
-    {
-        _tagDefinitions.addAll(_coreTagDefinitions);
     }
 
-//    private KeywordTagDefinition rootKeyword = null;
-    
-    private List<TagDefinition> _tagDefinitions = new LinkedList<TagDefinition>();
-    private List<Image> _images = new LinkedList<Image>();
-    private static List<TagDefinition> _coreTagDefinitions = new LinkedList<TagDefinition>();
-    
-    static
-    {
-        for (CoreTagDefinition def : CoreTagDefinition.values())
-        {
-            _coreTagDefinitions.add(def.getDefinition());
-        }
-    }
-    
     public Iterator<Image> getImages()
     {
         return getStorageStrategy().getImages();
+    }
+    
+    public Image getImage(File f)
+    {
+        double bestMatchPoints = 0;
+        Image bestMatch = null;
+        
+        Iterator<Image> i = getImages();
+        while (i.hasNext())
+        {
+            Image image = i.next();
+            double probability = FileIdentifier.equalityProbability(f, image, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
+            if (probability > bestMatchPoints)
+            {
+                bestMatchPoints = probability;
+                bestMatch = image;
+            }
+            if (bestMatchPoints >= FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD)
+            {
+                return bestMatch;
+            }
+        }
+        return null;
     }
     
     public Iterator<TagDefinition> getTagDefinitions()
@@ -64,87 +71,27 @@ public class Database extends DatabaseObject
         return getStorageStrategy().getTagDefinition(id);
     }
     
-    /*
-    public List<Image> getImages()
+    public <T extends TagDefinition> T getTagDefinition(UUID id, Class<T> type)
     {
-        return _images;
-    }
-
-    public List<TagDefinition> getTagDefinitions()
-    {
-        return getTagDefinitions(false);
+        return getStorageStrategy().getTagDefinition(id, type);
     }
     
-    public List<TagDefinition> getTagDefinitions(boolean excludeCoreTags)
+    public void replaceKeywordTagDefinition(KeywordTagDefinition old, KeywordTagDefinition replacement, boolean removeOld) throws DatabaseStorageException
     {
-        if (excludeCoreTags)
+        Iterator<Image> iterator = getStorageStrategy().getImagesWithTag(old);
+        while (iterator.hasNext())
         {
-            List<TagDefinition> res = new LinkedList<TagDefinition>(_tagDefinitions);
-            res.removeAll(_coreTagDefinitions);
-            return res;
+            Image image = iterator.next();
+            image.removeKeywordTagsOfType(old);
+            image.addTag(new KeywordTag(replacement));
+            image.store();
         }
-        else
+        if (removeOld)
         {
-            return _tagDefinitions;
+            old.remove();
         }
     }
     
-    public TagDefinition getTagDefinitionById(UUID id)
-    {
-        for (TagDefinition def : _tagDefinitions)
-        {
-            if (def.getId().equals(id))
-            {
-                return def;
-            }
-            else if (def instanceof KeywordTagDefinition)
-            {
-                for (KeywordTagDefinition descendant : ((KeywordTagDefinition)def).getDescendants())
-                {
-                    if (descendant.getId().equals(id))
-                    {
-                        return descendant;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    
-    public TagDefinition getTagDefinitionByName(String name)
-    {
-        for (TagDefinition def : _tagDefinitions)
-        {
-            if (def.getName().equals(name))
-            {
-                return def;
-            }
-            else if (def instanceof KeywordTagDefinition)
-            {
-                for (KeywordTagDefinition descendant : ((KeywordTagDefinition)def).getDescendants())
-                {
-                    if (descendant.getName().equals(name))
-                    {
-                        return descendant;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    
-    public void removeTagDefinition(TagDefinition toBeRemoved)
-    {
-        if (_tagDefinitions.contains(toBeRemoved))
-        {
-            _tagDefinitions.remove(toBeRemoved);
-        }
-        else if (toBeRemoved instanceof KeywordTagDefinition)
-        {
-            ((KeywordTagDefinition)toBeRemoved).remove();
-        }
-    }
-    */
     private String name = null;
 
     public String getName()
@@ -154,7 +101,9 @@ public class Database extends DatabaseObject
 
     public void setName(String name)
     {
+        if (equals(this.name, name)) return;
         this.name = name;
+        fireChangedEvent();
     }
     
     public KeywordTagDefinition createRootKeyword(String name)
@@ -162,29 +111,50 @@ public class Database extends DatabaseObject
         return new KeywordTagDefinition(name, getStorageStrategy());
     }
     
+    public <T extends TagDefinition> T createTagDefinition(Class<T> cls, String name)
+    {
+        try
+        {
+            Constructor<T> constructor = cls.getDeclaredConstructor(String.class, DatabaseStorageStrategy.class);
+            return constructor.newInstance(name, getStorageStrategy());
+        }
+        catch (SecurityException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (NoSuchMethodException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (InstantiationException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (InvocationTargetException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     public Image createImage()
     {
         return new Image(getStorageStrategy());
     }
-    
-//    public KeywordTagDefinition getRootKeyword()
-//    {
-//        return rootKeyword;
-//    }
-//    
-//    public void setRootKeyword(KeywordTagDefinition rootKeyword)
-//    {
-//        this.rootKeyword = rootKeyword;
-//    }
-//    
-//    public KeywordTagDefinition getCoreKeyword(CoreTagDefinition tag)
-//    {
-//        if (null != rootKeyword)
-//        {
-//            return rootKeyword.getChildById(tag.getUuid(), true);
-//        }
-//        return null;
-//    }
 
     public void close() throws DatabaseStorageException
     {

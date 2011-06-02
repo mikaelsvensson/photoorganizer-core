@@ -12,20 +12,16 @@ public class RealNumberTagDefinition extends ValueTagDefinition
     public RealNumberTagDefinition(DatabaseStorageStrategy storageContext)
     {
         super(storageContext);
-        // TODO Auto-generated constructor stub
     }
-    public RealNumberTagDefinition(String name,
-            DatabaseStorageStrategy storageContext)
+    
+    public RealNumberTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
         super(name, storageContext);
-        // TODO Auto-generated constructor stub
     }
-    public RealNumberTagDefinition(String name, UUID id,
-            DatabaseStorageStrategy storageContext)
+    
+    public RealNumberTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
         super(name, id, storageContext);
-        // TODO Auto-generated constructor stub
     }
-
 
 }

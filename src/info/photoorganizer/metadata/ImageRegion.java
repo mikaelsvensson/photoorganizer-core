@@ -18,6 +18,44 @@ public class ImageRegion
         _bottom = bottom;
     }
 
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        long temp;
+        temp = Double.doubleToLongBits(_bottom);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(_left);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(_right);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(_top);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ImageRegion other = (ImageRegion) obj;
+        if (Double.doubleToLongBits(_bottom) != Double.doubleToLongBits(other._bottom))
+            return false;
+        if (Double.doubleToLongBits(_left) != Double.doubleToLongBits(other._left))
+            return false;
+        if (Double.doubleToLongBits(_right) != Double.doubleToLongBits(other._right))
+            return false;
+        if (Double.doubleToLongBits(_top) != Double.doubleToLongBits(other._top))
+            return false;
+        return true;
+    }
+
     public double getBottom()
     {
         return _bottom;

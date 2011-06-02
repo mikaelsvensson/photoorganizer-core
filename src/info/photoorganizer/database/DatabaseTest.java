@@ -7,6 +7,8 @@ import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Calendar;
 
@@ -80,7 +82,7 @@ public class DatabaseTest
         }
     }
     
-    private void addImageWithKeyword(String url, String keywordName)
+    private void addImageWithKeyword(String uri, String keywordName)
     {
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
@@ -88,7 +90,7 @@ public class DatabaseTest
             TagDefinition keyword = database.getTagDefinition(keywordName);
             
             Image createImage = database.createImage();
-            createImage.setUrl(new URL(url));
+            createImage.setURI(new URI(uri));
             if (keyword instanceof KeywordTagDefinition)
             {
                 createImage.addTag(new KeywordTag((KeywordTagDefinition) keyword));
@@ -100,7 +102,7 @@ public class DatabaseTest
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (MalformedURLException e)
+        catch (URISyntaxException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();

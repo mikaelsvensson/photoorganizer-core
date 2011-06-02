@@ -17,12 +17,12 @@ public class ImageHandler extends DatabaseObjectHandler<Image>
         super(Image.class, storageStrategy);
     }
 
-    private static String ATTRIBUTENAME_URL = "url";
+    private static String ATTRIBUTENAME_URI = "uri";
     
     @Override
     public void readElement(Image o, Element el)
     {
-        o.setUrl(XMLUtilities.getURLAttribute(el, ATTRIBUTENAME_URL, null));
+        o.setURI(XMLUtilities.getURIAttribute(el, ATTRIBUTENAME_URI, null));
         
         Iterator<Tag> i = _storageStrategy.fromElementChildren(el, Tag.class).iterator();
         while (i.hasNext())
@@ -36,7 +36,7 @@ public class ImageHandler extends DatabaseObjectHandler<Image>
     @Override
     public void writeElement(Image o, Element el)
     {
-        XMLUtilities.setURLAttribute(el, ATTRIBUTENAME_URL, o.getUrl());
+        XMLUtilities.setURIAttribute(el, ATTRIBUTENAME_URI, o.getURI());
         
         XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getTags()));
 

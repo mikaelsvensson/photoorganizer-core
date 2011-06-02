@@ -11,21 +11,16 @@ public class IntegerNumberTagDefinition extends ValueTagDefinition
     public IntegerNumberTagDefinition(DatabaseStorageStrategy storageContext)
     {
         super(storageContext);
-        // TODO Auto-generated constructor stub
     }
 
-    public IntegerNumberTagDefinition(String name,
-            DatabaseStorageStrategy storageContext)
+    public IntegerNumberTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
         super(name, storageContext);
-        // TODO Auto-generated constructor stub
     }
 
-    public IntegerNumberTagDefinition(String name, UUID id,
-            DatabaseStorageStrategy storageContext)
+    public IntegerNumberTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
         super(name, id, storageContext);
-        // TODO Auto-generated constructor stub
     }
 
 }

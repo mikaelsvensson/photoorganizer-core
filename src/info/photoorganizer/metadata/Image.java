@@ -3,6 +3,8 @@ package info.photoorganizer.metadata;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
 
+import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,7 +15,8 @@ public class Image extends DatabaseObject
 {
     
     private List<Tag<? extends TagDefinition>> _tags = new LinkedList<Tag<? extends TagDefinition>>();
-    private URL _url = null;
+    private URI _uri = null;
+    private File _file = null;
 
     public Image(DatabaseStorageStrategy storageContext)
     {
@@ -32,22 +35,63 @@ public class Image extends DatabaseObject
     
     public void addTag(Tag<? extends TagDefinition> tag)
     {
-        _tags.add(tag);
+        if (null != tag)
+        {
+            _tags.add(tag);
+            fireChangedEvent();
+        }
     }
     
     public void removeTag(Tag<? extends TagDefinition> tag)
     {
-        _tags.remove(tag);
+        if (_tags.remove(tag))
+        {
+            fireChangedEvent();
+        }
+    }
+    
+    public void removeKeywordTagsOfType(KeywordTagDefinition oldKeyword)
+    {
+        Iterator<Tag<? extends TagDefinition>> i = _tags.iterator();
+        while (i.hasNext())
+        {
+            Tag<? extends TagDefinition> tag = i.next();
+            TagDefinition def = tag.getDefinition();
+            if (oldKeyword.equals(def) || oldKeyword.isAncestorTo(def))
+            {
+                i.remove();
+            }
+        }
     }
 
-    public URL getUrl()
+    public URI getURI()
     {
-        return _url;
+        return _uri;
+    }
+    
+    public File getFile()
+    {
+        return _file;
     }
 
-    public void setUrl(URL url)
+    public void setURI(URI uri)
     {
-        _url = url;
+        if (equals(_uri, uri)) return;
+        _uri = uri;
+        try
+        {
+            _file = new File(_uri);
+        }
+        catch (IllegalArgumentException e)
+        {
+            _file = null;
+        }
+        fireChangedEvent();
+    }
+    
+    public boolean isFile()
+    {
+        return null != _file;
     }
 
     public void store() throws DatabaseStorageException
@@ -70,5 +114,13 @@ public class Image extends DatabaseObject
             }
         }
         return false;
+    }
+
+    public void setFile(File file)
+    {
+        if (equals(_file, file)) return;
+        _file = file;
+        _uri = file.toURI();
+        fireChangedEvent();
     }
 }

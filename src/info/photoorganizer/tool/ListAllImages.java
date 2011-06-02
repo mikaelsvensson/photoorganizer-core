@@ -1,4 +1,4 @@
-package info.photoorganizer.database.xml;
+package info.photoorganizer.tool;
 
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseManager;
@@ -9,12 +9,9 @@ import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.util.Iterator;
 
-import org.junit.Test;
-
-public class ImagesIteratorTest
+public class ListAllImages
 {
-    @Test
-    public void printAll()
+    public static void main(String[] args) 
     {
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
@@ -24,8 +21,8 @@ public class ImagesIteratorTest
             {
                 Image image = images.next();
                 System.out.format("Information about image %s:\n", image.getId().toString());
-                System.out.format("   URL: %s\n", image.getUrl());
-                System.out.format("   Tags: %s\n", StringUtils.join(image.getTags(), ", "));
+                System.out.format("  URI:  %s\n", image.getURI());
+                System.out.format("  Tags: %s\n", StringUtils.join(image.getTags(), "\n        "));
             }
         }
         finally

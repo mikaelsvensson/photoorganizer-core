@@ -71,12 +71,14 @@ public abstract class TagDefinition extends DatabaseObject
 
     public void setApplicableToImageRegion(boolean applicableToImageRegion)
     {
+        if (equals(this.applicableToImageRegion, applicableToImageRegion)) return;
         this.applicableToImageRegion = applicableToImageRegion;
         fireChangedEvent();
     }
     
     public void setName(String name)
     {
+        if (equals(this.name, name)) return;
         this.name = name;
         fireChangedEvent();
     }
@@ -91,4 +93,10 @@ public abstract class TagDefinition extends DatabaseObject
     {
         getStorageStrategy().removeTagDefinition(this);
     }
+    
+    public void store() throws DatabaseStorageException
+    {
+        getStorageStrategy().storeTagDefinition(this);
+    }
+    
 }

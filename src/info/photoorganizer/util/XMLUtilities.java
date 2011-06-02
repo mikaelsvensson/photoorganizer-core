@@ -11,14 +11,20 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.spi.DateFormatProvider;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Locale;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +42,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.drew.metadata.exif.DataFormat;
 
 public class XMLUtilities
 {
@@ -180,6 +188,27 @@ public class XMLUtilities
         }
     }
     
+    private static DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.US);
+    
+    public static Date getDateAttribute(Element el, String attr, Date defaultValue) throws DatabaseStorageException
+    {
+        try
+        {
+            if (el.hasAttribute(attr))
+            {
+                return DatatypeConverter.parseDateTime(el.getAttribute(attr)).getTime();
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new DatabaseStorageException("Attribute value is not a valid date.", e);
+        }
+    }
+    
     public static Integer getIntegerAttribute(Element el, String attr, Integer defaultValue) throws DatabaseStorageException
     {
         try
@@ -196,6 +225,25 @@ public class XMLUtilities
         catch (NumberFormatException e)
         {
             throw new DatabaseStorageException("Attribute value is not a valid integer value.", e);
+        }
+    }
+    
+    public static Long getLongAttribute(Element el, String attr, Long defaultValue) throws DatabaseStorageException
+    {
+        try
+        {
+            if (el.hasAttribute(attr))
+            {
+                return Long.valueOf(el.getAttribute(attr));
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new DatabaseStorageException("Attribute value is not a valid long integer value.", e);
         }
     }
     
@@ -286,15 +334,15 @@ public class XMLUtilities
         }
     }
     
-    public static URL getURLAttribute(Element el, String attr, URL defaultValue)
+    public static URI getURIAttribute(Element el, String attr, URI defaultValue)
     {
         if (el.hasAttribute(attr))
         {
             try
             {
-                return new URL(el.getAttribute(attr));
+                return new URI(el.getAttribute(attr));
             }
-            catch (MalformedURLException e)
+            catch (URISyntaxException e)
             {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -339,9 +387,9 @@ public class XMLUtilities
         el.setAttribute(attr, Boolean.toString(value));
     }
     
-    public static void setURLAttribute(Element el, String attr, URL url)
+    public static void setURIAttribute(Element el, String attr, URI uri)
     {
-        el.setAttribute(attr, url.toString());
+        el.setAttribute(attr, uri.toString());
     }
     
     public static void setTextAttribute(Element el, String attr, String value)
@@ -358,6 +406,24 @@ public class XMLUtilities
     }
     
     public static void setDoubleAttribute(Element el, String attr, Double value)
+    {
+        if (null != value)
+        {
+            el.setAttribute(attr, value.toString());
+        }
+    }
+    
+    public static void setDateAttribute(Element el, String attr, Date value)
+    {
+        if (null != value)
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(value);
+            el.setAttribute(attr, DatatypeConverter.printDateTime(cal));
+        }
+    }
+    
+    public static void setLongAttribute(Element el, String attr, Long value)
     {
         if (null != value)
         {
