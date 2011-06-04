@@ -89,8 +89,7 @@ public abstract class ElementHandler<T extends Object>
     {
         if (o instanceof DatabaseObject)
         {
-            Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), rootElementName);
-            
+            Element rootKeywordContainerEl = getOrCreateRootElement(rootElementName);
             Element newElement = createElement();
             Element currentEl = _storageStrategy.getDatabaseObjectElement((DatabaseObject) o);
             if (currentEl != null)
@@ -107,6 +106,17 @@ public abstract class ElementHandler<T extends Object>
         {
             throw new DatabaseStorageException("Implementation only supports DatabaseObject instances.");
         }
+    }
+
+    private Element getOrCreateRootElement(String rootElementName)
+    {
+        Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), rootElementName);
+        if (null == rootKeywordContainerEl)
+        {
+            rootKeywordContainerEl = createElement(rootElementName, _storageStrategy.getDocument());
+            _storageStrategy.getDocument().getDocumentElement().appendChild(rootKeywordContainerEl);
+        }
+        return rootKeywordContainerEl;
     }
 
 }

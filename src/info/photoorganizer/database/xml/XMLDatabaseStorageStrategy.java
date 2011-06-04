@@ -11,18 +11,26 @@ import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefiniti
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
+import info.photoorganizer.database.xml.elementhandlers.IndexingConfigurationHandler;
+import info.photoorganizer.database.xml.elementhandlers.MetadataMappingConfigurationHandler;
+import info.photoorganizer.database.xml.elementhandlers.MultiParameterFunctionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
+import info.photoorganizer.database.xml.elementhandlers.SingleParameterFunctionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.IndexingConfiguration;
+import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.XMLUtilities;
+import info.photoorganizer.util.transform.ReplaceTransformer;
+import info.photoorganizer.util.transform.TextCaseTransformer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -111,7 +119,55 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     private Document doc = null;
     private final KeywordTagHandler KEYWORD_TAG_HANDLER = new KeywordTagHandler(this);
     private final KeywordTagDefinitionHandler KEYWORD_TAG_DEFINITION_HANDLER = new KeywordTagDefinitionHandler(this);
-    private ElementHandler[] HANDLERS = null; 
+    private ElementHandler[] HANDLERS = null;
+    
+    private class KeywordTranslatorFileFilterHandler extends SingleParameterFunctionHandler<KeywordTranslatorFileFilter>
+    {
+
+        public KeywordTranslatorFileFilterHandler(XMLDatabaseStorageStrategy storageStrategy)
+        {
+            super(KeywordTranslatorFileFilter.class, storageStrategy);
+        }
+
+        @Override
+        public KeywordTranslatorFileFilter createObject(Element el)
+        {
+            return new KeywordTranslatorFileFilter();
+        }
+        
+    }
+    
+    private class ReplaceTransformerHandler extends MultiParameterFunctionHandler<ReplaceTransformer>
+    {
+        
+        public ReplaceTransformerHandler(XMLDatabaseStorageStrategy storageStrategy)
+        {
+            super(ReplaceTransformer.class, storageStrategy);
+        }
+
+        @Override
+        public ReplaceTransformer createObject(Element el)
+        {
+            return new ReplaceTransformer();
+        }
+        
+    }
+    
+    private class TextCaseTransformerHandler extends SingleParameterFunctionHandler<TextCaseTransformer>
+    {
+        
+        public TextCaseTransformerHandler(XMLDatabaseStorageStrategy storageStrategy)
+        {
+            super(TextCaseTransformer.class, storageStrategy);
+        }
+        
+        @Override
+        public TextCaseTransformer createObject(Element el)
+        {
+            return new TextCaseTransformer();
+        }
+        
+    }
     
     public XMLDatabaseStorageStrategy(URL databaseUrl)
     {
@@ -131,6 +187,12 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
                 new RealNumberTagDefinitionHandler(this),
                 new RationalNumberTagDefinitionHandler(this),
                 new DatetimeTagDefinitionHandler(this),
+                
+                new IndexingConfigurationHandler(this),
+                new MetadataMappingConfigurationHandler(this),
+                new KeywordTranslatorFileFilterHandler(this),
+                new ReplaceTransformerHandler(this),
+                new TextCaseTransformerHandler(this),
                 
                 new DatabaseHandler(this) 
                 };
@@ -218,7 +280,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
             String name = el.getLocalName();
             for (ElementHandler handler : HANDLERS)
             {
-                if (handler.getDatabaseObjectClass().getSimpleName().equals(name))
+                if (handler.getDatabaseObjectClass().getSimpleName().equals(name) && cls.isAssignableFrom(handler.getDatabaseObjectClass()))
                 {
                     res = (T) handler.createObject(el);
                     handler.readElement(res, el);
@@ -278,7 +340,11 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         {
             for (Element child : XMLUtilities.getChildElements(el))
             {
-                res.add(fromElement(child, cls));
+                T o = fromElement(child, cls);
+                if (null != o)
+                {
+                    res.add(o);
+                }
             }
         }
         return res;
@@ -291,6 +357,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 
     public Element getDatabaseObjectElement(UUID id)
     {
+        getDocument().normalizeDocument();
         return getDocument().getElementById(getXMLIdFromUUID(id));
     }
 
@@ -687,5 +754,31 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
         handler.remove(tagDefinition);
+    }
+
+    @Override
+    public Iterator<IndexingConfiguration> getIndexingConfigurations()
+    {
+        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), this, IndexingConfiguration.class);
+    }
+
+    @Override
+    public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    {
+        storeIndexingConfiguration(translator);
+    }
+
+    @Override
+    public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    {
+        IndexingConfigurationHandler handler = getElementHandler(translator);
+        handler.storeElement(translator);
+    }
+
+    @Override
+    public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    {
+        IndexingConfigurationHandler handler = getElementHandler(translator);
+        handler.remove(translator);
     }
 }

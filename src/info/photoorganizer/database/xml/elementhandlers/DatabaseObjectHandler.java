@@ -32,6 +32,7 @@ public abstract class DatabaseObjectHandler<T extends DatabaseObject> extends El
     public void writeElement(T o, Element el)
     {
         _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_ID, o.getId());
+        el.setIdAttribute(ATTRIBUTENAME_ID, true);
         
         super.writeElement(o, el);
     }

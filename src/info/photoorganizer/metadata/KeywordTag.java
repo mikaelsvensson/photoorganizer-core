@@ -8,4 +8,10 @@ public class KeywordTag extends Tag<KeywordTagDefinition>
         super(definition);
     }
 
+    @Override
+    public String toString()
+    {
+        return "Keyword: " + getDefinition().getName();
+    }
+
 }

@@ -1,17 +1,11 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import java.util.Iterator;
-
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
 import org.w3c.dom.Element;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public abstract class TagDefinitionHandler<T extends TagDefinition> extends DatabaseObjectHandler<T>
 {
@@ -21,11 +15,15 @@ public abstract class TagDefinitionHandler<T extends TagDefinition> extends Data
     }
 
     private static String ATTRIBUTENAME_NAME = "name";
+    private static String ATTRIBUTENAME_USEREDITABLE = "isuserallowedtoedittags";
+    private static String ATTRIBUTENAME_USERCREATABLE= "isuserallowedtocreatetags";
     
     @Override
     public void readElement(T o, Element el)
     {
         o.setName(XMLUtilities.getTextAttribute(el, ATTRIBUTENAME_NAME, "untitled"));
+        o.setUserAllowedToCreateTags(XMLUtilities.getBooleanAttribute(el, ATTRIBUTENAME_USERCREATABLE));
+        o.setUserAllowedToEditTags(XMLUtilities.getBooleanAttribute(el, ATTRIBUTENAME_USEREDITABLE));
         
         super.readElement(o, el);
     }
@@ -34,6 +32,8 @@ public abstract class TagDefinitionHandler<T extends TagDefinition> extends Data
     public void writeElement(T o, Element el)
     {
         XMLUtilities.setTextAttribute(el, ATTRIBUTENAME_NAME, o.getName());
+        XMLUtilities.setBooleanAttribute(el, ATTRIBUTENAME_USERCREATABLE, o.isUserAllowedToCreateTags());
+        XMLUtilities.setBooleanAttribute(el, ATTRIBUTENAME_USEREDITABLE, o.isUserAllowedToEditTags());
         
         super.writeElement(o, el);
     }

@@ -1,7 +1,5 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import javax.naming.OperationNotSupportedException;
-
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
@@ -16,6 +14,7 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
 
     public static final String ELEMENTNAME_TAGDEFINITIONS = "TagDefinitions";
     public static final String ELEMENTNAME_IMAGES = "Images";
+    public static final String ELEMENTNAME_INDEXINGCONFIGURATIONS = "IndexingConfigurations";
 
     public DatabaseHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
@@ -69,6 +68,10 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         Element tagDefinitionsEl = createElement(ELEMENTNAME_TAGDEFINITIONS, owner);
         el.appendChild(tagDefinitionsEl);
         XMLUtilities.appendChildren(tagDefinitionsEl, _storageStrategy.toElements(owner, o.getTagDefinitions()));
+        
+        Element keywordTranslatorsEl = createElement(ELEMENTNAME_INDEXINGCONFIGURATIONS, owner);
+        el.appendChild(keywordTranslatorsEl);
+        XMLUtilities.appendChildren(keywordTranslatorsEl, _storageStrategy.toElements(owner, o.getIndexingConfigurations()));
         
         Element imagesEl = createElement(ELEMENTNAME_IMAGES, owner);
         el.appendChild(imagesEl);

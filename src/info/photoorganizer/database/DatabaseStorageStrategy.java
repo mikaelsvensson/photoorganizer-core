@@ -2,6 +2,7 @@ package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.TagDefinition;
 
 import java.util.Iterator;
@@ -20,12 +21,16 @@ public interface DatabaseStorageStrategy
 	public void removeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
 	public void storeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
 	
+	public Iterator<Image> getImages();
+	public Iterator<Image> getImagesWithTag(TagDefinition tagDefinition);
 	public void addImage(Image img) throws DatabaseStorageException;
 	public void removeImage(Image img) throws DatabaseStorageException;
 	public void storeImage(Image img) throws DatabaseStorageException;
 	
-	public Iterator<Image> getImages();
-	public Iterator<Image> getImagesWithTag(TagDefinition tagDefinition);
+	public Iterator<IndexingConfiguration> getIndexingConfigurations();
+	public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
+	public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
+	public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
 	
 	public void close() throws DatabaseStorageException;
 }

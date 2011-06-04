@@ -8,7 +8,7 @@ public abstract class Tag<T extends TagDefinition>
     }
 
     private T _definition = null;
-
+    
     private ImageRegion _region = null;
 
     public Tag(T definition)

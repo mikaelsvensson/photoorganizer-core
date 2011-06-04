@@ -63,7 +63,11 @@
     	<complexContent>
     		<extension base="po:DatabaseObject">
     			<attribute name="name" type="string" use="required"></attribute>
-    			<attribute name="applicabletoimageregion" type="boolean" use="optional"></attribute>
+    			<attribute name="applicabletoimageregion" type="boolean"
+    				use="optional">
+    			</attribute>
+    			<attribute name="isuserallowedtoedittags" type="boolean"></attribute>
+    			<attribute name="isuserallowedtocreatetags" type="boolean"></attribute>
     		</extension>
     	</complexContent>
     </complexType>
@@ -96,13 +100,13 @@
     <complexType name="Database">
     	<complexContent>
     		<extension base="po:DatabaseObject">
-    			<sequence>
+    			<sequence maxOccurs="unbounded" minOccurs="0">
 
-                    <element name="TagDefinitions" type="po:TagDefinitions" maxOccurs="1" minOccurs="0">
-    					</element>
-                    <element name="Images" type="po:Images" maxOccurs="1" minOccurs="0">
-    					</element>
-                </sequence>
+                    <choice><element name="IndexingConfigurations" type="po:IndexingConfigurations" maxOccurs="1" minOccurs="0">
+    				</element><element name="Images" type="po:Images" maxOccurs="1" minOccurs="0">
+    				</element><element name="TagDefinitions" type="po:TagDefinitions" maxOccurs="1" minOccurs="0">
+    				</element></choice>
+    			</sequence>
     			<attribute name="name" type="string" use="optional"></attribute>
     		</extension>
     	</complexContent>
@@ -202,5 +206,62 @@
     	<complexContent>
     		<extension base="po:ValueTagDefinition"></extension>
     	</complexContent>
+    </complexType>
+
+
+    <complexType name="MultiParameterFunction">
+    	<sequence>
+    		<element name="Parameter" type="po:Parameter" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="Parameter">
+		<attribute name="name" type="string" use="optional"></attribute>
+		<attribute name="value" type="string"></attribute>
+    </complexType>
+    
+    <complexType name="IndexingConfigurations">
+    	<sequence>
+    		<element name="IndexingConfiguration" type="po:IndexingConfiguration" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="IndexingConfiguration">
+    	<complexContent>
+    		<extension base="po:DatabaseObject">
+    			<sequence>
+    				<element name="KeywordTranslatorFileFilter"
+    					type="po:SingleParameterFunction" maxOccurs="1"
+    					minOccurs="0">
+    				</element>
+    				<element name="MetadataMappingConfigurations" type="po:MetadataMappingConfigurations" maxOccurs="1" minOccurs="0"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="SingleParameterFunction">
+    	<attribute name="param" type="string"></attribute>
+    </complexType>
+
+    <complexType name="MetadataMappingConfiguration">
+    	<sequence maxOccurs="unbounded" minOccurs="0">
+    		<choice>
+    			<element name="TextCaseTransformer"
+    				type="po:SingleParameterFunction">
+    			</element>
+    			<element name="ReplaceTransformer"
+    				type="po:MultiParameterFunction">
+    			</element>
+    		</choice>
+    	</sequence>
+    	<attribute name="source" type="string"></attribute>
+    	<attribute name="target" type="IDREF"></attribute>
+    </complexType>
+
+    <complexType name="MetadataMappingConfigurations">
+    	<sequence>
+    		<element name="MetadataMappingConfiguration" type="po:MetadataMappingConfiguration" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
     </complexType>
 </schema>

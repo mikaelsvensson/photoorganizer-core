@@ -6,6 +6,7 @@ import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
+import com.drew.metadata.iptc.IptcDirectory;
 
 
 public abstract class ValueTag<V extends Object, T extends ValueTagDefinition> extends Tag<T>

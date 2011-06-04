@@ -1,26 +1,22 @@
 package info.photoorganizer.metadata;
 
-import info.photoorganizer.database.Database;
 import info.photoorganizer.util.I18n;
 
 import java.util.UUID;
 
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-
 public enum DefaultTagDefinition
 {
-    F_NUMBER(RationalNumberTagDefinition.class, UUID.fromString("36d86990-728a-4b3d-ab6c-ab6daadb7d3e"), ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_FNUMBER),
-    CAMERA(TextTagDefinition.class, UUID.fromString("1622289b-f013-4243-960d-110b4da681c6")),
-    COMMENT(TextTagDefinition.class, UUID.fromString("646e958d-1d34-4d4d-be88-40f1680c6005")),
+    F_NUMBER(RationalNumberTagDefinition.class, UUID.fromString("36d86990-728a-4b3d-ab6c-ab6daadb7d3e"), false, false),
+    CAMERA(TextTagDefinition.class, UUID.fromString("1622289b-f013-4243-960d-110b4da681c6"), false, false),
+    COMMENT(TextTagDefinition.class, UUID.fromString("646e958d-1d34-4d4d-be88-40f1680c6005"), true, true),
     
-    DATE_TAKEN(DatetimeTagDefinition.class, UUID.fromString("ee43022f-aa37-4b29-b5a2-27d07aa388a5"), ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL),
+    DATE_TAKEN(DatetimeTagDefinition.class, UUID.fromString("ee43022f-aa37-4b29-b5a2-27d07aa388a5"), false, false),
 
-    RATING(IntegerNumberTagDefinition.class, UUID.fromString("26be7a9d-1ef8-4d5c-b32b-2258cf761a8b")), 
-    ROOT_KEYWORD(KeywordTagDefinition.class, UUID.fromString("f4840997-b116-43e6-8256-6fbaefb63b3d")),
+    RATING(IntegerNumberTagDefinition.class, UUID.fromString("26be7a9d-1ef8-4d5c-b32b-2258cf761a8b"), true, true), 
+    ROOT_KEYWORD(KeywordTagDefinition.class, UUID.fromString("f4840997-b116-43e6-8256-6fbaefb63b3d"), false, true),
     
-    EXPOSURE_TIME(RationalNumberTagDefinition.class, UUID.fromString("e54d8495-81b9-48b4-a106-0f8d6d4780ca"), ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_EXPOSURE_TIME)
+    EXPOSURE_TIME(RationalNumberTagDefinition.class, UUID.fromString("e54d8495-81b9-48b4-a106-0f8d6d4780ca"), false, false),
+    
 
     /*
      * e54d8495-81b9-48b4-a106-0f8d6d4780ca
@@ -43,26 +39,28 @@ public enum DefaultTagDefinition
     }
 
     private Class<? extends TagDefinition> _definitionClass = null;
-    private Class<? extends Directory> _fileMetadataDirectory = null;
-    private int _fileMetadataDirectoryTag = 0;
-    
+    private boolean _userAllowedToEditTags = false;
+    private boolean _userAllowedToCreateTags = false;
     private UUID _id = null;
 
-    private DefaultTagDefinition(Class<? extends TagDefinition> definitionClass, UUID id)
+    public boolean isUserAllowedToEditTags()
     {
-        _definitionClass = definitionClass;
-        _id = id;
+        return _userAllowedToEditTags;
+    }
+
+    public boolean isUserAllowedToCreateTags()
+    {
+        return _userAllowedToCreateTags;
     }
 
     private DefaultTagDefinition(
-            Class<? extends TagDefinition> definitionClass,
-            UUID id,
-            Class<? extends Directory> fileMetadataDirectory, int fileMetadataDirectoryTag)
+            Class<? extends TagDefinition> definitionClass, UUID id,
+            boolean userAllowedToCreateTags, boolean userAllowedToEditTags)
     {
         _definitionClass = definitionClass;
-        _fileMetadataDirectory = fileMetadataDirectory;
-        _fileMetadataDirectoryTag = fileMetadataDirectoryTag;
         _id = id;
+        _userAllowedToCreateTags = userAllowedToCreateTags;
+        _userAllowedToEditTags = userAllowedToEditTags;
     }
 
     public Class<? extends TagDefinition> getDefinitionClass()
@@ -70,34 +68,9 @@ public enum DefaultTagDefinition
         return _definitionClass;
     }
     
-    public Class<? extends Directory> getFileMetadataDirectory()
-    {
-        return _fileMetadataDirectory;
-    }
-    
-    public int getFileMetadataDirectoryTag()
-    {
-        return _fileMetadataDirectoryTag;
-    }
-    
     public UUID getId()
     {
         return _id;
     }
     
-    public ValueTag<? extends Object, ValueTagDefinition> createTagFromMetadata(Metadata metadata, Database database)
-    {
-        if (null != _fileMetadataDirectory && _fileMetadataDirectoryTag > 0)
-        {
-            if (ValueTagDefinition.class.isAssignableFrom(_definitionClass))
-            {
-                ValueTagDefinition def = database.getTagDefinition(_id, ValueTagDefinition.class);
-                if (null != def)
-                {
-                    return ValueTag.createFromMetadata(def, metadata, _fileMetadataDirectory, _fileMetadataDirectoryTag);
-                }
-            }
-        }
-        return null;
-    }
 }

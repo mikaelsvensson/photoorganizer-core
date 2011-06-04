@@ -45,33 +45,7 @@ public class ImportTestPhotos
                 else
                 {
                     System.out.println("  Not in database. Yet. Adding image.");
-                    try
-                    {
-                        image = database.createImage();
-                        image.setFile(f);
-                        
-                        Metadata metadata = ImageMetadataReader.readMetadata(f);
-                        DefaultTagDefinition[] tagDefs = { DefaultTagDefinition.F_NUMBER, DefaultTagDefinition.EXPOSURE_TIME, DefaultTagDefinition.DATE_TAKEN };
-                        for (DefaultTagDefinition tagDef : tagDefs)
-                        {
-                            ValueTag<? extends Object, ValueTagDefinition> tag = tagDef.createTagFromMetadata(metadata, database);
-                            image.addTag(tag);
-                        }
-                        
-                        image.store();
-                    }
-                    catch (DatabaseStorageException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (ImageProcessingException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    database.indexImage(f);
                 }
             }
         }

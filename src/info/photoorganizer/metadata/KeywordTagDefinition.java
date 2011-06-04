@@ -28,21 +28,29 @@ public class KeywordTagDefinition extends TagDefinition
         {
             parent.addChild(this);
         }
+        setUserAllowedToCreateTags(true);
+        setUserAllowedToEditTags(true);
     }
 
     public KeywordTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
         super(name, id, storageContext);
+        setUserAllowedToCreateTags(true);
+        setUserAllowedToEditTags(true);
     }
 
     public KeywordTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
         super(name, storageContext);
+        setUserAllowedToCreateTags(true);
+        setUserAllowedToEditTags(true);
     }
     
     public KeywordTagDefinition(DatabaseStorageStrategy storageContext)
     {
         super(storageContext);
+        setUserAllowedToCreateTags(true);
+        setUserAllowedToEditTags(true);
     }
 
     private final KeywordEventListener _childListener = new KeywordEventListener()

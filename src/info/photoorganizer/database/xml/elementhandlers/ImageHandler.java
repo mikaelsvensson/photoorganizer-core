@@ -2,6 +2,7 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
+import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.util.XMLUtilities;
@@ -27,7 +28,15 @@ public class ImageHandler extends DatabaseObjectHandler<Image>
         Iterator<Tag> i = _storageStrategy.fromElementChildren(el, Tag.class).iterator();
         while (i.hasNext())
         {
-            o.addTag(i.next());
+            try
+            {
+                o.addTag(i.next());
+            }
+            catch (DatabaseException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         
         super.readElement(o, el);

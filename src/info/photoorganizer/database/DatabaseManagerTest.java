@@ -1,5 +1,6 @@
 package info.photoorganizer.database;
 
+import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.DefaultTagDefinition;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.KeywordTag;
@@ -157,6 +158,11 @@ public class DatabaseManagerTest
             e.printStackTrace();
         }
         catch (URISyntaxException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (DatabaseException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();

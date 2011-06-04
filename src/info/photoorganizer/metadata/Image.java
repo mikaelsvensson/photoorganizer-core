@@ -33,12 +33,19 @@ public class Image extends DatabaseObject
         return _tags.iterator();
     }
     
-    public void addTag(Tag<? extends TagDefinition> tag)
+    public void addTag(Tag<? extends TagDefinition> tag) throws DatabaseException
     {
         if (null != tag)
         {
-            _tags.add(tag);
-            fireChangedEvent();
+            if (!hasTag(tag.getDefinition()))
+            {
+                _tags.add(tag);
+                fireChangedEvent();
+            }
+            else
+            {
+                throw new DatabaseException("Each image may only have one tag of each type. This image already has a tag of type " + tag.getDefinition() + ".");
+            }
         }
     }
     

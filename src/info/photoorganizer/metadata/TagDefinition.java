@@ -22,6 +22,28 @@ public abstract class TagDefinition extends DatabaseObject
     
     private boolean applicableToImageRegion = false;
     private String name = null;
+    private boolean userAllowedToEditTags = false;
+    private boolean userAllowedToCreateTags = false;
+
+    public boolean isUserAllowedToEditTags()
+    {
+        return userAllowedToEditTags;
+    }
+
+    public void setUserAllowedToEditTags(boolean userAllowedToEditTags)
+    {
+        this.userAllowedToEditTags = userAllowedToEditTags;
+    }
+
+    public boolean isUserAllowedToCreateTags()
+    {
+        return userAllowedToCreateTags;
+    }
+
+    public void setUserAllowedToCreateTags(boolean userAllowedToCreateTags)
+    {
+        this.userAllowedToCreateTags = userAllowedToCreateTags;
+    }
 
     public TagDefinition(DatabaseStorageStrategy storageContext)
     {
