@@ -1,4 +1,4 @@
-package info.photoorganizer.metadata;
+package info.photoorganizer.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

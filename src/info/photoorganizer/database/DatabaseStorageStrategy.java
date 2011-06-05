@@ -1,7 +1,6 @@
 package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.TagDefinition;
 

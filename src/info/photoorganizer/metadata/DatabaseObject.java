@@ -2,8 +2,8 @@ package info.photoorganizer.metadata;
 
 import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.util.Event;
-import info.photoorganizer.util.UUIDUtilities;
 import info.photoorganizer.util.Event.EventExecuter;
+import info.photoorganizer.util.UUIDUtilities;
 
 import java.util.UUID;
 

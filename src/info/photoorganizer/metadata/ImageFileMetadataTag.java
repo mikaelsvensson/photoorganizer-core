@@ -1,8 +1,5 @@
 package info.photoorganizer.metadata;
 
-import java.util.Date;
-
-import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.iptc.IptcDirectory;

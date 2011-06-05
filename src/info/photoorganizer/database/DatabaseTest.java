@@ -7,10 +7,8 @@ import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Calendar;
 
 import org.junit.Assert;

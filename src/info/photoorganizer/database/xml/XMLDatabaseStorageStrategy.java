@@ -7,11 +7,11 @@ import info.photoorganizer.database.xml.elementhandlers.DatetimeTagDefinitionHan
 import info.photoorganizer.database.xml.elementhandlers.DatetimeTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
 import info.photoorganizer.database.xml.elementhandlers.ImageHandler;
+import info.photoorganizer.database.xml.elementhandlers.IndexingConfigurationHandler;
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.IndexingConfigurationHandler;
 import info.photoorganizer.database.xml.elementhandlers.MetadataMappingConfigurationHandler;
 import info.photoorganizer.database.xml.elementhandlers.MultiParameterFunctionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagDefinitionHandler;

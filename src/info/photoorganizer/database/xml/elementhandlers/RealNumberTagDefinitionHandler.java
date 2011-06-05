@@ -1,9 +1,9 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import org.w3c.dom.Element;
-
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.RealNumberTagDefinition;
+
+import org.w3c.dom.Element;
 
 public class RealNumberTagDefinitionHandler extends ValueTagDefinitionHandler<RealNumberTagDefinition>
 {

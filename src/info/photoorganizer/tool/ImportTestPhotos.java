@@ -3,24 +3,10 @@ package info.photoorganizer.tool;
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseManager;
 import info.photoorganizer.database.DatabaseStorageException;
-import info.photoorganizer.metadata.DefaultTagDefinition;
 import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.TagDefinition;
-import info.photoorganizer.metadata.ValueTag;
-import info.photoorganizer.metadata.ValueTagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.io.File;
-import java.io.IOException;
-
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
-import com.drew.metadata.exif.ExifIFD0Descriptor;
-import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
 
 public class ImportTestPhotos
 {

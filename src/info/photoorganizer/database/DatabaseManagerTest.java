@@ -10,10 +10,8 @@ import info.photoorganizer.metadata.TextTag;
 import info.photoorganizer.metadata.TextTagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;

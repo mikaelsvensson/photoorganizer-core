@@ -1,7 +1,5 @@
 package info.photoorganizer.database.xml;
 
-import info.photoorganizer.metadata.Image;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

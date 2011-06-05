@@ -3,15 +3,11 @@ package info.photoorganizer.database.xml.elementhandlers;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.IndexingConfiguration;
-import info.photoorganizer.metadata.KeywordExtractor;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
-import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.XMLUtilities;
-import info.photoorganizer.util.transform.TextTransformer;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.w3c.dom.Element;
 

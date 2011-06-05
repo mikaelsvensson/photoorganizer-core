@@ -5,7 +5,6 @@ import info.photoorganizer.database.DatabaseStorageStrategy;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -130,4 +129,5 @@ public class Image extends DatabaseObject
         _uri = file.toURI();
         fireChangedEvent();
     }
+
 }

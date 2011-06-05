@@ -2,7 +2,6 @@ package info.photoorganizer.metadata;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
-import info.photoorganizer.util.transform.TextTransformer;
 
 import java.io.FileFilter;
 import java.util.ArrayList;

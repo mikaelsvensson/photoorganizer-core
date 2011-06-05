@@ -1,12 +1,11 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import org.w3c.dom.Element;
-
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
-import info.photoorganizer.util.XMLUtilities;
+
+import org.w3c.dom.Element;
 
 public class KeywordTagHandler extends TagHandler<KeywordTag>
 {

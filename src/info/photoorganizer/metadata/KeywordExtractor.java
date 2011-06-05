@@ -1,9 +1,9 @@
 package info.photoorganizer.metadata;
 
-import java.util.List;
-
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.WordInfo;
+
+import java.util.List;
 
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;

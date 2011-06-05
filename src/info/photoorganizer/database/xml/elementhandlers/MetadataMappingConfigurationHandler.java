@@ -2,19 +2,12 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.ImageFileMetadataTag;
-import info.photoorganizer.metadata.ImageRegion;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
-import info.photoorganizer.metadata.Tag;
-import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
-import info.photoorganizer.util.transform.SingleParameterFunction;
-import info.photoorganizer.util.transform.SingleParameterTextTransformer;
 import info.photoorganizer.util.transform.TextTransformer;
 
 import java.util.Iterator;
-import java.util.UUID;
 
 import org.w3c.dom.Element;
 

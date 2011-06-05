@@ -1,16 +1,15 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.AutoIndexTagDefinition;
 import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.DatetimeTag;
 import info.photoorganizer.metadata.DatetimeTagDefinition;
+import info.photoorganizer.metadata.DefaultTagDefinition;
 import info.photoorganizer.metadata.Image;
 import info.photoorganizer.metadata.ImageFileMetadataTag;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.IntegerNumberTag;
 import info.photoorganizer.metadata.IntegerNumberTagDefinition;
-import info.photoorganizer.metadata.KeywordExtractor;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
@@ -18,14 +17,13 @@ import info.photoorganizer.metadata.RationalNumberTag;
 import info.photoorganizer.metadata.RationalNumberTagDefinition;
 import info.photoorganizer.metadata.RealNumberTag;
 import info.photoorganizer.metadata.RealNumberTagDefinition;
-import info.photoorganizer.metadata.StringList;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.metadata.TextTag;
 import info.photoorganizer.metadata.TextTagDefinition;
-import info.photoorganizer.metadata.ValueTag;
 import info.photoorganizer.metadata.ValueTagDefinition;
 import info.photoorganizer.util.FileIdentifier;
+import info.photoorganizer.util.StringList;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -33,94 +31,93 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.Rational;
-import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 
 public class Database extends DatabaseObject
 {
     private static final double FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD = 1.0;
 
+    private String name = null;
+    
     public Database(DatabaseStorageStrategy storageContext)
     {
         this(null, storageContext);
     }
-    
+
     public Database(UUID id, DatabaseStorageStrategy storageContext)
     {
         super(id, storageContext);
     }
-
-    public Iterator<Image> getImages()
-    {
-        return getStorageStrategy().getImages();
-    }
     
-    public Image getImage(File f)
+    /*
+    private void addKeywordToImage(Image img,
+            IndexingConfiguration translator,
+            String keyword)
     {
-        double bestMatchPoints = 0;
-        Image bestMatch = null;
-        
-        Iterator<Image> i = getImages();
-        while (i.hasNext())
+        String translated = translator.applySourceTextTransformations(keyword.trim());
+        TagDefinition tagDefinition = getTagDefinition(translated);
+        if (tagDefinition == null)
         {
-            Image image = i.next();
-            double probability = FileIdentifier.equalityProbability(f, image, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
-            if (probability > bestMatchPoints)
+            try
             {
-                bestMatchPoints = probability;
-                bestMatch = image;
+                tagDefinition = createRootKeyword(translated);
+                tagDefinition.store();
+                System.out.println("Creating keyword '" + translated + "'.");
             }
-            if (bestMatchPoints >= FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD)
+            catch (DatabaseStorageException e)
             {
-                return bestMatch;
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.err.println("Could not create keyword '" + translated + "'.");
             }
         }
-        return null;
-    }
-    
-    public Image indexImage(File f)
-    {
-        Image img = getImage(f);
-        if (null == img)
-        {
-            img = createImage();
-            img.setFile(f);
-        }
         
-        try
+        if (tagDefinition instanceof KeywordTagDefinition)
         {
-            Metadata metadata = ImageMetadataReader.readMetadata(f);
-            
-//            addDefaultTags(img, metadata);
-            
-            addTags(img, metadata);
-            
-            img.store();
+            try
+            {
+                KeywordTag tag = new KeywordTag((KeywordTagDefinition) tagDefinition);
+                img.addTag(tag);
+                System.out.println("Tagging image with '" + translated + "'.");
+            }
+            catch (DatabaseException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        catch (ImageProcessingException e)
+    }
+    private void addDefaultTags(Image img, Metadata metadata)
+    {
+        for (AutoIndexTagDefinition tagDef : AutoIndexTagDefinition.values())
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try
+            {
+                ValueTag<? extends Object, ValueTagDefinition> tag = tagDef.createTagFromMetadata(metadata, this);
+                img.addTag(tag);
+            }
+            catch (DatabaseException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (DatabaseStorageException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return img;
+    }
+     */
+    
+    public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    {
+        getStorageStrategy().addIndexingConfiguration(translator);
     }
 
     private void addTags(Image img, Metadata metadata) throws DatabaseStorageException
@@ -136,39 +133,73 @@ public class Database extends DatabaseObject
                 {
                     ImageFileMetadataTag source = mapper.getSource();
                     Object value = getSourceData(metadata, mapper, source);
-                    
-                    List<Tag<? extends TagDefinition>> tags;
-                    try
-                    {
-                        tags = createTargetTagsFromSourceData(mapper, value);
-                        for (Tag<? extends TagDefinition> tag2 : tags)
-                        {
-                            if (null != tag2)
-                            {
-                                try
-                                {
-                                    img.addTag(tag2);
-                                }
-                                catch (DatabaseException e)
-                                {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        img.store();
-                    }
-                    catch (DatabaseException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                    
+                    setTargetData(img, mapper, value);
                 }
             }
         }
         img.store();
     }
 
+    public void close() throws DatabaseStorageException
+    {
+        getStorageStrategy().close();
+    }
+
+    public Image createImage()
+    {
+        return new Image(getStorageStrategy());
+    }
+
+    public IndexingConfiguration createIndexingConfiguration()
+    {
+        return new IndexingConfiguration(getStorageStrategy());
+    }
+
+    public KeywordTagDefinition createRootKeyword(String name)
+    {
+        return new KeywordTagDefinition(name, getStorageStrategy());
+    }
+    
+    public <T extends TagDefinition> T createTagDefinition(Class<T> cls, String name)
+    {
+        try
+        {
+            Constructor<T> constructor = cls.getDeclaredConstructor(String.class, DatabaseStorageStrategy.class);
+            return constructor.newInstance(name, getStorageStrategy());
+        }
+        catch (SecurityException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (NoSuchMethodException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (InstantiationException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (InvocationTargetException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     private List<Tag<? extends TagDefinition>> createTargetTagsFromSourceData(MetadataMappingConfiguration mapper, Object value) throws DatabaseStorageException, DatabaseException
     {
         List<Tag<? extends TagDefinition>> tags = new LinkedList<Tag<? extends TagDefinition>>();
@@ -238,7 +269,45 @@ public class Database extends DatabaseObject
         }
         return tags;
     }
-
+    
+    public Image getImage(File f)
+    {
+        double bestMatchPoints = 0;
+        Image bestMatch = null;
+        
+        Iterator<Image> i = getImages();
+        while (i.hasNext())
+        {
+            Image image = i.next();
+            double probability = FileIdentifier.equalityProbability(f, image, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
+            if (probability > bestMatchPoints)
+            {
+                bestMatchPoints = probability;
+                bestMatch = image;
+            }
+            if (bestMatchPoints >= FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD)
+            {
+                return bestMatch;
+            }
+        }
+        return null;
+    }
+    
+    public Iterator<Image> getImages()
+    {
+        return getStorageStrategy().getImages();
+    }
+    
+    public Iterator<IndexingConfiguration> getIndexingConfigurations()
+    {
+        return getStorageStrategy().getIndexingConfigurations();
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
     private Object getSourceData(Metadata metadata,
             MetadataMappingConfiguration mapper,
             ImageFileMetadataTag source)
@@ -259,67 +328,6 @@ public class Database extends DatabaseObject
         }
         return value;
     }
-
-    /*
-    private void addKeywordToImage(Image img,
-            IndexingConfiguration translator,
-            String keyword)
-    {
-        String translated = translator.applySourceTextTransformations(keyword.trim());
-        TagDefinition tagDefinition = getTagDefinition(translated);
-        if (tagDefinition == null)
-        {
-            try
-            {
-                tagDefinition = createRootKeyword(translated);
-                tagDefinition.store();
-                System.out.println("Creating keyword '" + translated + "'.");
-            }
-            catch (DatabaseStorageException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                System.err.println("Could not create keyword '" + translated + "'.");
-            }
-        }
-        
-        if (tagDefinition instanceof KeywordTagDefinition)
-        {
-            try
-            {
-                KeywordTag tag = new KeywordTag((KeywordTagDefinition) tagDefinition);
-                img.addTag(tag);
-                System.out.println("Tagging image with '" + translated + "'.");
-            }
-            catch (DatabaseException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-    */
-    private void addDefaultTags(Image img, Metadata metadata)
-    {
-        for (AutoIndexTagDefinition tagDef : AutoIndexTagDefinition.values())
-        {
-            try
-            {
-                ValueTag<? extends Object, ValueTagDefinition> tag = tagDef.createTagFromMetadata(metadata, this);
-                img.addTag(tag);
-            }
-            catch (DatabaseException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    public Iterator<TagDefinition> getTagDefinitions()
-    {
-        return getStorageStrategy().getTagDefinitions();
-    }
     
     public TagDefinition getTagDefinition(String name)
     {
@@ -330,25 +338,116 @@ public class Database extends DatabaseObject
     {
         return getStorageStrategy().getTagDefinition(id);
     }
-    
+
     public <T extends TagDefinition> T getTagDefinition(UUID id, Class<T> type)
     {
         return getStorageStrategy().getTagDefinition(id, type);
     }
-    
-    public Iterator<IndexingConfiguration> getIndexingConfigurations()
+
+    public Iterator<TagDefinition> getTagDefinitions()
     {
-        return getStorageStrategy().getIndexingConfigurations();
+        return getStorageStrategy().getTagDefinitions();
     }
     
-    public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    public Image indexImage(File f)
     {
-        getStorageStrategy().addIndexingConfiguration(translator);
+        Image img = getImage(f);
+        if (null == img)
+        {
+            img = createImage();
+            img.setFile(f);
+        }
+        
+        try
+        {
+            Metadata metadata = ImageMetadataReader.readMetadata(f);
+            
+//            addDefaultTags(img, metadata);
+            
+            addTags(img, metadata);
+            
+            img.store();
+        }
+        catch (ImageProcessingException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (DatabaseStorageException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return img;
     }
     
-    public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    /**
+     * Returns the keywords assigned to all the specified images, i.e. the
+     * keywords that are shared amongst all the specified images.
+     * 
+     * @param images
+     * @return
+     */
+    public Set<KeywordTagDefinition> keywordIntersection(Image... images)
     {
-        getStorageStrategy().storeIndexingConfiguration(translator);
+        Set<KeywordTagDefinition> res = new HashSet<KeywordTagDefinition>();
+        if (images.length > 0)
+        {
+            Image ref = images[0];
+            Iterator<Tag<? extends TagDefinition>> tags = ref.getTags();
+            while (tags.hasNext())
+            {
+                TagDefinition def = tags.next().getDefinition();
+                
+                if (def instanceof KeywordTagDefinition)
+                {
+                    boolean isInAll = true;
+                    for (int i=1; i < images.length; i++)
+                    {
+                        if (!images[i].hasTag(def))
+                        {
+                            isInAll = false;
+                            break;
+                        }
+                    }
+                    if (isInAll)
+                    {
+                        res.add((KeywordTagDefinition) def);
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    
+    /**
+     * Returns the keywords assigned to at least one of the specified images.
+     * 
+     * @param images
+     * @return
+     */
+    public Set<KeywordTagDefinition> keywordUnion(Image... images)
+    {
+        Set<KeywordTagDefinition> res = new HashSet<KeywordTagDefinition>();
+        for (Image image : images)
+        {
+            Iterator<Tag<? extends TagDefinition>> tags = image.getTags();
+            while (tags.hasNext())
+            {
+                TagDefinition def = tags.next().getDefinition();
+                
+                if (def instanceof KeywordTagDefinition)
+                {
+                    res.add((KeywordTagDefinition) def);
+                }
+            }
+        }
+        return res;
     }
     
     public void replaceKeywordTagDefinition(KeywordTagDefinition old, KeywordTagDefinition replacement, boolean removeOld) throws DatabaseStorageException
@@ -374,13 +473,6 @@ public class Database extends DatabaseObject
             old.remove();
         }
     }
-    
-    private String name = null;
-
-    public String getName()
-    {
-        return name;
-    }
 
     public void setName(String name)
     {
@@ -388,64 +480,43 @@ public class Database extends DatabaseObject
         this.name = name;
         fireChangedEvent();
     }
-    
-    public KeywordTagDefinition createRootKeyword(String name)
-    {
-        return new KeywordTagDefinition(name, getStorageStrategy());
-    }
-    
-    public <T extends TagDefinition> T createTagDefinition(Class<T> cls, String name)
+
+    private void setTargetData(Image img,
+            MetadataMappingConfiguration mapper,
+            Object value) throws DatabaseStorageException
     {
         try
         {
-            Constructor<T> constructor = cls.getDeclaredConstructor(String.class, DatabaseStorageStrategy.class);
-            return constructor.newInstance(name, getStorageStrategy());
+            List<Tag<? extends TagDefinition>> tags = createTargetTagsFromSourceData(mapper, value);
+            for (Tag<? extends TagDefinition> tag : tags)
+            {
+                if (null != tag)
+                {
+                    try
+                    {
+                        img.addTag(tag);
+                    }
+                    catch (DatabaseException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
-        catch (SecurityException e)
+        catch (DatabaseException e1)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            e1.printStackTrace();
         }
-        catch (NoSuchMethodException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IllegalArgumentException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (InstantiationException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IllegalAccessException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (InvocationTargetException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    public Image createImage()
-    {
-        return new Image(getStorageStrategy());
-    }
-    
-    public IndexingConfiguration createIndexingConfiguration()
-    {
-        return new IndexingConfiguration(getStorageStrategy());
     }
 
-    public void close() throws DatabaseStorageException
+    public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
-        getStorageStrategy().close();
+        getStorageStrategy().storeIndexingConfiguration(translator);
     }
- }
+
+    public KeywordTagDefinition getRootKeyword()
+    {
+        return getTagDefinition(DefaultTagDefinition.ROOT_KEYWORD.getId(), KeywordTagDefinition.class);
+    }
+}

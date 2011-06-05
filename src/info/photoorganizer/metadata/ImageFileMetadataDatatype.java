@@ -1,5 +1,7 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.util.StringList;
+
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 

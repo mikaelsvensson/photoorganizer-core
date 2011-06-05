@@ -2,7 +2,6 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
-import info.photoorganizer.util.XMLUtilities;
 
 import java.util.UUID;
 
