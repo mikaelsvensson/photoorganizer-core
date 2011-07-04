@@ -1,7 +1,7 @@
 package info.photoorganizer.metadata;
 
 
-public class KeywordEvent extends TagDefinitionEvent
+public class KeywordTagDefinitionEvent extends TagDefinitionEvent
 {
     /**
      * 
@@ -15,12 +15,12 @@ public class KeywordEvent extends TagDefinitionEvent
         return targetIndices;
     }
 
-    public KeywordEvent(Object source)
+    public KeywordTagDefinitionEvent(Object source)
     {
         super(source);
     }
     
-    public KeywordEvent(Object source, KeywordTagDefinition target)
+    public KeywordTagDefinitionEvent(Object source, KeywordTagDefinition target)
     {
         super(source, target);
         targetIndices = new int[] { getSource().getIndexOfChild(target) };

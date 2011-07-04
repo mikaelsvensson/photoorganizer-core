@@ -1,9 +1,16 @@
 package info.photoorganizer.metadata;
 
+import java.io.Serializable;
+
 import info.photoorganizer.util.StringUtils;
 
-public class ImageRegion
+public class ImageRegion implements Serializable
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6958403694140329229L;
+    
     private double _bottom = 1;
     private double _left = 0;
     private double _right = 1;

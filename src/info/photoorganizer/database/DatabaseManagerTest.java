@@ -34,7 +34,7 @@ public class DatabaseManagerTest
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            KeywordTagDefinition keyword = database.createRootKeyword(KEYWORD_NAME);
+            KeywordTagDefinition keyword = database.addRootKeyword(KEYWORD_NAME);
             keyword.store();
         }
         catch (DatabaseStorageException e)
@@ -90,8 +90,8 @@ public class DatabaseManagerTest
         try
         {
             
-            KeywordTagDefinition jfk = database.createRootKeyword("JKF");
-            KeywordTagDefinition johnFKennedy = database.createRootKeyword("John F Kennedy");
+            KeywordTagDefinition jfk = database.addRootKeyword("JKF");
+            KeywordTagDefinition johnFKennedy = database.addRootKeyword("John F Kennedy");
             
             KeywordTagDefinition.addSynonym(jfk, johnFKennedy, false);
             

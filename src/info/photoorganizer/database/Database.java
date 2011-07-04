@@ -155,9 +155,9 @@ public class Database extends DatabaseObject
         return new IndexingConfiguration(getStorageStrategy());
     }
 
-    public KeywordTagDefinition createRootKeyword(String name)
+    public KeywordTagDefinition addRootKeyword(String name)
     {
-        return new KeywordTagDefinition(name, getStorageStrategy());
+        return getRootKeyword().addChild(name);
     }
     
     public <T extends TagDefinition> T createTagDefinition(Class<T> cls, String name)
@@ -331,22 +331,49 @@ public class Database extends DatabaseObject
     
     public TagDefinition getTagDefinition(String name)
     {
-        return getStorageStrategy().getTagDefinition(name);
+        TagDefinition tag = getStorageStrategy().getTagDefinition(name);
+        if (tag instanceof KeywordTagDefinition)
+        {
+            return getKeywordTagDefinition(tag.getId());
+        }
+        return tag;
     }
     
     public TagDefinition getTagDefinition(UUID id)
     {
-        return getStorageStrategy().getTagDefinition(id);
+        TagDefinition tag = getStorageStrategy().getTagDefinition(id);
+        if (tag instanceof KeywordTagDefinition)
+        {
+            return getKeywordTagDefinition(tag.getId());
+        }
+        return tag;
     }
 
     public <T extends TagDefinition> T getTagDefinition(UUID id, Class<T> type)
     {
-        return getStorageStrategy().getTagDefinition(id, type);
+        T tag = getStorageStrategy().getTagDefinition(id, type);
+        if (tag instanceof KeywordTagDefinition)
+        {
+            return (T) getKeywordTagDefinition(tag.getId());
+        }
+        return tag;
     }
 
     public Iterator<TagDefinition> getTagDefinitions()
     {
         return getStorageStrategy().getTagDefinitions();
+    }
+    
+    private TagDefinition getKeywordTagDefinition(UUID id)
+    {
+        if (getRootKeyword().getId().equals(id))
+        {
+            return getRootKeyword();
+        }
+        else
+        {
+            return getRootKeyword().getChildById(id, true);
+        }
     }
     
     public Image indexImage(File f)
@@ -515,8 +542,14 @@ public class Database extends DatabaseObject
         getStorageStrategy().storeIndexingConfiguration(translator);
     }
 
+    private KeywordTagDefinition rootKeyword = null;
+    
     public KeywordTagDefinition getRootKeyword()
     {
-        return getTagDefinition(DefaultTagDefinition.ROOT_KEYWORD.getId(), KeywordTagDefinition.class);
+        if (rootKeyword == null)
+        {
+            rootKeyword = getStorageStrategy().getTagDefinition(DefaultTagDefinition.ROOT_KEYWORD.getId(), KeywordTagDefinition.class);
+        }
+        return rootKeyword;
     }
 }

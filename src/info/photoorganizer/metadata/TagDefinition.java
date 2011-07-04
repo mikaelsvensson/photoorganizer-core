@@ -11,12 +11,25 @@ public abstract class TagDefinition extends DatabaseObject
 {
     
     
-    private Event<TagDefinitionEventListener, TagDefinitionEvent> _tagChangedEvent = new Event<TagDefinitionEventListener, TagDefinitionEvent>(
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6122806956666432455L;
+    
+    transient private Event<TagDefinitionEventListener, TagDefinitionEvent> _tagChangedEvent = new Event<TagDefinitionEventListener, TagDefinitionEvent>(
             new EventExecuter<TagDefinitionEventListener, TagDefinitionEvent>()
             {
                 public void fire(TagDefinitionEventListener listener, TagDefinitionEvent event)
                 {
                     listener.tagChanged(event);
+                }
+            });
+    transient private Event<TagDefinitionEventListener, TagDefinitionEvent> _keywordDeletedEvent = new Event<TagDefinitionEventListener, TagDefinitionEvent>(
+            new EventExecuter<TagDefinitionEventListener, TagDefinitionEvent>()
+            {
+                public void fire(TagDefinitionEventListener listener, TagDefinitionEvent event)
+                {
+                    listener.tagDeleted(event);
                 }
             });
     
@@ -64,7 +77,19 @@ public abstract class TagDefinition extends DatabaseObject
     public void addTagEventListener(TagDefinitionEventListener listener)
     {
         _tagChangedEvent.addListener(listener);
+        _keywordDeletedEvent.addListener(listener);
     }
+    
+    protected void fireDeletedEvent(TagDefinitionEvent event)
+    {
+        _keywordDeletedEvent.fire(event);
+    }
+    
+    protected void fireDeletedEvent()
+    {
+        _keywordDeletedEvent.fire(new TagDefinitionEvent(this));
+    }
+    
     
     protected void fireChangedEvent(TagDefinitionEvent event)
     {
@@ -89,6 +114,7 @@ public abstract class TagDefinition extends DatabaseObject
     public void removeTagEventListener(TagDefinitionEventListener listener)
     {
         _tagChangedEvent.removeListener(listener);
+        _keywordDeletedEvent.removeListener(listener);
     }
 
     public void setApplicableToImageRegion(boolean applicableToImageRegion)

@@ -5,13 +5,19 @@ import info.photoorganizer.util.Event;
 import info.photoorganizer.util.Event.EventExecuter;
 import info.photoorganizer.util.UUIDUtilities;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class DatabaseObject
+public class DatabaseObject implements Serializable
 {
-    private DatabaseStorageStrategy _storageStrategy = null;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4608033872448671474L;
+
+    transient private DatabaseStorageStrategy _storageStrategy = null;
     
-    private Event<DatabaseObjectEventListener, DatabaseObjectEvent> _changedEvent = new Event<DatabaseObjectEventListener, DatabaseObjectEvent>(
+    transient private Event<DatabaseObjectEventListener, DatabaseObjectEvent> _changedEvent = new Event<DatabaseObjectEventListener, DatabaseObjectEvent>(
             new EventExecuter<DatabaseObjectEventListener, DatabaseObjectEvent>()
             {
                 public void fire(DatabaseObjectEventListener listener, DatabaseObjectEvent event)

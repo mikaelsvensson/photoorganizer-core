@@ -33,7 +33,7 @@ public class DatabaseTest
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            KeywordTagDefinition keyword = database.createRootKeyword(keywordName);
+            KeywordTagDefinition keyword = database.addRootKeyword(keywordName);
             keyword.store();
         }
         catch (DatabaseStorageException e)

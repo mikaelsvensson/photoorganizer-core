@@ -6,6 +6,10 @@ import info.photoorganizer.util.Event;
 import info.photoorganizer.util.Event.EventExecuter;
 import info.photoorganizer.util.StringUtils;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,8 +18,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class KeywordTagDefinition extends TagDefinition
+public class KeywordTagDefinition extends TagDefinition implements Transferable
 {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8096281677404108954L;
 
     public static final char DEFAULT_KEYWORD_QUOTATION_MARK = '"';
     
@@ -26,34 +35,33 @@ public class KeywordTagDefinition extends TagDefinition
         super(name, id, storageContext);
         if (null != parent)
         {
-            parent.addChild(this);
+            parent.addChild(this, true);
         }
         setUserAllowedToCreateTags(true);
         setUserAllowedToEditTags(true);
     }
+    
+    public KeywordTagDefinition(String name, KeywordTagDefinition parent, DatabaseStorageStrategy storageContext)
+    {
+        this(name, null, parent, storageContext);
+    }
 
     public KeywordTagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
     {
-        super(name, id, storageContext);
-        setUserAllowedToCreateTags(true);
-        setUserAllowedToEditTags(true);
+        this(name, id, null, storageContext);
     }
 
     public KeywordTagDefinition(String name, DatabaseStorageStrategy storageContext)
     {
-        super(name, storageContext);
-        setUserAllowedToCreateTags(true);
-        setUserAllowedToEditTags(true);
+        this(name, null, null, storageContext);
     }
     
     public KeywordTagDefinition(DatabaseStorageStrategy storageContext)
     {
-        super(storageContext);
-        setUserAllowedToCreateTags(true);
-        setUserAllowedToEditTags(true);
+        this(null, null, null, storageContext);
     }
 
-    private final KeywordEventListener _childListener = new KeywordEventListener()
+    transient private final KeywordTagDefinitionEventListener _childListener = new KeywordTagDefinitionEventListener()
     {
         
         @Override
@@ -63,45 +71,37 @@ public class KeywordTagDefinition extends TagDefinition
         }
         
         @Override
-        public void keywordDeleted(KeywordEvent event)
+        public void tagDeleted(TagDefinitionEvent event)
         {
             fireDeletedEvent(event);
         }
         
         @Override
-        public void keywordInserted(KeywordEvent event)
+        public void keywordInserted(KeywordTagDefinitionEvent event)
         {
             fireInsertedEvent(event);
         }
         
         @Override
-        public void keywordStructureChanged(KeywordEvent event)
+        public void keywordStructureChanged(KeywordTagDefinitionEvent event)
         {
             fireStructureChangedEvent(event);
         }
     };
     
-    private Event<KeywordEventListener, KeywordEvent> _keywordDeletedEvent = new Event<KeywordEventListener, KeywordEvent>(
-            new EventExecuter<KeywordEventListener, KeywordEvent>()
+    transient private Event<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent> _keywordInsertedEvent = new Event<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent>(
+            new EventExecuter<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent>()
             {
-                public void fire(KeywordEventListener listener, KeywordEvent event)
-                {
-                    listener.keywordDeleted(event);
-                }
-            });
-    private Event<KeywordEventListener, KeywordEvent> _keywordInsertedEvent = new Event<KeywordEventListener, KeywordEvent>(
-            new EventExecuter<KeywordEventListener, KeywordEvent>()
-            {
-                public void fire(KeywordEventListener listener, KeywordEvent event)
+                public void fire(KeywordTagDefinitionEventListener listener, KeywordTagDefinitionEvent event)
                 {
                     listener.keywordInserted(event);
                 }
             });
     
-    private Event<KeywordEventListener, KeywordEvent> _keywordStructureChangedEvent = new Event<KeywordEventListener, KeywordEvent>(
-            new EventExecuter<KeywordEventListener, KeywordEvent>()
+    transient private Event<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent> _keywordStructureChangedEvent = new Event<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent>(
+            new EventExecuter<KeywordTagDefinitionEventListener, KeywordTagDefinitionEvent>()
             {
-                public void fire(KeywordEventListener listener, KeywordEvent event)
+                public void fire(KeywordTagDefinitionEventListener listener, KeywordTagDefinitionEvent event)
                 {
                     listener.keywordStructureChanged(event);
                 }
@@ -123,17 +123,21 @@ public class KeywordTagDefinition extends TagDefinition
         }
         return false;
     }
-    
-    public boolean isAncestorTo(TagDefinition possibleDescendant)
+    public boolean isDescendantOf(UUID possibleAncestorId)
     {
-        for (KeywordTagDefinition descendant : getDescendants())
+        for (KeywordTagDefinition current = this.parent; current != null; current = current.parent)
         {
-            if (descendant.equals(possibleDescendant))
+            if (current.getId().equals(possibleAncestorId))
             {
                 return true;
             }
         }
         return false;
+    }
+    
+    public boolean isAncestorTo(TagDefinition possibleDescendant)
+    {
+        return possibleDescendant instanceof KeywordTagDefinition && ((KeywordTagDefinition)possibleDescendant).isDescendantOf(this);
     }
     
     public boolean isChildOf(KeywordTagDefinition possibleParent)
@@ -146,7 +150,7 @@ public class KeywordTagDefinition extends TagDefinition
         return children.contains(possibleChild);
     }
 
-    public void addChild(KeywordTagDefinition tag)
+    public KeywordTagDefinition addChild(KeywordTagDefinition tag, boolean notify)
     {
         if (tag.getParent() != null)
         {
@@ -156,16 +160,20 @@ public class KeywordTagDefinition extends TagDefinition
         {
             children.add(tag);
             tag.parent = this;
+            if (notify)
+            { 
+                fireInsertedEvent(new KeywordTagDefinitionEvent(this, tag));
+            }
         }
-        fireInsertedEvent(new KeywordEvent(this, tag));
         tag.addKeywordEventListener(_childListener);
+        return tag;
     }
     
     public void addChildren(Iterable<KeywordTagDefinition> tags)
     {
         for (KeywordTagDefinition t : tags)
         {
-            addChild(t);
+            addChild(t, true);
         }
     }
     
@@ -173,30 +181,24 @@ public class KeywordTagDefinition extends TagDefinition
     {
         for (KeywordTagDefinition t : tags)
         {
-            addChild(t);
+            addChild(t, true);
         }
     }
 
-    public void addKeywordEventListener(KeywordEventListener listener)
+    public void addKeywordEventListener(KeywordTagDefinitionEventListener listener)
     {
         addTagEventListener(listener);
-        _keywordDeletedEvent.addListener(listener);
         _keywordInsertedEvent.addListener(listener);
         _keywordStructureChangedEvent.addListener(listener);
     }
     
     
-    private void fireDeletedEvent(KeywordEvent event)
-    {
-        _keywordDeletedEvent.fire(event);
-    }
-    
-    private void fireInsertedEvent(KeywordEvent event)
+    private void fireInsertedEvent(KeywordTagDefinitionEvent event)
     {
         _keywordInsertedEvent.fire(event);
     }
     
-    private void fireStructureChangedEvent(KeywordEvent event)
+    private void fireStructureChangedEvent(KeywordTagDefinitionEvent event)
     {
         _keywordStructureChangedEvent.fire(event);
     }
@@ -333,23 +335,50 @@ public class KeywordTagDefinition extends TagDefinition
     {
         if (newParent != this && newParent != null)
         {
-            parent.removeChild(this);
-            newParent.addChild(this);
+            KeywordTagDefinitionEvent event = new KeywordTagDefinitionEvent(parent.getSharedAncestor(newParent));
+            try
+            {
+                parent.removeChild(this, false);
+                
+                newParent.addChild(this, false);
+                
+                fireStructureChangedEvent(event);
+            }
+            catch (Throwable e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         }
     }
     
-    public void removeChild(KeywordTagDefinition keyword)
+    public KeywordTagDefinition getSharedAncestor(KeywordTagDefinition newParent)
     {
-        KeywordEvent event = new KeywordEvent(this, keyword); // Before remove(...) so that the current child index can be computed.
+        for (KeywordTagDefinition current = this; current != null; current = current.parent)
+        {
+            if (current.equals(newParent) || current.isAncestorTo(newParent))
+            {
+                return current;
+            }
+        }
+        return null;
+    }
+
+    public void removeChild(KeywordTagDefinition keyword, boolean notify)
+    {
+        KeywordTagDefinitionEvent event = new KeywordTagDefinitionEvent(this, keyword); // Before remove(...) so that the current child index can be computed.
         children.remove(keyword);
         keyword.parent = null;
-        fireDeletedEvent(event);
+        if (notify)
+        {
+            fireDeletedEvent(event);
+        }
         keyword.removeKeywordEventListener(_childListener);
     }
     
-    public void removeKeywordEventListener(KeywordEventListener listener)
+    public void removeKeywordEventListener(KeywordTagDefinitionEventListener listener)
     {
-        _keywordDeletedEvent.removeListener(listener);
         _keywordInsertedEvent.removeListener(listener);
         _keywordStructureChangedEvent.removeListener(listener);
     }
@@ -463,7 +492,7 @@ public class KeywordTagDefinition extends TagDefinition
     {
         if (parent != null)
         {
-            parent.removeChild(this);
+            parent.removeChild(this, false);
         }
         removeTagsForTagDefinition();
         
@@ -491,6 +520,44 @@ public class KeywordTagDefinition extends TagDefinition
     
     public boolean isDirty()
     {
+        return false;
+    }
+    
+    public KeywordTagDefinition addChild(String name)
+    {
+        return addChild(new KeywordTagDefinition(name, getStorageStrategy()), true);
+    }
+    
+    public static final DataFlavor KEYWORD_FLAVOR = new DataFlavor(KeywordTagDefinition.class, "Dragable Keyword");
+    
+    private static DataFlavor[] FLAVORS = { KEYWORD_FLAVOR };
+
+    @Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
+    {
+        if (isDataFlavorSupported(flavor))
+        {
+            return this;
+        }
+        throw new UnsupportedFlavorException(flavor);
+    }
+
+    @Override
+    public DataFlavor[] getTransferDataFlavors()
+    {
+        return FLAVORS;
+    }
+
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor)
+    {
+        for (DataFlavor f : getTransferDataFlavors())
+        {
+            if (f.equals(flavor))
+            {
+                return true;
+            }
+        }
         return false;
     }
 

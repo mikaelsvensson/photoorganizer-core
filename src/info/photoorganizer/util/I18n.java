@@ -84,8 +84,7 @@ public class I18n
             }
             catch (MissingResourceException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println("Could not find " + bundleName);
                 return null;
             }
             bundles.put(bundleName, bundle);

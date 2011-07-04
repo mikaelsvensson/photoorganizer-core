@@ -5,4 +5,5 @@ import java.util.EventListener;
 public interface TagDefinitionEventListener extends EventListener
 {
     void tagChanged(TagDefinitionEvent event);
+    void tagDeleted(TagDefinitionEvent event);
 }
