@@ -9,7 +9,7 @@ public abstract class Tag<T extends TagDefinition>
 
     private T _definition = null;
     
-    private ImageRegion _region = null;
+    private PhotoRegion _region = null;
 
     public Tag(T definition)
     {
@@ -22,12 +22,12 @@ public abstract class Tag<T extends TagDefinition>
         return _definition;
     }
 
-    public ImageRegion getRegion()
+    public PhotoRegion getRegion()
     {
         return _region;
     }
 
-    public void setRegion(ImageRegion region)
+    public void setRegion(PhotoRegion region)
     {
         _region = region;
     }

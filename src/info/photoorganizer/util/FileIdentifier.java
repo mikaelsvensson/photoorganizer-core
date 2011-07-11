@@ -1,6 +1,6 @@
 package info.photoorganizer.util;
 
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 
 import java.io.File;
 import java.net.URI;
@@ -8,7 +8,7 @@ import java.net.URI;
 public class FileIdentifier
 {
     
-    public static double equalityProbability(File f, Image i, double exactMatchThreshold)
+    public static double equalityProbability(File f, Photo i, double exactMatchThreshold)
     {
         double points = 0;
         URI fileURL = f.toURI();

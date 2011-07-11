@@ -33,7 +33,7 @@ public abstract class TagDefinition extends DatabaseObject
                 }
             });
     
-    private boolean applicableToImageRegion = false;
+    private boolean applicableToPhotoRegion = false;
     private String name = null;
     private boolean userAllowedToEditTags = false;
     private boolean userAllowedToCreateTags = false;
@@ -106,9 +106,9 @@ public abstract class TagDefinition extends DatabaseObject
         return name;
     }
     
-    public boolean isApplicableToImageRegion()
+    public boolean isApplicableToPhotoRegion()
     {
-        return applicableToImageRegion;
+        return applicableToPhotoRegion;
     }
 
     public void removeTagEventListener(TagDefinitionEventListener listener)
@@ -117,10 +117,10 @@ public abstract class TagDefinition extends DatabaseObject
         _keywordDeletedEvent.removeListener(listener);
     }
 
-    public void setApplicableToImageRegion(boolean applicableToImageRegion)
+    public void setApplicableToPhotoRegion(boolean applicableToImageRegion)
     {
-        if (equals(this.applicableToImageRegion, applicableToImageRegion)) return;
-        this.applicableToImageRegion = applicableToImageRegion;
+        if (equals(this.applicableToPhotoRegion, applicableToImageRegion)) return;
+        this.applicableToPhotoRegion = applicableToImageRegion;
         fireChangedEvent();
     }
     

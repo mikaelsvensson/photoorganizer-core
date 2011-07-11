@@ -5,7 +5,7 @@ import info.photoorganizer.util.StringList;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 
-public enum ImageFileMetadataDatatype
+public enum PhotoFileMetadataDatatype
 {
     STRING {
         @Override

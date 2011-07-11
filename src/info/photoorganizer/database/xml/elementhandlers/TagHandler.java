@@ -2,7 +2,7 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.ImageRegion;
+import info.photoorganizer.metadata.PhotoRegion;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
@@ -26,9 +26,9 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
         
         TagDefinition tagDefinition = _storageStrategy.getTagDefinition(el, ATTRIBUTENAME_DEFINITION);
         o.setDefinition(tagDefinition);
-        if (tagDefinition.isApplicableToImageRegion())
+        if (tagDefinition.isApplicableToPhotoRegion())
         {
-            o.setRegion(ImageRegion.valueOf(el.getAttribute(ATTRIBUTENAME_REGION)));
+            o.setRegion(PhotoRegion.valueOf(el.getAttribute(ATTRIBUTENAME_REGION)));
         }
         
         /*
@@ -56,8 +56,8 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
     {
         _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_DEFINITION, o.getDefinition().getId());
         
-        ImageRegion region = o.getRegion();
-        if (o.getDefinition().isApplicableToImageRegion() && region != null)
+        PhotoRegion region = o.getRegion();
+        if (o.getDefinition().isApplicableToPhotoRegion() && region != null)
         {
             XMLUtilities.setTextAttribute(el, ATTRIBUTENAME_REGION, region.toString());
         }

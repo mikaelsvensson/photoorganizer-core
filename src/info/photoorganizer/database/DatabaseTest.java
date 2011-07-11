@@ -1,7 +1,7 @@
 package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.DatabaseException;
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
@@ -18,11 +18,11 @@ import org.junit.Test;
 public class DatabaseTest
 {
     @Test
-    public void addImageAndKeywordAndRemoveKeyword()
+    public void addPhotoAndKeywordAndRemoveKeyword()
     {
         String keywordName = "Keyword created at " + Calendar.getInstance().getTime().toString();
         addKeyword(keywordName);
-        addImageWithKeyword("http://host/addImageAndKeywordAndRemoveKeyword.jpg", keywordName);
+        addPhotoWithKeyword("http://host/addImageAndKeywordAndRemoveKeyword.jpg", keywordName);
         removeKeyword(keywordName);
         
         Assert.assertTrue(true);
@@ -81,14 +81,14 @@ public class DatabaseTest
         }
     }
     
-    private void addImageWithKeyword(String uri, String keywordName)
+    private void addPhotoWithKeyword(String uri, String keywordName)
     {
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
             TagDefinition keyword = database.getTagDefinition(keywordName);
             
-            Image createImage = database.createImage();
+            Photo createImage = database.createPhoto();
             createImage.setURI(new URI(uri));
             if (keyword instanceof KeywordTagDefinition)
             {

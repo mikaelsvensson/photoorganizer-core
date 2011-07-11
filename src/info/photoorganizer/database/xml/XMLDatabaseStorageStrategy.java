@@ -23,7 +23,7 @@ import info.photoorganizer.database.xml.elementhandlers.TagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
 import info.photoorganizer.metadata.DatabaseObject;
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.TagDefinition;
@@ -208,7 +208,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
     
     @Override
-    public void addImage(Image img) throws DatabaseStorageException
+    public void addPhoto(Photo img) throws DatabaseStorageException
     {
         // TODO Auto-generated method stub
         
@@ -432,9 +432,9 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public Iterator<Image> getImages()
+    public Iterator<Photo> getPhotos()
     {
-        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_IMAGES), this, Image.class);
+        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), this, Photo.class);
     }
 
     public TagDefinition getTagDefinition(Element el, String idAttrName)
@@ -571,7 +571,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 //    }
 
     @Override
-    public void removeImage(Image img) throws DatabaseStorageException
+    public void removePhoto(Photo img) throws DatabaseStorageException
     {
         // TODO Auto-generated method stub
         
@@ -593,7 +593,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public void storeImage(Image img) throws DatabaseStorageException
+    public void storePhoto(Photo img) throws DatabaseStorageException
     {
         ImageHandler handler = getElementHandler(img);
         handler.storeElement(img);
@@ -734,13 +734,13 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public Iterator<Image> getImagesWithTag(TagDefinition tagDefinition)
+    public Iterator<Photo> getPhotosWithTag(TagDefinition tagDefinition)
     {
-        List<Image> res = new LinkedList<Image>();
-        Iterator<Image> images = getImages();
+        List<Photo> res = new LinkedList<Photo>();
+        Iterator<Photo> images = getPhotos();
         while (images.hasNext())
         {
-            Image image = images.next();
+            Photo image = images.next();
             if (image.hasTag(tagDefinition))
             {
                 res.add(image);

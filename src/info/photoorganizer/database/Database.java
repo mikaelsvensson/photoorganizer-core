@@ -5,8 +5,8 @@ import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.DatetimeTag;
 import info.photoorganizer.metadata.DatetimeTagDefinition;
 import info.photoorganizer.metadata.DefaultTagDefinition;
-import info.photoorganizer.metadata.Image;
-import info.photoorganizer.metadata.ImageFileMetadataTag;
+import info.photoorganizer.metadata.Photo;
+import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.IntegerNumberTag;
 import info.photoorganizer.metadata.IntegerNumberTagDefinition;
@@ -120,7 +120,7 @@ public class Database extends DatabaseObject
         getStorageStrategy().addIndexingConfiguration(translator);
     }
 
-    private void addTags(Image img, Metadata metadata) throws DatabaseStorageException
+    private void addTags(Photo img, Metadata metadata) throws DatabaseStorageException
     {
         Iterator<IndexingConfiguration> cfgs = getIndexingConfigurations();
         while (cfgs.hasNext())
@@ -131,7 +131,7 @@ public class Database extends DatabaseObject
             {
                 for (MetadataMappingConfiguration mapper : cfg.getMetadataMappers())
                 {
-                    ImageFileMetadataTag source = mapper.getSource();
+                    PhotoFileMetadataTag source = mapper.getSource();
                     Object value = getSourceData(metadata, mapper, source);
                     if (null != value)
                     {
@@ -156,9 +156,9 @@ public class Database extends DatabaseObject
         getStorageStrategy().close();
     }
 
-    public Image createImage()
+    public Photo createPhoto()
     {
-        return new Image(getStorageStrategy());
+        return new Photo(getStorageStrategy());
     }
 
     public IndexingConfiguration createIndexingConfiguration()
@@ -281,15 +281,15 @@ public class Database extends DatabaseObject
         return tags;
     }
     
-    public Image getImage(File f)
+    public Photo getPhoto(File f)
     {
         double bestMatchPoints = 0;
-        Image bestMatch = null;
+        Photo bestMatch = null;
         
-        Iterator<Image> i = getImages();
+        Iterator<Photo> i = getPhotos();
         while (i.hasNext())
         {
-            Image image = i.next();
+            Photo image = i.next();
             double probability = FileIdentifier.equalityProbability(f, image, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
             if (probability > bestMatchPoints)
             {
@@ -304,9 +304,9 @@ public class Database extends DatabaseObject
         return null;
     }
     
-    public Iterator<Image> getImages()
+    public Iterator<Photo> getPhotos()
     {
-        return getStorageStrategy().getImages();
+        return getStorageStrategy().getPhotos();
     }
     
     public Iterator<IndexingConfiguration> getIndexingConfigurations()
@@ -321,7 +321,7 @@ public class Database extends DatabaseObject
     
     private Object getSourceData(Metadata metadata,
             MetadataMappingConfiguration mapper,
-            ImageFileMetadataTag source)
+            PhotoFileMetadataTag source)
     {
         Object value = source.getDatatype().get(metadata, source.getFileMetadataDirectory(), source.getFileMetadataDirectoryTag());
         if (value instanceof String)
@@ -387,12 +387,12 @@ public class Database extends DatabaseObject
         }
     }
     
-    public Image indexImage(File f)
+    public Photo indexPhoto(File f)
     {
-        Image img = getImage(f);
+        Photo img = getPhoto(f);
         if (null == img)
         {
-            img = createImage();
+            img = createPhoto();
             img.setFile(f);
         }
         
@@ -433,12 +433,12 @@ public class Database extends DatabaseObject
      * @param images
      * @return
      */
-    public Set<KeywordTagDefinition> keywordIntersection(Image... images)
+    public Set<KeywordTagDefinition> keywordIntersection(Photo... images)
     {
         Set<KeywordTagDefinition> res = new HashSet<KeywordTagDefinition>();
         if (images.length > 0)
         {
-            Image ref = images[0];
+            Photo ref = images[0];
             Iterator<Tag<? extends TagDefinition>> tags = ref.getTags();
             while (tags.hasNext())
             {
@@ -471,10 +471,10 @@ public class Database extends DatabaseObject
      * @param images
      * @return
      */
-    public Set<KeywordTagDefinition> keywordUnion(Image... images)
+    public Set<KeywordTagDefinition> keywordUnion(Photo... images)
     {
         Set<KeywordTagDefinition> res = new HashSet<KeywordTagDefinition>();
-        for (Image image : images)
+        for (Photo image : images)
         {
             Iterator<Tag<? extends TagDefinition>> tags = image.getTags();
             while (tags.hasNext())
@@ -492,10 +492,10 @@ public class Database extends DatabaseObject
     
     public void replaceKeywordTagDefinition(KeywordTagDefinition old, KeywordTagDefinition replacement, boolean removeOld) throws DatabaseStorageException
     {
-        Iterator<Image> iterator = getStorageStrategy().getImagesWithTag(old);
+        Iterator<Photo> iterator = getStorageStrategy().getPhotosWithTag(old);
         while (iterator.hasNext())
         {
-            Image image = iterator.next();
+            Photo image = iterator.next();
             image.removeKeywordTagsOfType(old);
             try
             {
@@ -521,7 +521,7 @@ public class Database extends DatabaseObject
         fireChangedEvent();
     }
 
-    private void setTargetData(Image img,
+    private void setTargetData(Photo img,
             MetadataMappingConfiguration mapper,
             Object value) throws DatabaseStorageException
     {

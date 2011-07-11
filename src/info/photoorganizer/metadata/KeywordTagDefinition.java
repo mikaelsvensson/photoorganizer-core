@@ -501,10 +501,10 @@ public class KeywordTagDefinition extends TagDefinition implements Transferable
 
     protected void removeTagsForTagDefinition() throws DatabaseStorageException
     {
-        Iterator<Image> images = getStorageStrategy().getImagesWithTag(this);
+        Iterator<Photo> images = getStorageStrategy().getPhotosWithTag(this);
         while (images.hasNext())
         {
-            Image image = images.next();
+            Photo image = images.next();
             Iterator<Tag<? extends TagDefinition>> tags = image.getTags();
             while (tags.hasNext())
             {

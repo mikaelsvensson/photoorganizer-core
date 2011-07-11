@@ -2,7 +2,7 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.ImageFileMetadataTag;
+import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
 import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.transform.TextTransformer;
@@ -24,7 +24,7 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
     @Override
     public void readElement(MetadataMappingConfiguration o, Element el)
     {
-        o.setSource(ImageFileMetadataTag.valueOf(el.getAttribute(ATTRIBUTENAME_SOURCE)));
+        o.setSource(PhotoFileMetadataTag.valueOf(el.getAttribute(ATTRIBUTENAME_SOURCE)));
         
         Iterator<TextTransformer> textTransformers = _storageStrategy.fromElementChildren(el, TextTransformer.class).iterator();
         while (textTransformers.hasNext())

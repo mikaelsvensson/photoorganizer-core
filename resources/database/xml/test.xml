@@ -28,10 +28,10 @@
 		<KeywordTagDefinition id="id-7322ee08-1ebe-4d74-91a4-41210722c8bc"
 			name="JKF" synonyms="id-efdae686-cfaa-41b4-ad6e-8578a007f8d9" />
 	</TagDefinitions>
-	<Images>
-		<Image url="http://demo/test.jpg">
+	<Photos>
+		<Photo uri="http://demo/test.jpg">
 			<KeywordTag tagdefinition="id-d9ec96c6-3800-4d3a-91dc-e23f33e5b862" />
 			<TextTag tagdefinition="id-646e958d-1d34-4d4d-be88-40f1680c6005">a flower</TextTag>
-		</Image>
-	</Images>
+		</Photo>
+	</Photos>
 </Database>

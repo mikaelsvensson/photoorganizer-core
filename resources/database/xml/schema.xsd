@@ -63,7 +63,7 @@
     	<complexContent>
     		<extension base="po:DatabaseObject">
     			<attribute name="name" type="string" use="required"></attribute>
-    			<attribute name="applicabletoimageregion" type="boolean"
+    			<attribute name="applicabletophotoregion" type="boolean"
     				use="optional">
     			</attribute>
     			<attribute name="isuserallowedtoedittags" type="boolean"></attribute>
@@ -103,7 +103,7 @@
     			<sequence maxOccurs="unbounded" minOccurs="0">
 
                     <choice><element name="IndexingConfigurations" type="po:IndexingConfigurations" maxOccurs="1" minOccurs="0">
-    				</element><element name="Images" type="po:Images" maxOccurs="1" minOccurs="0">
+    				</element><element name="Photos" type="po:Photos" maxOccurs="1" minOccurs="0">
     				</element><element name="TagDefinitions" type="po:TagDefinitions" maxOccurs="1" minOccurs="0">
     				</element></choice>
     			</sequence>
@@ -117,7 +117,7 @@
     	<attribute name="id" type="ID"></attribute>
     </complexType>
 
-    <complexType name="Image">
+    <complexType name="Photo">
     	<complexContent>
     		<extension base="po:DatabaseObject">
     			<sequence maxOccurs="unbounded" minOccurs="0">
@@ -150,9 +150,9 @@
 
 
 
-    <complexType name="Images">
+    <complexType name="Photos">
     	<sequence>
-    		<element name="Image" type="po:Image" maxOccurs="unbounded" minOccurs="0"></element>
+    		<element name="Photo" type="po:Photo" maxOccurs="unbounded" minOccurs="0"></element>
     	</sequence>
     </complexType>
     

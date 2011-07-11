@@ -5,7 +5,7 @@ import info.photoorganizer.database.DatabaseManager;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.metadata.AutoIndexTagDefinition;
 import info.photoorganizer.metadata.DefaultTagDefinition;
-import info.photoorganizer.metadata.ImageFileMetadataTag;
+import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
@@ -27,7 +27,7 @@ public class InitDefaultKeywordTranslators
             
             {
                 MetadataMappingConfiguration mappingCfg = new MetadataMappingConfiguration();
-                mappingCfg.setSource(ImageFileMetadataTag.IPTC_SUPPLEMENTAL_CATEGORIES);
+                mappingCfg.setSource(PhotoFileMetadataTag.IPTC_SUPPLEMENTAL_CATEGORIES);
                 mappingCfg.getSourceTextTransformers().add(new ReplaceTransformer(".", " "));
                 mappingCfg.setTarget(database.getTagDefinition(DefaultTagDefinition.ROOT_KEYWORD.getId()));
                 cfg.getMetadataMappers().add(mappingCfg);

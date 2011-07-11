@@ -3,7 +3,7 @@ package info.photoorganizer.database.xml.elementhandlers;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseException;
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.util.XMLUtilities;
 
@@ -11,17 +11,17 @@ import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
-public class ImageHandler extends DatabaseObjectHandler<Image>
+public class ImageHandler extends DatabaseObjectHandler<Photo>
 {
     public ImageHandler(XMLDatabaseStorageStrategy storageStrategy)
     {
-        super(Image.class, storageStrategy);
+        super(Photo.class, storageStrategy);
     }
 
     private static String ATTRIBUTENAME_URI = "uri";
     
     @Override
-    public void readElement(Image o, Element el)
+    public void readElement(Photo o, Element el)
     {
         o.setURI(XMLUtilities.getURIAttribute(el, ATTRIBUTENAME_URI, null));
         
@@ -43,7 +43,7 @@ public class ImageHandler extends DatabaseObjectHandler<Image>
     }
     
     @Override
-    public void writeElement(Image o, Element el)
+    public void writeElement(Photo o, Element el)
     {
         XMLUtilities.setURIAttribute(el, ATTRIBUTENAME_URI, o.getURI());
         
@@ -53,15 +53,15 @@ public class ImageHandler extends DatabaseObjectHandler<Image>
     }
 
     @Override
-    public Image createObject(Element el)
+    public Photo createObject(Element el)
     {
-        return new Image(_storageStrategy);
+        return new Photo(_storageStrategy);
     }
 
     @Override
-    public void storeElement(Image o) throws DatabaseStorageException
+    public void storeElement(Photo o) throws DatabaseStorageException
     {
-        storeElementInRoot(o, DatabaseHandler.ELEMENTNAME_IMAGES);
+        storeElementInRoot(o, DatabaseHandler.ELEMENTNAME_PHOTOS);
 //        Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_IMAGES);
 //        
 //        Element newElement = createElement();

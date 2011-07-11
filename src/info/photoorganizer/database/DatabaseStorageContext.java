@@ -1,6 +1,6 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
 
 import java.util.Iterator;
@@ -15,9 +15,9 @@ public class DatabaseStorageContext
         strategy.close();
     }
 
-    public void storeImage(Image img) throws DatabaseStorageException
+    public void storePhoto(Photo img) throws DatabaseStorageException
     {
-        strategy.storeImage(img);
+        strategy.storePhoto(img);
     }
 
     public Iterator<TagDefinition> getTagDefinitions()
@@ -35,14 +35,14 @@ public class DatabaseStorageContext
         strategy.removeTagDefinition(tag);
     }
 
-    public void addImage(Image img) throws DatabaseStorageException
+    public void addPhoto(Photo img) throws DatabaseStorageException
     {
-        strategy.addImage(img);
+        strategy.addPhoto(img);
     }
 
-    public void removeImage(Image img) throws DatabaseStorageException
+    public void removePhoto(Photo img) throws DatabaseStorageException
     {
-        strategy.removeImage(img);
+        strategy.removePhoto(img);
     }
 
     public TagDefinition getTagDefinition(UUID id)

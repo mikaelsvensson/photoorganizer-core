@@ -13,7 +13,7 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     private static final String ATTRIBUTENAME_NAME = "name";
 
     public static final String ELEMENTNAME_TAGDEFINITIONS = "TagDefinitions";
-    public static final String ELEMENTNAME_IMAGES = "Images";
+    public static final String ELEMENTNAME_PHOTOS = "Photos";
     public static final String ELEMENTNAME_INDEXINGCONFIGURATIONS = "IndexingConfigurations";
 
     public DatabaseHandler(XMLDatabaseStorageStrategy storageStrategy)
@@ -73,9 +73,9 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
         el.appendChild(keywordTranslatorsEl);
         XMLUtilities.appendChildren(keywordTranslatorsEl, _storageStrategy.toElements(owner, o.getIndexingConfigurations()));
         
-        Element imagesEl = createElement(ELEMENTNAME_IMAGES, owner);
+        Element imagesEl = createElement(ELEMENTNAME_PHOTOS, owner);
         el.appendChild(imagesEl);
-        XMLUtilities.appendChildren(imagesEl, _storageStrategy.toElements(owner, o.getImages()));
+        XMLUtilities.appendChildren(imagesEl, _storageStrategy.toElements(owner, o.getPhotos()));
         
         
 //        KeywordTagDefinition rootKeyword = o.getRootKeyword();

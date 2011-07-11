@@ -8,10 +8,10 @@ import java.util.List;
 public class MetadataMappingConfiguration
 {
     private TagDefinition _target = null;
-    private ImageFileMetadataTag _source = null;
+    private PhotoFileMetadataTag _source = null;
     private List<TextTransformer> _sourceTextTransformers = null;
 
-    public MetadataMappingConfiguration(ImageFileMetadataTag source, TagDefinition target)
+    public MetadataMappingConfiguration(PhotoFileMetadataTag source, TagDefinition target)
     {
         super();
         _target = target;
@@ -33,12 +33,12 @@ public class MetadataMappingConfiguration
         _target = target;
     }
 
-    public ImageFileMetadataTag getSource()
+    public PhotoFileMetadataTag getSource()
     {
         return _source;
     }
 
-    public void setSource(ImageFileMetadataTag source)
+    public void setSource(PhotoFileMetadataTag source)
     {
         _source = source;
     }

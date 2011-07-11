@@ -10,18 +10,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class Image extends DatabaseObject
+public class Photo extends DatabaseObject
 {
     private List<Tag<? extends TagDefinition>> _tags = new LinkedList<Tag<? extends TagDefinition>>();
     private URI _uri = null;
     private File _file = null;
 
-    public Image(DatabaseStorageStrategy storageContext)
+    public Photo(DatabaseStorageStrategy storageContext)
     {
         super(null, storageContext);
     }
     
-    public Image(UUID id, DatabaseStorageStrategy storageContext)
+    public Photo(UUID id, DatabaseStorageStrategy storageContext)
     {
         super(id, storageContext);
     }
@@ -101,12 +101,12 @@ public class Image extends DatabaseObject
 
     public void store() throws DatabaseStorageException
     {
-        getStorageStrategy().storeImage(this);
+        getStorageStrategy().storePhoto(this);
     }
     
     public void remove() throws DatabaseStorageException
     {
-        getStorageStrategy().removeImage(this);
+        getStorageStrategy().removePhoto(this);
     }
     
     public boolean hasTag(TagDefinition tagDefinition)

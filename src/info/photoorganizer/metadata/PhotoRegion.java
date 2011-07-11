@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import info.photoorganizer.util.StringUtils;
 
-public class ImageRegion implements Serializable
+public class PhotoRegion implements Serializable
 {
     /**
      * 
@@ -16,7 +16,7 @@ public class ImageRegion implements Serializable
     private double _right = 1;
     private double _top = 0;
 
-    public ImageRegion(double top, double right, double bottom, double left)
+    public PhotoRegion(double top, double right, double bottom, double left)
     {
         super();
         _top = top;
@@ -51,7 +51,7 @@ public class ImageRegion implements Serializable
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ImageRegion other = (ImageRegion) obj;
+        PhotoRegion other = (PhotoRegion) obj;
         if (Double.doubleToLongBits(_bottom) != Double.doubleToLongBits(other._bottom))
             return false;
         if (Double.doubleToLongBits(_left) != Double.doubleToLongBits(other._left))
@@ -89,7 +89,7 @@ public class ImageRegion implements Serializable
         return _top + " " + _right + " " + _bottom + " " + _left; 
     }
     
-    public static ImageRegion valueOf(String str) throws NumberFormatException
+    public static PhotoRegion valueOf(String str) throws NumberFormatException
     {
         String[] values = StringUtils.split(str, ' ');
         if (values.length == 4)
@@ -99,7 +99,7 @@ public class ImageRegion implements Serializable
             double bottom = Double.parseDouble(values[2]);
             double left = Double.parseDouble(values[3]);
             
-            return new ImageRegion(top, right, bottom, left);
+            return new PhotoRegion(top, right, bottom, left);
         }
         throw new NumberFormatException("Input string does not have 4 values.");
     }

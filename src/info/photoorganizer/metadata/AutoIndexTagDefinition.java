@@ -8,12 +8,12 @@ import com.drew.metadata.Metadata;
 
 public enum AutoIndexTagDefinition
 {
-    F_NUMBER(DefaultTagDefinition.F_NUMBER.getId(), ImageFileMetadataTag.EXIF_FNUMBER),
-    DATE_TAKEN(DefaultTagDefinition.DATE_TAKEN.getId(), ImageFileMetadataTag.EXIF_DATE_ORIGINAL),
-    EXPOSURE_TIME(DefaultTagDefinition.EXPOSURE_TIME.getId(), ImageFileMetadataTag.EXIF_EXPOSURE_TIME)
+    F_NUMBER(DefaultTagDefinition.F_NUMBER.getId(), PhotoFileMetadataTag.EXIF_FNUMBER),
+    DATE_TAKEN(DefaultTagDefinition.DATE_TAKEN.getId(), PhotoFileMetadataTag.EXIF_DATE_ORIGINAL),
+    EXPOSURE_TIME(DefaultTagDefinition.EXPOSURE_TIME.getId(), PhotoFileMetadataTag.EXIF_EXPOSURE_TIME)
     ;
 
-    private ImageFileMetadataTag _fileTag = null;
+    private PhotoFileMetadataTag _fileTag = null;
     private UUID _targetTagDefinitionId = null;
 
     public UUID getTargetTagDefinitionId()
@@ -22,13 +22,13 @@ public enum AutoIndexTagDefinition
     }
 
     private AutoIndexTagDefinition(UUID targetTagDefinitionId,
-            ImageFileMetadataTag fileTag)
+            PhotoFileMetadataTag fileTag)
     {
         _targetTagDefinitionId = targetTagDefinitionId;
         _fileTag = fileTag;
     }
 
-    public ImageFileMetadataTag getFileTag()
+    public PhotoFileMetadataTag getFileTag()
     {
         return _fileTag;
     }

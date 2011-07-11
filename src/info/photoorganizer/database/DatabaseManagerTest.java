@@ -2,7 +2,7 @@ package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.DefaultTagDefinition;
-import info.photoorganizer.metadata.Image;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
@@ -122,12 +122,12 @@ public class DatabaseManagerTest
     }
     
     @Test
-    public void addImage()
+    public void addPhoto()
     {
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            Image img = database.createImage();
+            Photo img = database.createPhoto();
             img.setURI(new URI("http://demo/test.jpg"));
             
             TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
