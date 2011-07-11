@@ -22,7 +22,7 @@ public class Event<L extends EventListener, E extends EventObject>
 
     private List<L> _listeners = null;
     
-    public List<L> getListeners()
+    public synchronized List<L> getListeners()
     {
         if (null == _listeners)
         {
@@ -31,7 +31,7 @@ public class Event<L extends EventListener, E extends EventObject>
         return _listeners;
     }
 
-    public void addListener(L listener)
+    public synchronized void addListener(L listener)
     {
         List<L> listeners = getListeners();
         if (!listeners.contains(listener))
@@ -40,13 +40,13 @@ public class Event<L extends EventListener, E extends EventObject>
         }
     }
     
-    public void removeListener(L listener)
+    public synchronized void removeListener(L listener)
     {
         List<L> listeners = getListeners();
         listeners.remove(listener);
     }
     
-    public void fire(E event)
+    public synchronized void fire(E event)
     {
         List<L> listeners = getListeners();
         for (L listener : listeners)

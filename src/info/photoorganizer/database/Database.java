@@ -133,8 +133,19 @@ public class Database extends DatabaseObject
                 {
                     ImageFileMetadataTag source = mapper.getSource();
                     Object value = getSourceData(metadata, mapper, source);
-                    setTargetData(img, mapper, value);
+                    if (null != value)
+                    {
+                        setTargetData(img, mapper, value);
+                    }
+                    else
+                    {
+                        System.err.println("getSourceData returned 'null' for " + mapper.getTarget().getName());
+                    }
                 }
+            }
+            else
+            {
+                System.err.println("File filter did not allow tags for " + img.getFile() + " to be added to database.");
             }
         }
         img.store();
@@ -387,28 +398,30 @@ public class Database extends DatabaseObject
         
         try
         {
-            Metadata metadata = ImageMetadataReader.readMetadata(f);
-            
-//            addDefaultTags(img, metadata);
-            
-            addTags(img, metadata);
-            
+            try {
+                Metadata metadata = ImageMetadataReader.readMetadata(f);
+                
+    //            addDefaultTags(img, metadata);
+                
+                addTags(img, metadata);
+                
+            }
+            catch (ImageProcessingException e)
+            {
+                System.err.println("indexImage(" + f.getName() + "): " + e.getMessage());
+                //e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                System.err.println("indexImage(" + f.getName() + "): " + e.getMessage());
+                //e.printStackTrace();
+            }
             img.store();
-        }
-        catch (ImageProcessingException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         catch (DatabaseStorageException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println("indexImage(" + f.getName() + "): " + e.getMessage());
+            //e.printStackTrace();
         }
         return img;
     }

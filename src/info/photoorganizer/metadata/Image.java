@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public class Image extends DatabaseObject
 {
-    
     private List<Tag<? extends TagDefinition>> _tags = new LinkedList<Tag<? extends TagDefinition>>();
     private URI _uri = null;
     private File _file = null;
