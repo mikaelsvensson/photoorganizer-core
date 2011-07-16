@@ -82,10 +82,6 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         {
             e.printStackTrace();
         }
-        // catch (SAXException e)
-        // {
-        // e.printStackTrace();
-        // }
     }
     
     public static boolean handles(URL databaseUrl)
@@ -96,15 +92,9 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     private File _databaseFile = null;
     private Date _lastOperation = null;
 
-    //private Document doc = null;
-    
-    private Collection<IndexingConfiguration> _indexingConfigurations = null;
-    private Collection<Photo> _photos = null;
-    private Collection<TagDefinition> _tagDefinitions = null;
-    
-//    private final KeywordTagHandler KEYWORD_TAG_HANDLER = new KeywordTagHandler(this);
-//    private final KeywordTagDefinitionHandler KEYWORD_TAG_DEFINITION_HANDLER = new KeywordTagDefinitionHandler(this);
-//    private ElementHandler[] HANDLERS = null;
+    private Collection<IndexingConfiguration> _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
+    private Collection<Photo> _photos = new LinkedHashSet<Photo>();
+    private Collection<TagDefinition> _tagDefinitions = new LinkedHashSet<TagDefinition>();
     
     public XMLDatabaseStorageStrategy(URL databaseUrl)
     {
@@ -126,13 +116,6 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         storePhoto(photo);
     }
     
-//    private File getDatabaseFile()
-//    {
-//        String databasePath = ConfigurationProperty.dbPath.get();
-//        File f = new File(databasePath);
-//        return f;
-//    }
-
     @Override
     public void addTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException
     {
@@ -295,7 +278,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_photos)
         {
-            _photos = new LinkedHashSet<Photo>();
+            _photos.clear();
             DatabaseObjectIterator<Photo> i = new DatabaseObjectIterator<Photo>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), context, Photo.class);
             while (i.hasNext())
             {
@@ -384,7 +367,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_tagDefinitions)
         {
-            _tagDefinitions = new LinkedHashSet<TagDefinition>();
+            _tagDefinitions.clear();
             for (ElementHandler<? extends Object> eh : context.getHandlers())
             {
                 if (TagDefinition.class.isAssignableFrom(eh.getDatabaseObjectClass()))
@@ -613,7 +596,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_indexingConfigurations)
         {
-            _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
+            _indexingConfigurations.clear();
             DatabaseObjectIterator<IndexingConfiguration> i = new DatabaseObjectIterator<IndexingConfiguration>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), context, IndexingConfiguration.class);
             while (i.hasNext())
             {
