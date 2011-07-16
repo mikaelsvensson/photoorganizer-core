@@ -1,16 +1,17 @@
 package info.photoorganizer.database;
 
-import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.IndexingConfiguration;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 public interface DatabaseStorageStrategy
 {
-//	public TagDefinition getRootTag();
-    public Iterator<TagDefinition> getTagDefinitions();
+    public Collection<TagDefinition> getTagDefinitions();
 	public TagDefinition getTagDefinition(UUID id);
 	public TagDefinition getTagDefinition(String name);
 	public <T extends TagDefinition> T getTagDefinition(UUID id, Class<T> type);
@@ -20,13 +21,13 @@ public interface DatabaseStorageStrategy
 	public void removeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
 	public void storeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException;
 	
-	public Iterator<Photo> getPhotos();
-	public Iterator<Photo> getPhotosWithTag(TagDefinition tagDefinition);
+	public Collection<Photo> getPhotos();
+	public Collection<Photo> getPhotosWithTag(TagDefinition tagDefinition);
 	public void addPhoto(Photo img) throws DatabaseStorageException;
 	public void removePhoto(Photo img) throws DatabaseStorageException;
 	public void storePhoto(Photo img) throws DatabaseStorageException;
 	
-	public Iterator<IndexingConfiguration> getIndexingConfigurations();
+	public Collection<IndexingConfiguration> getIndexingConfigurations();
 	public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
 	public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
 	public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;

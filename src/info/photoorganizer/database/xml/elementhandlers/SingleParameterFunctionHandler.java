@@ -1,16 +1,18 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.util.transform.SingleParameterFunction;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class SingleParameterFunctionHandler<T extends SingleParameterFunction> extends ElementHandler<T>
 {
-    public SingleParameterFunctionHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
+    public SingleParameterFunctionHandler(Class<T> cls, StorageContext context)
     {
-        super(cls, storageStrategy);
+        super(cls, context);
     }
     
     @Override

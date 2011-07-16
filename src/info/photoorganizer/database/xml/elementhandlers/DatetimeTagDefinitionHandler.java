@@ -1,21 +1,22 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.metadata.DatetimeTagDefinition;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class DatetimeTagDefinitionHandler extends ValueTagDefinitionHandler<DatetimeTagDefinition>
 {
-    public DatetimeTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public DatetimeTagDefinitionHandler(StorageContext context)
     {
-        super(DatetimeTagDefinition.class, storageStrategy);
+        super(DatetimeTagDefinition.class, context);
     }
 
     @Override
     public DatetimeTagDefinition createObject(Element el)
     {
-        return new DatetimeTagDefinition(_storageStrategy);
+        return new DatetimeTagDefinition(_context.getStrategy());
     }
 
 //    @Override

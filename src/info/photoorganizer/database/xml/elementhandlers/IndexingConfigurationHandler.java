@@ -1,6 +1,7 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
@@ -9,27 +10,28 @@ import info.photoorganizer.util.XMLUtilities;
 
 import java.util.Iterator;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class IndexingConfigurationHandler extends DatabaseObjectHandler<IndexingConfiguration>
 {
     private static final String ELEMENTNAME_METADATAMAPPINGCONFIGURATIONS = "MetadataMappingConfigurations";
 
-    public IndexingConfigurationHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public IndexingConfigurationHandler(StorageContext context)
     {
-        super(IndexingConfiguration.class, storageStrategy);
+        super(IndexingConfiguration.class, context);
     }
 
     @Override
     public void readElement(IndexingConfiguration o, Element el)
     {
-        Iterator<KeywordTranslatorFileFilter> fileFilters = _storageStrategy.fromElementChildren(el, KeywordTranslatorFileFilter.class).iterator();
+        Iterator<KeywordTranslatorFileFilter> fileFilters = fromElementChildren(el, KeywordTranslatorFileFilter.class).iterator();
         if (fileFilters.hasNext())
         {
             o.setFileFilter(fileFilters.next());
         }
         
-        Iterator<MetadataMappingConfiguration> i = _storageStrategy.fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_METADATAMAPPINGCONFIGURATIONS), MetadataMappingConfiguration.class).iterator();
+        Iterator<MetadataMappingConfiguration> i = fromElementChildren(XMLUtilities.getNamedChild(el, ELEMENTNAME_METADATAMAPPINGCONFIGURATIONS), MetadataMappingConfiguration.class).iterator();
         while (i.hasNext())
         {
             o.getMetadataMappers().add(i.next());
@@ -66,11 +68,11 @@ public class IndexingConfigurationHandler extends DatabaseObjectHandler<Indexing
     @Override
     public void writeElement(IndexingConfiguration o, Element el)
     {
-        el.appendChild(_storageStrategy.toElement(el.getOwnerDocument(), o.getFileFilter()));
+        el.appendChild(toElement(o.getFileFilter()));
         
         Element mappersEl = createElement(ELEMENTNAME_METADATAMAPPINGCONFIGURATIONS, el.getOwnerDocument());
         el.appendChild(mappersEl);
-        XMLUtilities.appendChildren(mappersEl, _storageStrategy.toElements(el.getOwnerDocument(), o.getMetadataMappers()));
+        XMLUtilities.appendChildren(mappersEl, toElements(o.getMetadataMappers()));
 
         super.writeElement(o, el);
     }
@@ -78,7 +80,7 @@ public class IndexingConfigurationHandler extends DatabaseObjectHandler<Indexing
     @Override
     public IndexingConfiguration createObject(Element el)
     {
-        return new IndexingConfiguration(_storageStrategy);
+        return new IndexingConfiguration(_context.getStrategy());
     }
 
     @Override
@@ -89,7 +91,7 @@ public class IndexingConfigurationHandler extends DatabaseObjectHandler<Indexing
 
     public void remove(IndexingConfiguration translator)
     {
-        Element element = _storageStrategy.getDatabaseObjectElement(translator);
+        Element element = getDatabaseObjectElement(translator);
         element.getParentNode().removeChild(element);
     }
 

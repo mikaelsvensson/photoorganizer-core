@@ -1,12 +1,14 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.RationalNumberTag;
 import info.photoorganizer.metadata.RationalNumberTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.drew.lang.Rational;
@@ -17,9 +19,9 @@ public class RationalNumberTagHandler extends TagHandler<RationalNumberTag>
     private static final String ATTRIBUTENAME_NUMERATOR = "numerator";
     private static final String ATTRIBUTENAME_DENOMINATOR = "denominator";
 
-    public RationalNumberTagHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public RationalNumberTagHandler(StorageContext context)
     {
-        super(RationalNumberTag.class, storageStrategy);
+        super(RationalNumberTag.class, context);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class RationalNumberTagHandler extends TagHandler<RationalNumberTag>
     @Override
     public RationalNumberTag createObject(Element el)
     {
-        TagDefinition tagDefinition = _storageStrategy.getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
+        TagDefinition tagDefinition = getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
         return new RationalNumberTag((RationalNumberTagDefinition) tagDefinition);
     }
 

@@ -1,21 +1,22 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.metadata.TextTagDefinition;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class TextTagDefinitionHandler extends ValueTagDefinitionHandler<TextTagDefinition>
 {
-    public TextTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public TextTagDefinitionHandler(StorageContext context)
     {
-        super(TextTagDefinition.class, storageStrategy);
+        super(TextTagDefinition.class, context);
     }
 
     @Override
     public TextTagDefinition createObject(Element el)
     {
-        return new TextTagDefinition(_storageStrategy);
+        return new TextTagDefinition(_context.getStrategy());
     }
 
 //    @Override

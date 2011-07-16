@@ -30,6 +30,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,80 +55,23 @@ public class Database extends DatabaseObject
         this(null, storageContext);
     }
 
-    public Database(UUID id, DatabaseStorageStrategy storageContext)
+    public Database(UUID id, DatabaseStorageStrategy storageStrategy)
     {
-        super(id, storageContext);
+        super(id, storageStrategy);
     }
-    
-    /*
-    private void addKeywordToImage(Image img,
-            IndexingConfiguration translator,
-            String keyword)
-    {
-        String translated = translator.applySourceTextTransformations(keyword.trim());
-        TagDefinition tagDefinition = getTagDefinition(translated);
-        if (tagDefinition == null)
-        {
-            try
-            {
-                tagDefinition = createRootKeyword(translated);
-                tagDefinition.store();
-                System.out.println("Creating keyword '" + translated + "'.");
-            }
-            catch (DatabaseStorageException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                System.err.println("Could not create keyword '" + translated + "'.");
-            }
-        }
-        
-        if (tagDefinition instanceof KeywordTagDefinition)
-        {
-            try
-            {
-                KeywordTag tag = new KeywordTag((KeywordTagDefinition) tagDefinition);
-                img.addTag(tag);
-                System.out.println("Tagging image with '" + translated + "'.");
-            }
-            catch (DatabaseException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-    private void addDefaultTags(Image img, Metadata metadata)
-    {
-        for (AutoIndexTagDefinition tagDef : AutoIndexTagDefinition.values())
-        {
-            try
-            {
-                ValueTag<? extends Object, ValueTagDefinition> tag = tagDef.createTagFromMetadata(metadata, this);
-                img.addTag(tag);
-            }
-            catch (DatabaseException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-     */
-    
+
     public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
         getStorageStrategy().addIndexingConfiguration(translator);
     }
 
-    private void addTags(Photo img, Metadata metadata) throws DatabaseStorageException
+    private void addTags(Photo photo, Metadata metadata) throws DatabaseStorageException
     {
-        Iterator<IndexingConfiguration> cfgs = getIndexingConfigurations();
-        while (cfgs.hasNext())
+        Collection<IndexingConfiguration> cfgs = getIndexingConfigurations();
+        for (IndexingConfiguration cfg : cfgs)
         {
-            IndexingConfiguration cfg = cfgs.next();
             FileFilter fileFilter = cfg.getFileFilter();
-            if (null == fileFilter || fileFilter.accept(img.getFile()))
+            if (null == fileFilter || fileFilter.accept(photo.getFile()))
             {
                 for (MetadataMappingConfiguration mapper : cfg.getMetadataMappers())
                 {
@@ -135,7 +79,7 @@ public class Database extends DatabaseObject
                     Object value = getSourceData(metadata, mapper, source);
                     if (null != value)
                     {
-                        setTargetData(img, mapper, value);
+                        setTargetData(photo, mapper, value);
                     }
                     else
                     {
@@ -145,10 +89,10 @@ public class Database extends DatabaseObject
             }
             else
             {
-                System.err.println("File filter did not allow tags for " + img.getFile() + " to be added to database.");
+                System.err.println("File filter did not allow tags for " + photo.getFile() + " to be added to database.");
             }
         }
-        img.store();
+        photo.store();
     }
 
     public void close() throws DatabaseStorageException
@@ -286,15 +230,14 @@ public class Database extends DatabaseObject
         double bestMatchPoints = 0;
         Photo bestMatch = null;
         
-        Iterator<Photo> i = getPhotos();
-        while (i.hasNext())
+        Collection<Photo> photos = getPhotos();
+        for (Photo photo : photos)
         {
-            Photo image = i.next();
-            double probability = FileIdentifier.equalityProbability(f, image, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
+            double probability = FileIdentifier.equalityProbability(f, photo, FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD);
             if (probability > bestMatchPoints)
             {
                 bestMatchPoints = probability;
-                bestMatch = image;
+                bestMatch = photo;
             }
             if (bestMatchPoints >= FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD)
             {
@@ -304,12 +247,12 @@ public class Database extends DatabaseObject
         return null;
     }
     
-    public Iterator<Photo> getPhotos()
+    public Collection<Photo> getPhotos()
     {
         return getStorageStrategy().getPhotos();
     }
     
-    public Iterator<IndexingConfiguration> getIndexingConfigurations()
+    public Collection<IndexingConfiguration> getIndexingConfigurations()
     {
         return getStorageStrategy().getIndexingConfigurations();
     }
@@ -370,7 +313,7 @@ public class Database extends DatabaseObject
         return tag;
     }
 
-    public Iterator<TagDefinition> getTagDefinitions()
+    public Collection<TagDefinition> getTagDefinitions()
     {
         return getStorageStrategy().getTagDefinitions();
     }
@@ -389,11 +332,11 @@ public class Database extends DatabaseObject
     
     public Photo indexPhoto(File f)
     {
-        Photo img = getPhoto(f);
-        if (null == img)
+        Photo photo = getPhoto(f);
+        if (null == photo)
         {
-            img = createPhoto();
-            img.setFile(f);
+            photo = createPhoto();
+            photo.setFile(f);
         }
         
         try
@@ -403,7 +346,7 @@ public class Database extends DatabaseObject
                 
     //            addDefaultTags(img, metadata);
                 
-                addTags(img, metadata);
+                addTags(photo, metadata);
                 
             }
             catch (ImageProcessingException e)
@@ -416,14 +359,14 @@ public class Database extends DatabaseObject
                 System.err.println("indexImage(" + f.getName() + "): " + e.getMessage());
                 //e.printStackTrace();
             }
-            img.store();
+            photo.store();
         }
         catch (DatabaseStorageException e)
         {
             System.err.println("indexImage(" + f.getName() + "): " + e.getMessage());
             //e.printStackTrace();
         }
-        return img;
+        return photo;
     }
     
     /**
@@ -492,10 +435,9 @@ public class Database extends DatabaseObject
     
     public void replaceKeywordTagDefinition(KeywordTagDefinition old, KeywordTagDefinition replacement, boolean removeOld) throws DatabaseStorageException
     {
-        Iterator<Photo> iterator = getStorageStrategy().getPhotosWithTag(old);
-        while (iterator.hasNext())
+        Collection<Photo> photos = getStorageStrategy().getPhotosWithTag(old);
+        for (Photo image : photos)
         {
-            Photo image = iterator.next();
             image.removeKeywordTagsOfType(old);
             try
             {

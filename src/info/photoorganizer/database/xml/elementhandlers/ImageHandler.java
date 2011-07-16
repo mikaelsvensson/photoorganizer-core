@@ -1,6 +1,7 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.Photo;
@@ -9,13 +10,14 @@ import info.photoorganizer.util.XMLUtilities;
 
 import java.util.Iterator;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ImageHandler extends DatabaseObjectHandler<Photo>
 {
-    public ImageHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public ImageHandler(StorageContext context)
     {
-        super(Photo.class, storageStrategy);
+        super(Photo.class, context);
     }
 
     private static String ATTRIBUTENAME_URI = "uri";
@@ -25,7 +27,7 @@ public class ImageHandler extends DatabaseObjectHandler<Photo>
     {
         o.setURI(XMLUtilities.getURIAttribute(el, ATTRIBUTENAME_URI, null));
         
-        Iterator<Tag> i = _storageStrategy.fromElementChildren(el, Tag.class).iterator();
+        Iterator<Tag> i = fromElementChildren(el, Tag.class).iterator();
         while (i.hasNext())
         {
             try
@@ -47,7 +49,7 @@ public class ImageHandler extends DatabaseObjectHandler<Photo>
     {
         XMLUtilities.setURIAttribute(el, ATTRIBUTENAME_URI, o.getURI());
         
-        XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getTags()));
+        XMLUtilities.appendChildren(el, toElements(o.getTags()));
 
         super.writeElement(o, el);
     }
@@ -55,7 +57,7 @@ public class ImageHandler extends DatabaseObjectHandler<Photo>
     @Override
     public Photo createObject(Element el)
     {
-        return new Photo(_storageStrategy);
+        return new Photo(_context.getStrategy());
     }
 
     @Override

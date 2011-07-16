@@ -16,14 +16,14 @@ public class Photo extends DatabaseObject
     private URI _uri = null;
     private File _file = null;
 
-    public Photo(DatabaseStorageStrategy storageContext)
+    public Photo(DatabaseStorageStrategy storageStrategy)
     {
-        super(null, storageContext);
+        super(null, storageStrategy);
     }
     
-    public Photo(UUID id, DatabaseStorageStrategy storageContext)
+    public Photo(UUID id, DatabaseStorageStrategy storageStrategy)
     {
-        super(id, storageContext);
+        super(id, storageStrategy);
     }
 
     public Iterator<Tag<? extends TagDefinition>> getTags()

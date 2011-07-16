@@ -1,21 +1,23 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.RealNumberTagDefinition;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class RealNumberTagDefinitionHandler extends ValueTagDefinitionHandler<RealNumberTagDefinition>
 {
-    public RealNumberTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public RealNumberTagDefinitionHandler(StorageContext context)
     {
-        super(RealNumberTagDefinition.class, storageStrategy);
+        super(RealNumberTagDefinition.class, context);
     }
 
     @Override
     public RealNumberTagDefinition createObject(Element el)
     {
-        return new RealNumberTagDefinition(_storageStrategy);
+        return new RealNumberTagDefinition(_context.getStrategy());
     }
 
 //    @Override

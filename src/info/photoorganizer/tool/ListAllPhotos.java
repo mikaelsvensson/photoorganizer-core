@@ -7,7 +7,9 @@ import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ListAllPhotos
 {
@@ -16,10 +18,9 @@ public class ListAllPhotos
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            Iterator<Photo> images = database.getPhotos();
-            while (images.hasNext())
+            Collection<Photo> images = database.getPhotos();
+            for (Photo image : images)
             {
-                Photo image = images.next();
                 System.out.format("Information about image %s:\n", image.getId().toString());
                 System.out.format("  URI:  %s\n", image.getURI());
                 System.out.format("  Tags: %s\n", StringUtils.join(image.getTags(), "\n        "));

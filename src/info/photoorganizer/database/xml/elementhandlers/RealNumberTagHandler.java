@@ -1,12 +1,14 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.RealNumberTag;
 import info.photoorganizer.metadata.RealNumberTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class RealNumberTagHandler extends TagHandler<RealNumberTag>
@@ -14,9 +16,9 @@ public class RealNumberTagHandler extends TagHandler<RealNumberTag>
 
     private static final String ATTRIBUTENAME_VALUE = "value";
 
-    public RealNumberTagHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public RealNumberTagHandler(StorageContext context)
     {
-        super(RealNumberTag.class, storageStrategy);
+        super(RealNumberTag.class, context);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class RealNumberTagHandler extends TagHandler<RealNumberTag>
     @Override
     public RealNumberTag createObject(Element el)
     {
-        TagDefinition tagDefinition = _storageStrategy.getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
+        TagDefinition tagDefinition = getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
         return new RealNumberTag((RealNumberTagDefinition) tagDefinition);
     }
 

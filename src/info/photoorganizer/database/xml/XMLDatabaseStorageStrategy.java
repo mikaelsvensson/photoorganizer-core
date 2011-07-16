@@ -13,24 +13,19 @@ import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.MetadataMappingConfigurationHandler;
-import info.photoorganizer.database.xml.elementhandlers.MultiParameterFunctionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.SingleParameterFunctionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
 import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
 import info.photoorganizer.metadata.DatabaseObject;
-import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.IndexingConfiguration;
-import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.XMLUtilities;
-import info.photoorganizer.util.transform.ReplaceTransformer;
-import info.photoorganizer.util.transform.TextCaseTransformer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -40,9 +35,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -55,6 +54,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
 public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 {
@@ -116,89 +117,22 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     private File _databaseFile = null;
     private Date _lastOperation = null;
 
-    private Document doc = null;
-    private final KeywordTagHandler KEYWORD_TAG_HANDLER = new KeywordTagHandler(this);
-    private final KeywordTagDefinitionHandler KEYWORD_TAG_DEFINITION_HANDLER = new KeywordTagDefinitionHandler(this);
-    private ElementHandler[] HANDLERS = null;
+    //private Document doc = null;
     
-    private class KeywordTranslatorFileFilterHandler extends SingleParameterFunctionHandler<KeywordTranslatorFileFilter>
-    {
-
-        public KeywordTranslatorFileFilterHandler(XMLDatabaseStorageStrategy storageStrategy)
-        {
-            super(KeywordTranslatorFileFilter.class, storageStrategy);
-        }
-
-        @Override
-        public KeywordTranslatorFileFilter createObject(Element el)
-        {
-            return new KeywordTranslatorFileFilter();
-        }
-        
-    }
+    private Collection<IndexingConfiguration> _indexingConfigurations = null;
+    private Collection<Photo> _photos = null;
+    private Collection<TagDefinition> _tagDefinitions = null;
     
-    private class ReplaceTransformerHandler extends MultiParameterFunctionHandler<ReplaceTransformer>
-    {
-        
-        public ReplaceTransformerHandler(XMLDatabaseStorageStrategy storageStrategy)
-        {
-            super(ReplaceTransformer.class, storageStrategy);
-        }
-
-        @Override
-        public ReplaceTransformer createObject(Element el)
-        {
-            return new ReplaceTransformer();
-        }
-        
-    }
-    
-    private class TextCaseTransformerHandler extends SingleParameterFunctionHandler<TextCaseTransformer>
-    {
-        
-        public TextCaseTransformerHandler(XMLDatabaseStorageStrategy storageStrategy)
-        {
-            super(TextCaseTransformer.class, storageStrategy);
-        }
-        
-        @Override
-        public TextCaseTransformer createObject(Element el)
-        {
-            return new TextCaseTransformer();
-        }
-        
-    }
+//    private final KeywordTagHandler KEYWORD_TAG_HANDLER = new KeywordTagHandler(this);
+//    private final KeywordTagDefinitionHandler KEYWORD_TAG_DEFINITION_HANDLER = new KeywordTagDefinitionHandler(this);
+//    private ElementHandler[] HANDLERS = null;
     
     public XMLDatabaseStorageStrategy(URL databaseUrl)
     {
-        HANDLERS = new ElementHandler[] { 
-                new ImageHandler(this),
-                
-                KEYWORD_TAG_HANDLER,
-                new TextTagHandler(this),
-                new IntegerNumberTagHandler(this),
-                new RealNumberTagHandler(this),
-                new RationalNumberTagHandler(this),
-                new DatetimeTagHandler(this),
-                
-                KEYWORD_TAG_DEFINITION_HANDLER,
-                new TextTagDefinitionHandler(this),
-                new IntegerNumberTagDefinitionHandler(this),
-                new RealNumberTagDefinitionHandler(this),
-                new RationalNumberTagDefinitionHandler(this),
-                new DatetimeTagDefinitionHandler(this),
-                
-                new IndexingConfigurationHandler(this),
-                new MetadataMappingConfigurationHandler(this),
-                new KeywordTranslatorFileFilterHandler(this),
-                new ReplaceTransformerHandler(this),
-                new TextCaseTransformerHandler(this),
-                
-                new DatabaseHandler(this) 
-                };
         try
         {
             _databaseFile = new File(databaseUrl.toURI());
+            load(_databaseFile);
         }
         catch (URISyntaxException e)
         {
@@ -208,10 +142,9 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
     
     @Override
-    public void addPhoto(Photo img) throws DatabaseStorageException
+    public void addPhoto(Photo photo) throws DatabaseStorageException
     {
-        // TODO Auto-generated method stub
-        
+        storePhoto(photo);
     }
     
 //    private File getDatabaseFile()
@@ -230,7 +163,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public void close() throws DatabaseStorageException
     {
-        if (true /*isDirty()*/)
+        if (isDirty())
         {
             try
             {
@@ -250,9 +183,27 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 //        return null;
 //    }
 
-    public Element createElement(String name)
+    public Element createElement(String name, Document doc)
     {
-        return getDocument().createElementNS(NAMESPACE, name);
+        return doc.createElementNS(NAMESPACE, name);
+    }
+    
+    private Document createDocument()
+    {
+        try
+        {
+            return docBuilder.parse(getClass().getResourceAsStream("/database/xml/empty.xml"));
+        }
+        catch (SAXException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void createEmptyDatabase(File f) throws FileNotFoundException, IOException
@@ -272,94 +223,18 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         }
     }
     
-    public <T extends Object> T fromElement(Element el, Class<T> cls)
-    {
-        T res = null;
-        if (null != el)
-        {
-            String name = el.getLocalName();
-            for (ElementHandler handler : HANDLERS)
-            {
-                if (handler.getDatabaseObjectClass().getSimpleName().equals(name) && cls.isAssignableFrom(handler.getDatabaseObjectClass()))
-                {
-                    res = (T) handler.createObject(el);
-                    handler.readElement(res, el);
-                    return res;
-                    /*
-                    try
-                    {
-                        if (cls.isAssignableFrom(handler.getDatabaseObjectClass()))
-                        {
-                            Constructor<? extends Object> constructor = handler.getDatabaseObjectClass().getDeclaredConstructor(DatabaseStorageStrategy.class);
-                            res = (T) constructor.newInstance(this);
-                            //res = (DatabaseObject) handler.getDatabaseObjectClass().newInstance();
-                            handler.readElement(res, el);
-                            return res;
-                        }
-                    }
-                    catch (InstantiationException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (IllegalAccessException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (SecurityException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    catch (NoSuchMethodException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    catch (IllegalArgumentException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    catch (InvocationTargetException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    */
-                }
-            }
-        }
-        return null;
-    }
     
-    public <T extends Object> Iterable<T> fromElementChildren(Element el, Class<T> cls)
-    {
-        LinkedList<T> res = new LinkedList<T>();
-     
-        if (null != el)
-        {
-            for (Element child : XMLUtilities.getChildElements(el))
-            {
-                T o = fromElement(child, cls);
-                if (null != o)
-                {
-                    res.add(o);
-                }
-            }
-        }
-        return res;
-    }
     
-    public Element getDatabaseObjectElement(DatabaseObject o)
-    {
-        return getDatabaseObjectElement(o.getId());
-    }
-
-    public Element getDatabaseObjectElement(UUID id)
-    {
-        getDocument().normalizeDocument();
-        return getDocument().getElementById(getXMLIdFromUUID(id));
-    }
+//    public Element getDatabaseObjectElement(DatabaseObject o, Document doc)
+//    {
+//        return getDatabaseObjectElement(o.getId(), doc);
+//    }
+//
+//    public Element getDatabaseObjectElement(UUID id, Document doc)
+//    {
+//        doc.normalizeDocument();
+//        return doc.getElementById(getXMLIdFromUUID(id));
+//    }
 
 //    @Override
 //    public Database load()
@@ -386,70 +261,70 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 //        }
 //    }
 
-    public Document getDocument()
+    private Document loadDocument(File f)
     {
-        if (null == doc)
+        Document doc = null;
+        if (!f.isFile() && f.getParentFile().canWrite())
         {
-            File f = _databaseFile;
-            if (!f.isFile() && f.getParentFile().canWrite())
+            try
             {
-                try
-                {
-                    createEmptyDatabase(f);
-                }
-                catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+                createEmptyDatabase(f);
             }
-            if (f.isFile())
+            catch (FileNotFoundException e)
             {
-                try
-                {
-                    Document parsedDoc = docBuilder.parse(f);
-                    //validateDocument(parsedDoc);
-                    doc = parsedDoc;
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        if (f.isFile())
+        {
+            try
+            {
+                Document parsedDoc = docBuilder.parse(f);
+                //validateDocument(parsedDoc);
+                doc = parsedDoc;
 
-                    //doc = XMLUtilities.documentFromFile(f);
-                }
-                catch (SAXException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                //doc = XMLUtilities.documentFromFile(f);
+            }
+            catch (SAXException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
         return doc;
     }
 
     @Override
-    public Iterator<Photo> getPhotos()
+    public Collection<Photo> getPhotos()
     {
-        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), this, Photo.class);
+        return Collections.unmodifiableCollection(_photos);
     }
 
-    public TagDefinition getTagDefinition(Element el, String idAttrName)
+    private void loadPhotos(StorageContext context)
     {
-        Element element = getDocument().getElementById(el.getAttribute(idAttrName));
-        return fromElement(element, TagDefinition.class);
+        _photos = new LinkedHashSet<Photo>();
+        DatabaseObjectIterator<Photo> i = new DatabaseObjectIterator<Photo>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), context, Photo.class);
+        while (i.hasNext())
+        {
+            _photos.add(i.next());
+        }
     }
 
     @Override
     public TagDefinition getTagDefinition(String name)
     {
-        Iterator<TagDefinition> definitions = getTagDefinitions();
-        while (definitions.hasNext())
+        Collection<TagDefinition> definitions = getTagDefinitions();
+        for (TagDefinition definition : definitions)
         {
-            TagDefinition definition = definitions.next();
             if (definition.getName().equalsIgnoreCase(name))
             {
                 return definition;
@@ -487,8 +362,16 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public TagDefinition getTagDefinition(UUID id)
     {
-        Element element = getDatabaseObjectElement(id);
-        return fromElement(element, TagDefinition.class);
+        for (TagDefinition def : _tagDefinitions)
+        {
+            if (def.getId().equals(id))
+            {
+                return def;
+            }
+        }
+        return null;
+//        Element element = getDatabaseObjectElement(id);
+//        return fromElement(element, TagDefinition.class);
     }
 
     @Override
@@ -503,31 +386,33 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public Iterator<TagDefinition> getTagDefinitions()
+    public Collection<TagDefinition> getTagDefinitions()
     {
-        List<TagDefinition> res = new LinkedList<TagDefinition>();
-        for (ElementHandler<? extends Object> eh : HANDLERS)
+        return Collections.unmodifiableCollection(_tagDefinitions);
+    }
+
+    private void loadTagDefinitions(StorageContext context)
+    {
+        _tagDefinitions = new LinkedHashSet<TagDefinition>();
+        for (ElementHandler<? extends Object> eh : context.getHandlers())
         {
             if (TagDefinition.class.isAssignableFrom(eh.getDatabaseObjectClass()))
             {
                 String localName = eh.getDatabaseObjectClass().getSimpleName();
-
-                for (Element e : XMLUtilities.getNamedDecendants(getDocument().getDocumentElement(), NAMESPACE, localName))
+                
+                for (Element e : XMLUtilities.getNamedDecendants(context.getDocument().getDocumentElement(), NAMESPACE, localName))
                 {
-                    TagDefinition tagDefinition = fromElement(e, TagDefinition.class);
+                    TagDefinition tagDefinition = context.fromElement(e, TagDefinition.class);
                     if (null != tagDefinition)
                     {
-                        res.add(tagDefinition);
+                        _tagDefinitions.add(tagDefinition);
                     }
                 }
             }
         }
-        return res.iterator();
-
-//        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_TAGDEFINITIONS), this, TagDefinition.class);
     }
 
-    private UUID getUUIDfromXMLId(String id)
+    public static UUID getUUIDfromXMLId(String id)
     {
         if (id.length() > 3)
         {
@@ -539,7 +424,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         }
     }
 
-    private String getXMLIdFromUUID(UUID id)
+    public static String getXMLIdFromUUID(UUID id)
     {
         return "id-" + id.toString();
     }
@@ -571,39 +456,50 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 //    }
 
     @Override
-    public void removePhoto(Photo img) throws DatabaseStorageException
+    public void removePhoto(Photo photo) throws DatabaseStorageException
     {
-        // TODO Auto-generated method stub
-        
+        _photos.remove(photo);
+        makeDirty();
     }
     
-    private void storeDatabase() throws IOException
+    private void storeDatabase() throws IOException, DatabaseStorageException
     {
-        //          addSynonymsToDocument(db, document);
-        //          if (isValidDocument(document))
-        //          {
-                      File f = _databaseFile;
-                      XMLUtilities.documentToFile(getDocument(), f, XMLUtilities.UTF_8);
-        //          }
-        //          else
-        //          {
-        //              throw new IOException(
-        //                      "Database contains data that is not allowed according to the XML schema.");
-        //          }
+        File f = _databaseFile;
+        Document doc = createDocument();
+        
+        StorageContext context = new StorageContext(doc, this);
+        
+        for (Photo o : _photos)
+        {
+            context.storeDatabaseObject(o);
+        }
+        for (TagDefinition o : _tagDefinitions)
+        {
+            context.storeDatabaseObject(o);
+        }
+        for (IndexingConfiguration o : _indexingConfigurations)
+        {
+            context.storeDatabaseObject(o);
+        }
+        XMLUtilities.documentToFile(doc, f, XMLUtilities.UTF_8);
     }
 
     @Override
-    public void storePhoto(Photo img) throws DatabaseStorageException
+    public void storePhoto(Photo photo) throws DatabaseStorageException
     {
-        ImageHandler handler = getElementHandler(img);
-        handler.storeElement(img);
+        _photos.add(photo);
+        makeDirty();
+//        ImageHandler handler = getElementHandler(img);
+//        handler.storeElement(img);
     }
 
     @Override
     public void storeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException
     {
-        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
-        handler.storeElement(tagDefinition);
+        _tagDefinitions.add(tagDefinition);
+        makeDirty();
+//        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
+//        handler.storeElement(tagDefinition);
         /*
         Element element = getDocument().getElementById(getXMLIdFromUUID(tag.getId()));
         
@@ -624,7 +520,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         */
     }
     
-    public void setUUIDAttribute(Element el, String attr, UUID value)
+    public static void setUUIDAttribute(Element el, String attr, UUID value)
     {
         if (value != null)
         {
@@ -636,7 +532,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         }
     }
     
-    public void setUUIDsAttribute(Element el, String attr, UUID[] values)
+    public static void setUUIDsAttribute(Element el, String attr, UUID[] values)
     {
         if (values != null && values.length > 0)
         {
@@ -657,7 +553,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         }
     }
     
-    public UUID getUUIDAttribute(Element el, String attr)
+    public static UUID getUUIDAttribute(Element el, String attr)
     {
         try
         {
@@ -669,7 +565,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         }
     }
     
-    public UUID[] getUUIDsAttribute(Element el, String attr)
+    public static UUID[] getUUIDsAttribute(Element el, String attr)
     {
         String value = el.getAttribute(attr);
         String[] ids = StringUtils.split(value, ' ');
@@ -688,78 +584,45 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         return res;
     }
     
-    private <X extends Object, Y extends ElementHandler<X>> Y getElementHandler(X o)
-    {
-        for (ElementHandler<X> eh : HANDLERS)
-        {
-            if (eh.getDatabaseObjectClass() == o.getClass())
-            {
-                return (Y) eh;
-            }
-        }
-        return null;
-    }
 
-    public Element toElement(Document owner, Object o)
-    {
-        for (ElementHandler handler : HANDLERS)
-        {
-            Element el = handler.createElement(o, owner);
-            if (el != null)
-            {
-                return el;
-            }
-        }
-        return null;
-    }
-
-    public Iterable<Element> toElements(Document owner, Iterable<? extends Object> objects)
-    {
-        LinkedList<Element> res = new LinkedList<Element>();
-        for (Object o : objects)
-        {
-            res.add(toElement(owner, o));
-        }
-        return res;
-    }
-
-    public Iterable<Element> toElements(Document owner, Iterator<? extends Object> objects)
-    {
-        LinkedList<Element> res = new LinkedList<Element>();
-        while (objects.hasNext())
-        {
-            res.add(toElement(owner, objects.next()));
-        }
-        return res;
-    }
 
     @Override
-    public Iterator<Photo> getPhotosWithTag(TagDefinition tagDefinition)
+    public Collection<Photo> getPhotosWithTag(TagDefinition tagDefinition)
     {
-        List<Photo> res = new LinkedList<Photo>();
-        Iterator<Photo> images = getPhotos();
-        while (images.hasNext())
+        List<Photo> res = new ArrayList<Photo>();
+        for (Photo photo : _photos)
         {
-            Photo image = images.next();
-            if (image.hasTag(tagDefinition))
+            if (photo.hasTag(tagDefinition))
             {
-                res.add(image);
+                res.add(photo);
             }
         }
-        return res.iterator();
+        return Collections.unmodifiableCollection(res);
     }
 
     @Override
     public void removeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException
     {
-        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
-        handler.remove(tagDefinition);
+        _tagDefinitions.remove(tagDefinition);
+        makeDirty();
+//        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
+//        handler.remove(tagDefinition);
     }
 
     @Override
-    public Iterator<IndexingConfiguration> getIndexingConfigurations()
+    public Collection<IndexingConfiguration> getIndexingConfigurations()
     {
-        return new DatabaseObjectIterator(XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), this, IndexingConfiguration.class);
+        return Collections.unmodifiableCollection(_indexingConfigurations);
+    }
+
+    private void loadIndexingConfigurations(StorageContext context)
+    {
+        _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
+        DatabaseObjectIterator<IndexingConfiguration> i = new DatabaseObjectIterator<IndexingConfiguration>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), context, IndexingConfiguration.class);
+        while (i.hasNext())
+        {
+            _indexingConfigurations.add(i.next());
+        }
     }
 
     @Override
@@ -771,14 +634,27 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
-        IndexingConfigurationHandler handler = getElementHandler(translator);
-        handler.storeElement(translator);
+        _indexingConfigurations.add(translator);
+        makeDirty();
+//        IndexingConfigurationHandler handler = getElementHandler(translator);
+//        handler.storeElement(translator);
     }
 
     @Override
     public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
-        IndexingConfigurationHandler handler = getElementHandler(translator);
-        handler.remove(translator);
+        _indexingConfigurations.remove(translator);
+        makeDirty();
+//        IndexingConfigurationHandler handler = getElementHandler(translator);
+//        handler.remove(translator);
+    }
+    
+    private void load(File dbFile)
+    {
+        Document doc = loadDocument(dbFile);
+        StorageContext context = new StorageContext(doc, this);
+        loadIndexingConfigurations(context);
+        loadTagDefinitions(context);
+        loadPhotos(context);
     }
 }

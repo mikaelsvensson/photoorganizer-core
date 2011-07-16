@@ -58,19 +58,19 @@ public abstract class TagDefinition extends DatabaseObject
         this.userAllowedToCreateTags = userAllowedToCreateTags;
     }
 
-    public TagDefinition(DatabaseStorageStrategy storageContext)
+    public TagDefinition(DatabaseStorageStrategy storageStrategy)
     {
-        this(null, null, storageContext);
+        this(null, null, storageStrategy);
     }
 
-    public TagDefinition(String name, DatabaseStorageStrategy storageContext)
+    public TagDefinition(String name, DatabaseStorageStrategy storageStrategy)
     {
-        this(name, null, storageContext);
+        this(name, null, storageStrategy);
     }
 
-    public TagDefinition(String name, UUID id, DatabaseStorageStrategy storageContext)
+    public TagDefinition(String name, UUID id, DatabaseStorageStrategy storageStrategy)
     {
-        super(id, storageContext);
+        super(id, storageStrategy);
         this.name = name;
     }
     

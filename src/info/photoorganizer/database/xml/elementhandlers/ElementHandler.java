@@ -2,11 +2,15 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.DatabaseObject;
+import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,17 +32,56 @@ public abstract class ElementHandler<T extends Object>
         return createElement(name, elementInDocument.getOwnerDocument());
     }
 
-    protected XMLDatabaseStorageStrategy _storageStrategy = null;
+//    protected XMLDatabaseStorageStrategy _storageStrategy = null;
+//    protected Document _doc = null;
+    protected StorageContext _context = null;
 
     private Class<T> _objectClass = null;
 
-    public ElementHandler(Class<T> objectClass, XMLDatabaseStorageStrategy storageStrategy)
+    public ElementHandler(Class<T> objectClass, StorageContext context/*Document doc*//*, XMLDatabaseStorageStrategy storageStrategy*/)
     {
         super();
         _objectClass = objectClass;
-        _storageStrategy = storageStrategy;
+//        _storageStrategy = storageStrategy;
+//        _doc = doc;
+        _context = context;
     }
 
+    public Iterable<Element> toElements(List<? extends Object> objects)
+    {
+        return _context.toElements(objects);
+    }
+
+    public <T> Iterable<T> fromElementChildren(Element el, Class<T> cls)
+    {
+        return _context.fromElementChildren(el, cls);
+    }
+
+    public Element toElement(Object o)
+    {
+        return _context.toElement(o);
+    }
+
+    public Iterable<Element> toElements(Iterable<? extends Object> objects)
+    {
+        return _context.toElements(objects);
+    }
+
+    public Iterable<Element> toElements(Iterator<? extends Object> objects)
+    {
+        return _context.toElements(objects);
+    }
+
+    public <T> T fromElement(Element el, Class<T> cls)
+    {
+        return _context.fromElement(el, cls);
+    }
+
+    protected TagDefinition getTagDefinition(Element el, String idAttrName)
+    {
+        return _context.getTagDefinition(el, idAttrName);
+    }
+    
     public Element createElement(T o, Document owner)
     {
         if (o.getClass() == _objectClass)
@@ -55,7 +98,8 @@ public abstract class ElementHandler<T extends Object>
     
     protected Element createElement()
     {
-        return _storageStrategy.createElement(_objectClass.getSimpleName());
+        return _context.getDocument().createElementNS(XMLDatabaseStorageStrategy.NAMESPACE, _objectClass.getSimpleName());
+//        return _storageStrategy.createElement(_objectClass.getSimpleName());
     }
 
     public Class<T> getDatabaseObjectClass()
@@ -91,7 +135,7 @@ public abstract class ElementHandler<T extends Object>
         {
             Element rootKeywordContainerEl = getOrCreateRootElement(rootElementName);
             Element newElement = createElement();
-            Element currentEl = _storageStrategy.getDatabaseObjectElement((DatabaseObject) o);
+            Element currentEl = getDatabaseObjectElement((DatabaseObject) o);
             if (currentEl != null)
             {
                 rootKeywordContainerEl.replaceChild(newElement, currentEl);
@@ -107,14 +151,25 @@ public abstract class ElementHandler<T extends Object>
             throw new DatabaseStorageException("Implementation only supports DatabaseObject instances.");
         }
     }
+    
+    protected Element getDatabaseObjectElement(DatabaseObject o)
+    {
+        return getDatabaseObjectElement(o.getId());
+    }
+
+    protected Element getDatabaseObjectElement(UUID id)
+    {
+        _context.getDocument().normalizeDocument();
+        return _context.getDocument().getElementById(XMLDatabaseStorageStrategy.getXMLIdFromUUID(id));
+    }
 
     private Element getOrCreateRootElement(String rootElementName)
     {
-        Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_storageStrategy.getDocument().getDocumentElement(), rootElementName);
+        Element rootKeywordContainerEl = XMLUtilities.getNamedChild(_context.getDocument().getDocumentElement(), rootElementName);
         if (null == rootKeywordContainerEl)
         {
-            rootKeywordContainerEl = createElement(rootElementName, _storageStrategy.getDocument());
-            _storageStrategy.getDocument().getDocumentElement().appendChild(rootKeywordContainerEl);
+            rootKeywordContainerEl = createElement(rootElementName, _context.getDocument());
+            _context.getDocument().getDocumentElement().appendChild(rootKeywordContainerEl);
         }
         return rootKeywordContainerEl;
     }

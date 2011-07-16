@@ -1,17 +1,19 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTagDefinition>
 {
-    public KeywordTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public KeywordTagDefinitionHandler(StorageContext context)
     {
-        super(KeywordTagDefinition.class, storageStrategy);
+        super(KeywordTagDefinition.class, context);
     }
 
     private static String ATTRIBUTENAME_NAME = "name";
@@ -24,9 +26,9 @@ public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTag
     {
         o.setName(XMLUtilities.getTextAttribute(el, ATTRIBUTENAME_NAME, "untitled"));
         
-        o.setSynonymIds(_storageStrategy.getUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS));
+        o.setSynonymIds(XMLDatabaseStorageStrategy.getUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS));
         
-        o.addChildren(_storageStrategy.fromElementChildren(el, KeywordTagDefinition.class));
+        o.addChildren(fromElementChildren(el, KeywordTagDefinition.class));
         
         super.readElement(o, el);
     }
@@ -95,7 +97,7 @@ public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTag
         KeywordTagDefinition parent = o.getParent();
         if (parent != null)
         {
-            Element parentEl = _storageStrategy.getDatabaseObjectElement(parent);
+            Element parentEl = getDatabaseObjectElement(parent);
             if (parentEl != null)
             {
                 Element element = createElement();
@@ -143,9 +145,9 @@ public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTag
     {
         XMLUtilities.setTextAttribute(el, ATTRIBUTENAME_NAME, o.getName());
        
-        _storageStrategy.setUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS, o.getSynonymIds());
+        XMLDatabaseStorageStrategy.setUUIDsAttribute(el, ATTRIBUTENAME_SYNONYMS, o.getSynonymIds());
         
-        XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getChildren()));
+        XMLUtilities.appendChildren(el, toElements(o.getChildren()));
         
         super.writeElement(o, el);
     }
@@ -153,7 +155,7 @@ public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTag
     @Override
     public KeywordTagDefinition createObject(Element el)
     {
-        return new KeywordTagDefinition(_storageStrategy);
+        return new KeywordTagDefinition(_context.getStrategy());
     }
 
     @Override

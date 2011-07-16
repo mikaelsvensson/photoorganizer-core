@@ -11,12 +11,12 @@ public class DatabaseObjectIterator<T extends Object> implements Iterator<T>
     private Node _startNode = null;
     private Class<T> _cls = null;
 
-    private XMLDatabaseStorageStrategy _strategy = null;
+    private StorageContext _context = null;
     
-    public DatabaseObjectIterator(Element parent, XMLDatabaseStorageStrategy strategy, Class<T> cls)
+    public DatabaseObjectIterator(Element parent, StorageContext context, Class<T> cls)
     {
         super();
-        _strategy = strategy;
+        _context = context;
         _cls = cls;
         if (null != parent)
         {
@@ -53,7 +53,7 @@ public class DatabaseObjectIterator<T extends Object> implements Iterator<T>
             throw new NoSuchElementException();
         }
         _startNode = next.getNextSibling();
-        return _strategy.fromElement(next, _cls);
+        return _context.fromElement(next, _cls);
     }
     
     @Override

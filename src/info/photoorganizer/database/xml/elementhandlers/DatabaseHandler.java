@@ -2,6 +2,7 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.util.XMLUtilities;
 
@@ -16,9 +17,9 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     public static final String ELEMENTNAME_PHOTOS = "Photos";
     public static final String ELEMENTNAME_INDEXINGCONFIGURATIONS = "IndexingConfigurations";
 
-    public DatabaseHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public DatabaseHandler(StorageContext context)
     {
-        super(Database.class, storageStrategy);
+        super(Database.class, context);
     }
 
     @Override
@@ -61,21 +62,21 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     @Override
     public void writeElement(Database o, Element el)
     {
-        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_NAME, o.getId());
+        XMLDatabaseStorageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_NAME, o.getId());
         
         Document owner = el.getOwnerDocument();
         
         Element tagDefinitionsEl = createElement(ELEMENTNAME_TAGDEFINITIONS, owner);
         el.appendChild(tagDefinitionsEl);
-        XMLUtilities.appendChildren(tagDefinitionsEl, _storageStrategy.toElements(owner, o.getTagDefinitions()));
+        XMLUtilities.appendChildren(tagDefinitionsEl, _context.toElements(o.getTagDefinitions()));
         
         Element keywordTranslatorsEl = createElement(ELEMENTNAME_INDEXINGCONFIGURATIONS, owner);
         el.appendChild(keywordTranslatorsEl);
-        XMLUtilities.appendChildren(keywordTranslatorsEl, _storageStrategy.toElements(owner, o.getIndexingConfigurations()));
+        XMLUtilities.appendChildren(keywordTranslatorsEl, _context.toElements(o.getIndexingConfigurations()));
         
         Element imagesEl = createElement(ELEMENTNAME_PHOTOS, owner);
         el.appendChild(imagesEl);
-        XMLUtilities.appendChildren(imagesEl, _storageStrategy.toElements(owner, o.getPhotos()));
+        XMLUtilities.appendChildren(imagesEl, _context.toElements(o.getPhotos()));
         
         
 //        KeywordTagDefinition rootKeyword = o.getRootKeyword();
@@ -90,7 +91,7 @@ public class DatabaseHandler extends DatabaseObjectHandler<Database>
     @Override
     public Database createObject(Element el)
     {
-        return new Database(_storageStrategy);
+        return new Database(_context.getStrategy());
     }
 
     @Override

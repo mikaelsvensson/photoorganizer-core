@@ -1,6 +1,7 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
@@ -16,9 +17,9 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
     private static final String ATTRIBUTENAME_SOURCE = "source";
     private static final String ATTRIBUTENAME_TARGET = "target";
 
-    public MetadataMappingConfigurationHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public MetadataMappingConfigurationHandler(StorageContext context)
     {
-        super(MetadataMappingConfiguration.class, storageStrategy);
+        super(MetadataMappingConfiguration.class, context);
     }
     
     @Override
@@ -26,13 +27,13 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
     {
         o.setSource(PhotoFileMetadataTag.valueOf(el.getAttribute(ATTRIBUTENAME_SOURCE)));
         
-        Iterator<TextTransformer> textTransformers = _storageStrategy.fromElementChildren(el, TextTransformer.class).iterator();
+        Iterator<TextTransformer> textTransformers = fromElementChildren(el, TextTransformer.class).iterator();
         while (textTransformers.hasNext())
         {
             o.getSourceTextTransformers().add(textTransformers.next());
         }
         
-        o.setTarget(_storageStrategy.getTagDefinition(el, ATTRIBUTENAME_TARGET));
+        o.setTarget(getTagDefinition(el, ATTRIBUTENAME_TARGET));
         
         super.readElement(o, el);
     }
@@ -42,9 +43,9 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
     {
         el.setAttribute(ATTRIBUTENAME_SOURCE, o.getSource().name());
         
-        XMLUtilities.appendChildren(el, _storageStrategy.toElements(el.getOwnerDocument(), o.getSourceTextTransformers()));
+        XMLUtilities.appendChildren(el, toElements(o.getSourceTextTransformers()));
         
-        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_TARGET, o.getTarget().getId());
+        XMLDatabaseStorageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_TARGET, o.getTarget().getId());
         
         super.writeElement(o, el);
     }

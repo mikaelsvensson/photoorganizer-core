@@ -19,8 +19,7 @@ public class IndexingConfiguration extends DatabaseObject
         super(null, storageStrategy);
     }
 
-    public IndexingConfiguration(UUID id,
-            DatabaseStorageStrategy storageStrategy)
+    public IndexingConfiguration(UUID id, DatabaseStorageStrategy storageStrategy)
     {
         super(id, storageStrategy);
     }

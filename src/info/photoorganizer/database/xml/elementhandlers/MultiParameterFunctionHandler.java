@@ -1,10 +1,12 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.transform.MultiParameterFunction;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class MultiParameterFunctionHandler<T extends MultiParameterFunction> extends ElementHandler<T>
@@ -13,9 +15,9 @@ public abstract class MultiParameterFunctionHandler<T extends MultiParameterFunc
     private static final String ATTRIBUTENAME_NAME = "name";
     private static final String ELEMENTNAME_PARAMETER = "Parameter";
 
-    public MultiParameterFunctionHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
+    public MultiParameterFunctionHandler(Class<T> cls, StorageContext context)
     {
-        super(cls, storageStrategy);
+        super(cls, context);
     }
     
     @Override

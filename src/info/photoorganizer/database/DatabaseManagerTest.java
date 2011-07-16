@@ -127,13 +127,13 @@ public class DatabaseManagerTest
         Database database = DatabaseManager.getInstance().openDatabase(ConfigurationProperty.dbPath.get());
         try
         {
-            Photo img = database.createPhoto();
-            img.setURI(new URI("http://demo/test.jpg"));
+            Photo photo = database.createPhoto();
+            photo.setURI(new URI("http://demo/test.jpg"));
             
             TagDefinition tagDefinition = database.getTagDefinition(DatabaseManager.KEYWORD_OBJECTS);
             if (tagDefinition instanceof KeywordTagDefinition)
             {
-                img.addTag(new KeywordTag((KeywordTagDefinition) tagDefinition));
+                photo.addTag(new KeywordTag((KeywordTagDefinition) tagDefinition));
             }
             
             TagDefinition commentTagDefinition = database.getTagDefinition(DefaultTagDefinition.COMMENT.getId());
@@ -142,10 +142,10 @@ public class DatabaseManagerTest
                 TextTag commentTag = new TextTag((TextTagDefinition) commentTagDefinition);
                 commentTag.setValue("a flower");
                 
-                img.addTag(commentTag);
+                photo.addTag(commentTag);
             }
             
-            img.store();
+            photo.store();
             
 //                DatabaseManager.getInstance().saveDatabase();
             

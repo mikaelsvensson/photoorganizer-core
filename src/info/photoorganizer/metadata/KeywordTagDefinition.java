@@ -11,6 +11,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -501,10 +502,9 @@ public class KeywordTagDefinition extends TagDefinition implements Transferable
 
     protected void removeTagsForTagDefinition() throws DatabaseStorageException
     {
-        Iterator<Photo> images = getStorageStrategy().getPhotosWithTag(this);
-        while (images.hasNext())
+        Collection<Photo> images = getStorageStrategy().getPhotosWithTag(this);
+        for (Photo image : images)
         {
-            Photo image = images.next();
             Iterator<Tag<? extends TagDefinition>> tags = image.getTags();
             while (tags.hasNext())
             {

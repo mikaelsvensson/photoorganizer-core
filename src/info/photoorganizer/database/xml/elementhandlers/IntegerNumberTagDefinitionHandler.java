@@ -1,21 +1,22 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.metadata.IntegerNumberTagDefinition;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class IntegerNumberTagDefinitionHandler extends ValueTagDefinitionHandler<IntegerNumberTagDefinition>
 {
-    public IntegerNumberTagDefinitionHandler(XMLDatabaseStorageStrategy storageStrategy)
+    public IntegerNumberTagDefinitionHandler(StorageContext context)
     {
-        super(IntegerNumberTagDefinition.class, storageStrategy);
+        super(IntegerNumberTagDefinition.class, context);
     }
 
     @Override
     public IntegerNumberTagDefinition createObject(Element el)
     {
-        return new IntegerNumberTagDefinition(_storageStrategy);
+        return new IntegerNumberTagDefinition(_context.getStrategy());
     }
 
 //    @Override

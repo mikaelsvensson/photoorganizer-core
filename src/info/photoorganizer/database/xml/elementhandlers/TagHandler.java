@@ -1,12 +1,14 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.PhotoRegion;
 import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
@@ -15,16 +17,16 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
 
     private static final String ATTRIBUTENAME_REGION = "region";
 
-    public TagHandler(Class<T> cls, XMLDatabaseStorageStrategy storageStrategy)
+    public TagHandler(Class<T> cls, StorageContext context)
     {
-        super(cls, storageStrategy);
+        super(cls, context);
     }
     
     @Override
     public void readElement(T o, Element el)
     {
         
-        TagDefinition tagDefinition = _storageStrategy.getTagDefinition(el, ATTRIBUTENAME_DEFINITION);
+        TagDefinition tagDefinition = getTagDefinition(el, ATTRIBUTENAME_DEFINITION);
         o.setDefinition(tagDefinition);
         if (tagDefinition.isApplicableToPhotoRegion())
         {
@@ -54,7 +56,7 @@ public abstract class TagHandler<T extends Tag> extends ElementHandler<T>
     @Override
     public void writeElement(T o, Element el)
     {
-        _storageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_DEFINITION, o.getDefinition().getId());
+        XMLDatabaseStorageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_DEFINITION, o.getDefinition().getId());
         
         PhotoRegion region = o.getRegion();
         if (o.getDefinition().isApplicableToPhotoRegion() && region != null)
