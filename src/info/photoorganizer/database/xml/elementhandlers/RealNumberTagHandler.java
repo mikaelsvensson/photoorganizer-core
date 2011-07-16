@@ -2,13 +2,11 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.StorageContext;
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.RealNumberTag;
 import info.photoorganizer.metadata.RealNumberTagDefinition;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class RealNumberTagHandler extends TagHandler<RealNumberTag>

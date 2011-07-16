@@ -3,7 +3,6 @@ package info.photoorganizer.database.xml.elementhandlers;
 import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.metadata.DatetimeTagDefinition;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class DatetimeTagDefinitionHandler extends ValueTagDefinitionHandler<DatetimeTagDefinition>

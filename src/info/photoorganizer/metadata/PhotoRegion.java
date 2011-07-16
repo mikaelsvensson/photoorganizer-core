@@ -1,8 +1,8 @@
 package info.photoorganizer.metadata;
 
-import java.io.Serializable;
-
 import info.photoorganizer.util.StringUtils;
+
+import java.io.Serializable;
 
 public class PhotoRegion implements Serializable
 {

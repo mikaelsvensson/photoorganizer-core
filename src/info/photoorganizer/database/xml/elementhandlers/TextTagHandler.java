@@ -1,12 +1,10 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.xml.StorageContext;
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.metadata.TextTag;
 import info.photoorganizer.metadata.TextTagDefinition;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class TextTagHandler extends TagHandler<TextTag>

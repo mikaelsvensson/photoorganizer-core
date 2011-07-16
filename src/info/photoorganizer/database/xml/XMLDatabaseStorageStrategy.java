@@ -3,24 +3,7 @@ package info.photoorganizer.database.xml;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseHandler;
-import info.photoorganizer.database.xml.elementhandlers.DatetimeTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.DatetimeTagHandler;
 import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
-import info.photoorganizer.database.xml.elementhandlers.ImageHandler;
-import info.photoorganizer.database.xml.elementhandlers.IndexingConfigurationHandler;
-import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.IntegerNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.KeywordTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.KeywordTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.MetadataMappingConfigurationHandler;
-import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.RationalNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.RealNumberTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.RealNumberTagHandler;
-import info.photoorganizer.database.xml.elementhandlers.TagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.TextTagDefinitionHandler;
-import info.photoorganizer.database.xml.elementhandlers.TextTagHandler;
-import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
@@ -40,9 +23,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,8 +35,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
 public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
 {
@@ -306,16 +285,22 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public Collection<Photo> getPhotos()
     {
-        return Collections.unmodifiableCollection(_photos);
+        synchronized (_photos)
+        {
+            return Collections.unmodifiableCollection(_photos);
+        }
     }
 
     private void loadPhotos(StorageContext context)
     {
-        _photos = new LinkedHashSet<Photo>();
-        DatabaseObjectIterator<Photo> i = new DatabaseObjectIterator<Photo>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), context, Photo.class);
-        while (i.hasNext())
+        synchronized (_photos)
         {
-            _photos.add(i.next());
+            _photos = new LinkedHashSet<Photo>();
+            DatabaseObjectIterator<Photo> i = new DatabaseObjectIterator<Photo>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_PHOTOS), context, Photo.class);
+            while (i.hasNext())
+            {
+                _photos.add(i.next());
+            }
         }
     }
 
@@ -362,16 +347,17 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public TagDefinition getTagDefinition(UUID id)
     {
-        for (TagDefinition def : _tagDefinitions)
+        synchronized (_tagDefinitions)
         {
-            if (def.getId().equals(id))
+            for (TagDefinition def : _tagDefinitions)
             {
-                return def;
+                if (def.getId().equals(id))
+                {
+                    return def;
+                }
             }
+            return null;
         }
-        return null;
-//        Element element = getDatabaseObjectElement(id);
-//        return fromElement(element, TagDefinition.class);
     }
 
     @Override
@@ -388,24 +374,30 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public Collection<TagDefinition> getTagDefinitions()
     {
-        return Collections.unmodifiableCollection(_tagDefinitions);
+        synchronized (_tagDefinitions)
+        {
+            return Collections.unmodifiableCollection(_tagDefinitions);
+        }
     }
 
     private void loadTagDefinitions(StorageContext context)
     {
-        _tagDefinitions = new LinkedHashSet<TagDefinition>();
-        for (ElementHandler<? extends Object> eh : context.getHandlers())
+        synchronized (_tagDefinitions)
         {
-            if (TagDefinition.class.isAssignableFrom(eh.getDatabaseObjectClass()))
+            _tagDefinitions = new LinkedHashSet<TagDefinition>();
+            for (ElementHandler<? extends Object> eh : context.getHandlers())
             {
-                String localName = eh.getDatabaseObjectClass().getSimpleName();
-                
-                for (Element e : XMLUtilities.getNamedDecendants(context.getDocument().getDocumentElement(), NAMESPACE, localName))
+                if (TagDefinition.class.isAssignableFrom(eh.getDatabaseObjectClass()))
                 {
-                    TagDefinition tagDefinition = context.fromElement(e, TagDefinition.class);
-                    if (null != tagDefinition)
+                    String localName = eh.getDatabaseObjectClass().getSimpleName();
+                    
+                    for (Element e : XMLUtilities.getNamedDecendants(context.getDocument().getDocumentElement(), NAMESPACE, localName))
                     {
-                        _tagDefinitions.add(tagDefinition);
+                        TagDefinition tagDefinition = context.fromElement(e, TagDefinition.class);
+                        if (null != tagDefinition)
+                        {
+                            _tagDefinitions.add(tagDefinition);
+                        }
                     }
                 }
             }
@@ -458,8 +450,11 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public void removePhoto(Photo photo) throws DatabaseStorageException
     {
-        _photos.remove(photo);
-        makeDirty();
+        synchronized (_photos)
+        {
+            _photos.remove(photo);
+            makeDirty();
+        }
     }
     
     private void storeDatabase() throws IOException, DatabaseStorageException
@@ -468,18 +463,26 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
         Document doc = createDocument();
         
         StorageContext context = new StorageContext(doc, this);
-        
-        for (Photo o : _photos)
+        synchronized (_photos)
         {
-            context.storeDatabaseObject(o);
-        }
-        for (TagDefinition o : _tagDefinitions)
-        {
-            context.storeDatabaseObject(o);
-        }
-        for (IndexingConfiguration o : _indexingConfigurations)
-        {
-            context.storeDatabaseObject(o);
+            synchronized (_tagDefinitions)
+            {
+                synchronized (_indexingConfigurations)
+                {
+                    for (Photo o : _photos)
+                    {
+                        context.storeDatabaseObject(o);
+                    }
+                    for (TagDefinition o : _tagDefinitions)
+                    {
+                        context.storeDatabaseObject(o);
+                    }
+                    for (IndexingConfiguration o : _indexingConfigurations)
+                    {
+                        context.storeDatabaseObject(o);
+                    }
+                }
+            }
         }
         XMLUtilities.documentToFile(doc, f, XMLUtilities.UTF_8);
     }
@@ -487,37 +490,21 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public void storePhoto(Photo photo) throws DatabaseStorageException
     {
-        _photos.add(photo);
-        makeDirty();
-//        ImageHandler handler = getElementHandler(img);
-//        handler.storeElement(img);
+        synchronized (_photos)
+        {
+            _photos.add(photo);
+            makeDirty();
+        }
     }
 
     @Override
     public void storeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException
     {
-        _tagDefinitions.add(tagDefinition);
-        makeDirty();
-//        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
-//        handler.storeElement(tagDefinition);
-        /*
-        Element element = getDocument().getElementById(getXMLIdFromUUID(tag.getId()));
-        
-        if (null == element)
+        synchronized (_tagDefinitions)
         {
-            // Tag not previously saved. Add to tree.
-            Element imagesElement = XMLUtilities.getNamedChild(getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_TAGDEFINITIONS);
-            if (null != imagesElement)
-            {
-                imagesElement.appendChild(element);
-            }
+            _tagDefinitions.add(tagDefinition);
+            makeDirty();
         }
-        else
-        {
-            // Replace current tag definition with new one.
-            element.getParentNode().replaceChild(toElement(getDocument(), tag), element);
-        }
-        */
     }
     
     public static void setUUIDAttribute(Element el, String attr, UUID value)
@@ -589,39 +576,49 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public Collection<Photo> getPhotosWithTag(TagDefinition tagDefinition)
     {
-        List<Photo> res = new ArrayList<Photo>();
-        for (Photo photo : _photos)
+        synchronized (_photos)
         {
-            if (photo.hasTag(tagDefinition))
+            List<Photo> res = new ArrayList<Photo>();
+            for (Photo photo : _photos)
             {
-                res.add(photo);
+                if (photo.hasTag(tagDefinition))
+                {
+                    res.add(photo);
+                }
             }
+            return Collections.unmodifiableCollection(res);
         }
-        return Collections.unmodifiableCollection(res);
     }
 
     @Override
     public void removeTagDefinition(TagDefinition tagDefinition) throws DatabaseStorageException
     {
-        _tagDefinitions.remove(tagDefinition);
-        makeDirty();
-//        TagDefinitionHandler<TagDefinition> handler = getElementHandler(tagDefinition);
-//        handler.remove(tagDefinition);
+        synchronized (_tagDefinitions)
+        {
+            _tagDefinitions.remove(tagDefinition);
+            makeDirty();
+        }
     }
 
     @Override
     public Collection<IndexingConfiguration> getIndexingConfigurations()
     {
-        return Collections.unmodifiableCollection(_indexingConfigurations);
+        synchronized (_indexingConfigurations)
+        {
+            return Collections.unmodifiableCollection(_indexingConfigurations);
+        }
     }
 
     private void loadIndexingConfigurations(StorageContext context)
     {
-        _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
-        DatabaseObjectIterator<IndexingConfiguration> i = new DatabaseObjectIterator<IndexingConfiguration>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), context, IndexingConfiguration.class);
-        while (i.hasNext())
+        synchronized (_indexingConfigurations)
         {
-            _indexingConfigurations.add(i.next());
+            _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
+            DatabaseObjectIterator<IndexingConfiguration> i = new DatabaseObjectIterator<IndexingConfiguration>(XMLUtilities.getNamedChild(context.getDocument().getDocumentElement(), DatabaseHandler.ELEMENTNAME_INDEXINGCONFIGURATIONS), context, IndexingConfiguration.class);
+            while (i.hasNext())
+            {
+                _indexingConfigurations.add(i.next());
+            }
         }
     }
 
@@ -634,19 +631,21 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     @Override
     public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
-        _indexingConfigurations.add(translator);
-        makeDirty();
-//        IndexingConfigurationHandler handler = getElementHandler(translator);
-//        handler.storeElement(translator);
+        synchronized (_indexingConfigurations)
+        {
+            _indexingConfigurations.add(translator);
+            makeDirty();
+        }
     }
 
     @Override
     public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
     {
-        _indexingConfigurations.remove(translator);
-        makeDirty();
-//        IndexingConfigurationHandler handler = getElementHandler(translator);
-//        handler.remove(translator);
+        synchronized (_indexingConfigurations)
+        {
+            _indexingConfigurations.remove(translator);
+            makeDirty();
+        }
     }
     
     private void load(File dbFile)

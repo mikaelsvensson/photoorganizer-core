@@ -1,9 +1,9 @@
 package info.photoorganizer.database;
 
 import info.photoorganizer.metadata.DatabaseException;
-import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
+import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.config.ConfigurationProperty;
 

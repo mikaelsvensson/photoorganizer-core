@@ -3,8 +3,8 @@ package info.photoorganizer.database.xml.elementhandlers;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
+import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.transform.TextTransformer;
 

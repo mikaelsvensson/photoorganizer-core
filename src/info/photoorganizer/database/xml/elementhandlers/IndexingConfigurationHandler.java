@@ -2,7 +2,6 @@ package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.xml.StorageContext;
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
@@ -10,7 +9,6 @@ import info.photoorganizer.util.XMLUtilities;
 
 import java.util.Iterator;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class IndexingConfigurationHandler extends DatabaseObjectHandler<IndexingConfiguration>

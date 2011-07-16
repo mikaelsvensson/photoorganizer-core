@@ -8,8 +8,6 @@ import info.photoorganizer.util.StringUtils;
 import info.photoorganizer.util.config.ConfigurationProperty;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 public class ListAllPhotos
 {

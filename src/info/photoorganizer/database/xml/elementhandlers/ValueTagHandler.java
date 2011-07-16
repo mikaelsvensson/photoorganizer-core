@@ -1,9 +1,6 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
-import org.w3c.dom.Document;
-
 import info.photoorganizer.database.xml.StorageContext;
-import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.ValueTag;
 
 public abstract class ValueTagHandler<T extends ValueTag> extends TagHandler<T>

@@ -4,8 +4,6 @@ import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
 public class DatabaseStorageContext

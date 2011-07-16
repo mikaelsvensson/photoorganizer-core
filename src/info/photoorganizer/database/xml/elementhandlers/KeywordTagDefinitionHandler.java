@@ -6,7 +6,6 @@ import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
 import info.photoorganizer.metadata.KeywordTagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class KeywordTagDefinitionHandler extends TagDefinitionHandler<KeywordTagDefinition>

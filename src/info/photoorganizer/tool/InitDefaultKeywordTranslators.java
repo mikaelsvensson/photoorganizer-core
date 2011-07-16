@@ -5,10 +5,10 @@ import info.photoorganizer.database.DatabaseManager;
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.metadata.AutoIndexTagDefinition;
 import info.photoorganizer.metadata.DefaultTagDefinition;
-import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
 import info.photoorganizer.metadata.MetadataMappingConfiguration;
+import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.util.config.ConfigurationProperty;
 import info.photoorganizer.util.transform.ReplaceTransformer;
 

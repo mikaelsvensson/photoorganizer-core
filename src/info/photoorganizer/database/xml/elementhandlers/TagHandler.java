@@ -8,7 +8,6 @@ import info.photoorganizer.metadata.Tag;
 import info.photoorganizer.metadata.TagDefinition;
 import info.photoorganizer.util.XMLUtilities;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class TagHandler<T extends Tag> extends ElementHandler<T>

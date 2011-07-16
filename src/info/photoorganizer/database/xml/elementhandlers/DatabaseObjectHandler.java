@@ -6,7 +6,6 @@ import info.photoorganizer.metadata.DatabaseObject;
 
 import java.util.UUID;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class DatabaseObjectHandler<T extends DatabaseObject> extends ElementHandler<T>
