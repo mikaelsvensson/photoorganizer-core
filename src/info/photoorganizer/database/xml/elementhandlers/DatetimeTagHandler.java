@@ -56,7 +56,7 @@ public class DatetimeTagHandler extends TagHandler<DatetimeTag>
     @Override
     public DatetimeTag createObject(Element el)
     {
-        TagDefinition tagDefinition = _context.getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
+        TagDefinition tagDefinition = getTagDefinition(el, TagHandler.ATTRIBUTENAME_DEFINITION);
         return new DatetimeTag((DatetimeTagDefinition) tagDefinition);
     }
 

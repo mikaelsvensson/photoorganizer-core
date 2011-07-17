@@ -164,8 +164,8 @@ public class StorageContext
     }
     public TagDefinition getTagDefinition(Element el, String idAttrName)
     {
-        Element element = getDocument().getElementById(el.getAttribute(idAttrName));
-        return fromElement(element, TagDefinition.class);
+        String id = el.getAttribute(idAttrName);
+        return _strategy.getTagDefinition(XMLDatabaseStorageStrategy.getUUIDfromXMLId(id));
     }
     
     public <T extends Object> T fromElement(Element el, Class<T> cls)

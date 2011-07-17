@@ -270,7 +270,8 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_photos)
         {
-            return Collections.unmodifiableCollection(_photos);
+            Collection<Photo> currentPhotos = new ArrayList<Photo>(_photos);
+            return Collections.unmodifiableCollection(currentPhotos);
         }
     }
 
@@ -359,7 +360,8 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_tagDefinitions)
         {
-            return Collections.unmodifiableCollection(_tagDefinitions);
+            Collection<TagDefinition> currentTags = new ArrayList<TagDefinition>(_tagDefinitions);
+            return Collections.unmodifiableCollection(currentTags);
         }
     }
 
@@ -588,7 +590,8 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         synchronized (_indexingConfigurations)
         {
-            return Collections.unmodifiableCollection(_indexingConfigurations);
+            Collection<IndexingConfiguration> currentCfgs = new ArrayList<IndexingConfiguration>(_indexingConfigurations);
+            return Collections.unmodifiableCollection(currentCfgs);
         }
     }
 
@@ -635,8 +638,8 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     {
         Document doc = loadDocument(dbFile);
         StorageContext context = new StorageContext(doc, this);
-        loadIndexingConfigurations(context);
         loadTagDefinitions(context);
+        loadIndexingConfigurations(context);
         loadPhotos(context);
     }
 }

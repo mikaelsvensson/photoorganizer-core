@@ -172,8 +172,9 @@ public class Database extends DatabaseObject
                 KeywordTagDefinition keywordDef = targetDef.getChildByName(v, true);
                 if (null == keywordDef)
                 {
-                    keywordDef = new KeywordTagDefinition(v, null, targetDef, getStorageStrategy());
-                    keywordDef.store();
+                    keywordDef = targetDef.addChild(v);
+//                    keywordDef = new KeywordTagDefinition(v, null, targetDef, getStorageStrategy());
+//                    keywordDef.store();
                 }
                 tags.add(new KeywordTag(keywordDef));
             }
