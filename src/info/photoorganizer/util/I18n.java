@@ -26,7 +26,7 @@ public class I18n
         return singleton;
     }
     
-    private Class _defaultBundle = null;
+    private Class<?> _defaultBundle = null;
     private Locale _preferredLocale = null;
     private Map<Locale, Map<String, ResourceBundle>> _resources = new HashMap<Locale, Map<String,ResourceBundle>>();
     
@@ -35,7 +35,7 @@ public class I18n
         this(Locale.getDefault());
     }
     
-    protected I18n(Class defaultBundle)
+    protected I18n(Class<?> defaultBundle)
     {
         this(null, defaultBundle);
     }
@@ -45,7 +45,7 @@ public class I18n
         this(preferredLocale, null);
     }
     
-    protected I18n(Locale preferredLocale, Class defaultBundle)
+    protected I18n(Locale preferredLocale, Class<?> defaultBundle)
     {
         _preferredLocale = preferredLocale;
         _defaultBundle = defaultBundle;
@@ -56,7 +56,7 @@ public class I18n
         return _preferredLocale;
     }
 
-    public String getString(Class bundle, String key, Object... parameters)
+    public String getString(Class<?> bundle, String key, Object... parameters)
     {
         return getString(bundle.getName(), key, _preferredLocale, parameters);
     }
