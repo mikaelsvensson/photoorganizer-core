@@ -46,6 +46,11 @@ public class Event<L extends EventListener, E extends EventObject>
         listeners.remove(listener);
     }
     
+    public synchronized void removeAllListeners()
+    {
+        getListeners().clear();
+    }
+    
     public synchronized void fire(E event)
     {
         List<L> listeners = getListeners();
