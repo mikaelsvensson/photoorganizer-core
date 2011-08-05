@@ -10,7 +10,8 @@ public enum AutoIndexTagDefinition
 {
     F_NUMBER(DefaultTagDefinition.F_NUMBER.getId(), PhotoFileMetadataTag.EXIF_FNUMBER),
     DATE_TAKEN(DefaultTagDefinition.DATE_TAKEN.getId(), PhotoFileMetadataTag.EXIF_DATE_ORIGINAL),
-    EXPOSURE_TIME(DefaultTagDefinition.EXPOSURE_TIME.getId(), PhotoFileMetadataTag.EXIF_EXPOSURE_TIME)
+    EXPOSURE_TIME(DefaultTagDefinition.EXPOSURE_TIME.getId(), PhotoFileMetadataTag.EXIF_EXPOSURE_TIME),
+    ORIENTATION(DefaultTagDefinition.ORIENTATION.getId(), PhotoFileMetadataTag.EXIF_ORIENTATION)
     ;
 
     private PhotoFileMetadataTag _fileTag = null;
@@ -21,8 +22,7 @@ public enum AutoIndexTagDefinition
         return _targetTagDefinitionId;
     }
 
-    private AutoIndexTagDefinition(UUID targetTagDefinitionId,
-            PhotoFileMetadataTag fileTag)
+    private AutoIndexTagDefinition(UUID targetTagDefinitionId, PhotoFileMetadataTag fileTag)
     {
         _targetTagDefinitionId = targetTagDefinitionId;
         _fileTag = fileTag;

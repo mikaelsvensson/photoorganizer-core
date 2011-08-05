@@ -16,11 +16,9 @@ public enum DefaultTagDefinition
     ROOT_KEYWORD(KeywordTagDefinition.class, UUID.fromString("f4840997-b116-43e6-8256-6fbaefb63b3d"), false, true),
     
     EXPOSURE_TIME(RationalNumberTagDefinition.class, UUID.fromString("e54d8495-81b9-48b4-a106-0f8d6d4780ca"), false, false),
+    ORIENTATION(IntegerNumberTagDefinition.class, UUID.fromString("2628b93f-e6fd-4a6c-adb4-1c29ffda7447"), false, false)
     
-
     /*
-     * e54d8495-81b9-48b4-a106-0f8d6d4780ca
-     * 2628b93f-e6fd-4a6c-adb4-1c29ffda7447
      * 5380469c-eefd-4f2c-bdc8-4a28807da371 
      * 1bc6e716-8120-4cb8-9e93-c0f939b27af9
      * 24782749-5c23-42fd-a1db-626394bb55c5 

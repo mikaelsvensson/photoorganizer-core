@@ -1,6 +1,7 @@
 package info.photoorganizer.metadata;
 
 import com.drew.metadata.Directory;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.iptc.IptcDirectory;
 
@@ -9,6 +10,7 @@ public enum PhotoFileMetadataTag
     EXIF_DATE_ORIGINAL(PhotoFileMetadataDatatype.DATETIME, ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL),
     EXIF_EXPOSURE_TIME(PhotoFileMetadataDatatype.RATIONAL, ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_EXPOSURE_TIME),
     EXIF_FNUMBER(PhotoFileMetadataDatatype.RATIONAL, ExifSubIFDDirectory.class, ExifSubIFDDirectory.TAG_FNUMBER),
+    EXIF_ORIENTATION(PhotoFileMetadataDatatype.INTEGER, ExifIFD0Directory.class, ExifIFD0Directory.TAG_ORIENTATION),
     
     IPTC_SUPPLEMENTAL_CATEGORIES(PhotoFileMetadataDatatype.STRING_LIST, IptcDirectory.class, IptcDirectory.TAG_SUPPLEMENTAL_CATEGORIES)
     ;
