@@ -111,14 +111,19 @@ public class Photo extends DatabaseObject
     
     public boolean hasTag(TagDefinition tagDefinition)
     {
+        return getTag(tagDefinition) != null;
+    }
+    
+    public Tag<? extends TagDefinition> getTag(TagDefinition tagDefinition)
+    {
         for (Tag<? extends TagDefinition> tag : _tags)
         {
             if (tag.getDefinition().equals(tagDefinition))
             {
-                return true;
+                return tag;
             }
         }
-        return false;
+        return null;
     }
 
     public void setFile(File file)
