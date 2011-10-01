@@ -176,7 +176,7 @@ public class PopularityMapCache<TYPE, KEY> implements MapCache<TYPE, KEY>
         {
             _typeOfCacheName = getTypeOfCacheName();
         }
-        L.UTIL.log(Level.FINEST, "Cache for " + (_typeOfCacheName != null ? _typeOfCacheName : "unknown type of objects") + ": " + msg);
+        Log.UTIL.log(Level.FINEST, "Cache for " + (_typeOfCacheName != null ? _typeOfCacheName : "unknown type of objects") + ": " + msg);
     }
 
     private synchronized String getTypeOfCacheName()

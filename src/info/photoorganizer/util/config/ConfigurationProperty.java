@@ -1,5 +1,7 @@
 package info.photoorganizer.util.config;
 
+import info.photoorganizer.database.autoindexing.IndexingConfigurationList;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -43,6 +45,8 @@ public abstract class ConfigurationProperty<T extends Object>
             }
         }
     });
+    
+    public final static ConfigurationProperty<IndexingConfigurationList> indexingConfigurationList = new ConfigurationPropertyIndexingConfigurationList();
     
     /*
      * ACTUAL CODE

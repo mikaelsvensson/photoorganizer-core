@@ -6,10 +6,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class I18n
 {
     private static volatile I18n singleton = null;
+    
+    private static Logger L = Log.getLogger(I18n.class);
     
     public static I18n getInstance()
     {
@@ -84,7 +87,7 @@ public class I18n
             }
             catch (MissingResourceException e)
             {
-                System.err.println("Could not find " + bundleName);
+                L.fine("Could not find properties file for " + bundleName);
                 return null;
             }
             bundles.put(bundleName, bundle);
@@ -115,7 +118,7 @@ public class I18n
                 }
                 catch (MissingResourceException e)
                 {
-                    // TODO: Log missing properties
+                    L.fine("Could not find property '" + key + "' in resource bundle " + bundleName);
                 }
             }
         }
