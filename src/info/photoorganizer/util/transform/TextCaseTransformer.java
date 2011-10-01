@@ -1,10 +1,35 @@
 package info.photoorganizer.util.transform;
 
+import info.photoorganizer.util.I18n;
+
 public class TextCaseTransformer extends SingleParameterTextTransformer
 {
-    public enum Transformation implements TextTransformer
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public TextCaseTransformer cloneDeep()
     {
-        LOWERCASE()
+        TextCaseTransformer clone = new TextCaseTransformer();
+        clone.setParam(getParam());
+        return clone;
+    }
+
+    public TextCaseTransformer()
+    {
+        super();
+    }
+
+    public TextCaseTransformer(String param)
+    {
+        super(param);
+    }
+
+    public enum Transformation
+    {
+        LOWERCASE
         {
             @Override
             public String transform(String input)
@@ -12,15 +37,15 @@ public class TextCaseTransformer extends SingleParameterTextTransformer
                 return input.toLowerCase();
             }
         },
-        UPPERCASE()
+        UPPERCASE
         {
             @Override
             public String transform(String input)
             {
-                return input.toLowerCase();
+                return input.toUpperCase();
             }
         },
-        CAPITALIZE()
+        CAPITALIZE
         {
             @Override
             public String transform(String input)
@@ -35,6 +60,19 @@ public class TextCaseTransformer extends SingleParameterTextTransformer
                 }
                 return sb.toString();
             }
+        };
+        protected abstract String transform(String input);
+        
+        public String getI18nString(String key, Object... parameters)
+        {
+            return I18n.getInstance().getString(TextCaseTransformer.class,
+                    Transformation.class.getSimpleName() + "." + key, parameters);
+        }
+        
+        @Override
+        public String toString()
+        {
+            return getI18nString(name());
         }
     }
 
@@ -50,6 +88,19 @@ public class TextCaseTransformer extends SingleParameterTextTransformer
         {
             return input;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        I18n i18n = I18n.getInstance();
+        Transformation trans = null;
+        if (null != getParam())
+        {
+            trans = Transformation.valueOf(getParam().toUpperCase());
+        }
+        return i18n.getString(getClass(), "TOSTRING_PATTERN", trans/*.toString()*/);
+
     }
 
 }

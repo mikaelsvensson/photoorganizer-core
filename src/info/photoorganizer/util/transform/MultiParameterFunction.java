@@ -1,9 +1,10 @@
 package info.photoorganizer.util.transform;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class MultiParameterFunction
+public abstract class MultiParameterFunction implements Serializable
 {
     private Map<String, String> _params = new HashMap<String, String>();
 //    private List<String> _paramNames = new ArrayList<String>();

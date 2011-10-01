@@ -7,7 +7,7 @@ import info.photoorganizer.util.Event.EventExecuter;
 
 import java.util.UUID;
 
-public abstract class TagDefinition extends DatabaseObject 
+public abstract class TagDefinition extends DatabaseObject
 {
     
     

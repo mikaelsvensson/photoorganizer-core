@@ -1,5 +1,7 @@
 package info.photoorganizer.metadata;
 
+import info.photoorganizer.util.I18n;
+
 import com.drew.metadata.Directory;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
@@ -14,6 +16,12 @@ public enum PhotoFileMetadataTag
     
     IPTC_SUPPLEMENTAL_CATEGORIES(PhotoFileMetadataDatatype.STRING_LIST, IptcDirectory.class, IptcDirectory.TAG_SUPPLEMENTAL_CATEGORIES)
     ;
+
+    @Override
+    public String toString()
+    {
+        return I18n.getInstance().getString(getClass(), name());
+    }
 
     private PhotoFileMetadataDatatype _datatype = null;
     private Class<? extends Directory> _fileMetadataDirectory = null;

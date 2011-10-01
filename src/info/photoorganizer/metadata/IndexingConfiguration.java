@@ -2,18 +2,38 @@ package info.photoorganizer.metadata;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
+import info.photoorganizer.database.autoindexing.DefaultIndexingConfiguration;
+import info.photoorganizer.database.autoindexing.IndexingConfigurationInterface;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfigurationInterface;
+import info.photoorganizer.database.autoindexing.POFileFilter;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class IndexingConfiguration extends DatabaseObject
+public class IndexingConfiguration extends DatabaseObject implements IndexingConfigurationInterface
 {
-    private FileFilter _fileFilter = null;
+    private POFileFilter _fileFilter = null;
 
-    private List<MetadataMappingConfiguration> _metadataMappers = null;
+    private List<MetadataMappingConfigurationInterface> _metadataMappers = null;
 
+    @Override
+    public IndexingConfigurationInterface cloneDeep()
+    {
+        IndexingConfiguration clone = new IndexingConfiguration(getStorageStrategy());
+        clone._fileFilter = _fileFilter.cloneDeep();
+        if (_metadataMappers != null)
+        {
+            clone._metadataMappers = new ArrayList<MetadataMappingConfigurationInterface>();
+            for (MetadataMappingConfigurationInterface metadataMapper : _metadataMappers)
+            {
+                clone._metadataMappers.add(metadataMapper.cloneDeep());
+            }
+        }
+        return clone;
+    }
+    
     public IndexingConfiguration(DatabaseStorageStrategy storageStrategy)
     {
         super(null, storageStrategy);
@@ -24,16 +44,24 @@ public class IndexingConfiguration extends DatabaseObject
         super(id, storageStrategy);
     }
 
-    public FileFilter getFileFilter()
+    /* (non-Javadoc)
+     * @see info.photoorganizer.metadata.MetadataIndexingConfiguration#getFileFilter()
+     */
+    @Override
+    public POFileFilter getFileFilter()
     {
         return _fileFilter;
     }
 
-    public List<MetadataMappingConfiguration> getMetadataMappers()
+    /* (non-Javadoc)
+     * @see info.photoorganizer.metadata.MetadataIndexingConfiguration#getMetadataMappers()
+     */
+    @Override
+    public List<MetadataMappingConfigurationInterface> getMetadataMappers()
     {
         if (null == _metadataMappers)
         {
-            _metadataMappers = new ArrayList<MetadataMappingConfiguration>();
+            _metadataMappers = new ArrayList<MetadataMappingConfigurationInterface>();
         }
         return _metadataMappers;
     }
@@ -43,7 +71,7 @@ public class IndexingConfiguration extends DatabaseObject
         getStorageStrategy().removeIndexingConfiguration(this);
     }
 
-    public void setFileFilter(FileFilter fileFilter)
+    public void setFileFilter(POFileFilter fileFilter)
     {
         _fileFilter = fileFilter;
     }
