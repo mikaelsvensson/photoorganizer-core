@@ -445,6 +445,16 @@ public class KeywordTagDefinition extends TagDefinition implements Transferable
         }
         return ids;
     }
+    
+    public Set<UUID> getSynonymIdsSet()
+    {
+        HashSet<UUID> set = new HashSet<UUID>();
+        for(UUID id : getSynonymIds())
+        {
+            set.add(id);
+        }
+        return set;
+    }
 
     public String getSynonymIds(char separatorChar, char quotationChar)
     {
