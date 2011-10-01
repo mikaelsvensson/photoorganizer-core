@@ -3,11 +3,11 @@ package info.photoorganizer.tool;
 import info.photoorganizer.database.Database;
 import info.photoorganizer.database.DatabaseManager;
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfiguration;
 import info.photoorganizer.metadata.AutoIndexTagDefinition;
 import info.photoorganizer.metadata.DefaultTagDefinition;
 import info.photoorganizer.metadata.IndexingConfiguration;
-import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
-import info.photoorganizer.metadata.MetadataMappingConfiguration;
+import info.photoorganizer.metadata.RegexpFileFilter;
 import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.util.config.ConfigurationProperty;
 import info.photoorganizer.util.transform.ReplaceTransformer;
@@ -26,7 +26,7 @@ public class InitDefaultKeywordTranslators
             IndexingConfiguration cfg = database.createIndexingConfiguration();
             
             {
-                MetadataMappingConfiguration mappingCfg = new MetadataMappingConfiguration();
+                MetadataMappingConfiguration mappingCfg = new MetadataMappingConfiguration(/*database*/);
                 mappingCfg.setSource(PhotoFileMetadataTag.IPTC_SUPPLEMENTAL_CATEGORIES);
                 mappingCfg.getSourceTextTransformers().add(new ReplaceTransformer(".", " "));
                 mappingCfg.setTarget(database.getTagDefinition(DefaultTagDefinition.ROOT_KEYWORD.getId()));
@@ -38,10 +38,11 @@ public class InitDefaultKeywordTranslators
                 cfg.getMetadataMappers().add(
                         new MetadataMappingConfiguration(
                                 aitd.getFileTag(), 
-                                database.getTagDefinition(aitd.getTargetTagDefinitionId())));
+                                database.getTagDefinition(aitd.getTargetTagDefinitionId())/*,
+                                database*/));
             }
             
-            cfg.setFileFilter(new KeywordTranslatorFileFilter("^soccer_.*"));
+            cfg.setFileFilter(new RegexpFileFilter("^soccer_.*"));
             
             cfg.store();
         }

@@ -1,10 +1,11 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.autoindexing.IndexingConfigurationInterface;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfiguration;
 import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.metadata.IndexingConfiguration;
-import info.photoorganizer.metadata.KeywordTranslatorFileFilter;
-import info.photoorganizer.metadata.MetadataMappingConfiguration;
+import info.photoorganizer.metadata.RegexpFileFilter;
 import info.photoorganizer.util.XMLUtilities;
 
 import java.util.Iterator;
@@ -23,7 +24,7 @@ public class IndexingConfigurationHandler extends DatabaseObjectHandler<Indexing
     @Override
     public void readElement(IndexingConfiguration o, Element el)
     {
-        Iterator<KeywordTranslatorFileFilter> fileFilters = fromElementChildren(el, KeywordTranslatorFileFilter.class).iterator();
+        Iterator<RegexpFileFilter> fileFilters = fromElementChildren(el, RegexpFileFilter.class).iterator();
         if (fileFilters.hasNext())
         {
             o.setFileFilter(fileFilters.next());

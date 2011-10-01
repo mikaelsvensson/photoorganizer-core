@@ -1,9 +1,10 @@
 package info.photoorganizer.database.xml.elementhandlers;
 
 import info.photoorganizer.database.DatabaseStorageException;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfiguration;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfigurationInterface;
 import info.photoorganizer.database.xml.StorageContext;
 import info.photoorganizer.database.xml.XMLDatabaseStorageStrategy;
-import info.photoorganizer.metadata.MetadataMappingConfiguration;
 import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.util.XMLUtilities;
 import info.photoorganizer.util.transform.TextTransformer;
@@ -45,7 +46,7 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
         
         XMLUtilities.appendChildren(el, toElements(o.getSourceTextTransformers()));
         
-        XMLDatabaseStorageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_TARGET, o.getTarget().getId());
+        XMLDatabaseStorageStrategy.setUUIDAttribute(el, ATTRIBUTENAME_TARGET, o.getTarget(null).getId());
         
         super.writeElement(o, el);
     }
@@ -59,7 +60,7 @@ public class MetadataMappingConfigurationHandler extends ElementHandler<Metadata
     @Override
     public MetadataMappingConfiguration createObject(Element el)
     {
-        return new MetadataMappingConfiguration();
+        return new MetadataMappingConfiguration(/*null*/);
     }
 
 }

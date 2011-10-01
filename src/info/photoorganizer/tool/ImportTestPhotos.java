@@ -31,7 +31,7 @@ public class ImportTestPhotos
                 else
                 {
                     System.out.println("  Not in database. Yet. Adding image.");
-                    database.indexPhoto(f);
+                    database.indexPhoto(f, database.getIndexingConfigurations());
                 }
             }
         }

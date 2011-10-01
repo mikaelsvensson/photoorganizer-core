@@ -155,7 +155,7 @@ public class StorageContext
                 
                 new IndexingConfigurationHandler(this),
                 new MetadataMappingConfigurationHandler(this),
-                new KeywordTranslatorFileFilterHandler(this),
+                new RegexpFileFilterHandler(this),
                 new ReplaceTransformerHandler(this),
                 new TextCaseTransformerHandler(this),
                 

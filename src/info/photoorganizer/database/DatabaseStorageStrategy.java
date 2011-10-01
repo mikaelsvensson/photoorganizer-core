@@ -1,5 +1,6 @@
 package info.photoorganizer.database;
 
+import info.photoorganizer.database.autoindexing.IndexingConfigurationInterface;
 import info.photoorganizer.metadata.IndexingConfiguration;
 import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.TagDefinition;
@@ -25,10 +26,10 @@ public interface DatabaseStorageStrategy
 	public void removePhoto(Photo img) throws DatabaseStorageException;
 	public void storePhoto(Photo img) throws DatabaseStorageException;
 	
-	public Collection<IndexingConfiguration> getIndexingConfigurations();
-	public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
-	public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
-	public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException;
+	public Collection<IndexingConfigurationInterface> getIndexingConfigurations();
+	public void addIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException;
+	public void removeIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException;
+	public void storeIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException;
 	
 	public void close() throws DatabaseStorageException;
 }

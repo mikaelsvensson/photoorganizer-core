@@ -1,5 +1,7 @@
 package info.photoorganizer.database;
 
+import info.photoorganizer.database.autoindexing.IndexingConfigurationInterface;
+import info.photoorganizer.database.autoindexing.MetadataMappingConfigurationInterface;
 import info.photoorganizer.metadata.DatabaseException;
 import info.photoorganizer.metadata.DatabaseObject;
 import info.photoorganizer.metadata.DatetimeTag;
@@ -10,7 +12,6 @@ import info.photoorganizer.metadata.IntegerNumberTag;
 import info.photoorganizer.metadata.IntegerNumberTagDefinition;
 import info.photoorganizer.metadata.KeywordTag;
 import info.photoorganizer.metadata.KeywordTagDefinition;
-import info.photoorganizer.metadata.MetadataMappingConfiguration;
 import info.photoorganizer.metadata.Photo;
 import info.photoorganizer.metadata.PhotoFileMetadataTag;
 import info.photoorganizer.metadata.RationalNumberTag;
@@ -43,9 +44,15 @@ import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.Rational;
 import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifThumbnailDirectory;
 
 public class Database extends DatabaseObject
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private static final double FILE_EQUALITY_PROBABLITY_MATCH_THRESHOLD = 1.0;
 
     private String name = null;
@@ -65,15 +72,14 @@ public class Database extends DatabaseObject
         getStorageStrategy().addIndexingConfiguration(translator);
     }
 
-    private void addTags(Photo photo, Metadata metadata) throws DatabaseStorageException
+    private void addTags(Photo photo, Metadata metadata, Iterable<IndexingConfigurationInterface> cfgs) throws DatabaseStorageException
     {
-        Collection<IndexingConfiguration> cfgs = getIndexingConfigurations();
-        for (IndexingConfiguration cfg : cfgs)
+        for (IndexingConfigurationInterface cfg : cfgs)
         {
             FileFilter fileFilter = cfg.getFileFilter();
             if (null == fileFilter || fileFilter.accept(photo.getFile()))
             {
-                for (MetadataMappingConfiguration mapper : cfg.getMetadataMappers())
+                for (MetadataMappingConfigurationInterface mapper : cfg.getMetadataMappers())
                 {
                     PhotoFileMetadataTag source = mapper.getSource();
                     Object value = getSourceData(metadata, mapper, source);
@@ -83,7 +89,7 @@ public class Database extends DatabaseObject
                     }
                     else
                     {
-                        System.err.println("getSourceData returned 'null' for " + mapper.getTarget().getName());
+                        System.err.println("getSourceData returned 'null' for " + mapper.getTarget(this).getName());
                     }
                 }
             }
@@ -155,10 +161,10 @@ public class Database extends DatabaseObject
         return null;
     }
     
-    private List<Tag<? extends TagDefinition>> createTargetTagsFromSourceData(MetadataMappingConfiguration mapper, Object value) throws DatabaseStorageException, DatabaseException
+    private List<Tag<? extends TagDefinition>> createTargetTagsFromSourceData(MetadataMappingConfigurationInterface mapper, Object value) throws DatabaseStorageException, DatabaseException
     {
         List<Tag<? extends TagDefinition>> tags = new LinkedList<Tag<? extends TagDefinition>>();
-        TagDefinition target = mapper.getTarget();
+        TagDefinition target = mapper.getTarget(this);
         if (target instanceof KeywordTagDefinition)
         {
             KeywordTagDefinition targetDef = (KeywordTagDefinition) target;
@@ -253,7 +259,7 @@ public class Database extends DatabaseObject
         return getStorageStrategy().getPhotos();
     }
     
-    public Collection<IndexingConfiguration> getIndexingConfigurations()
+    public Collection<IndexingConfigurationInterface> getIndexingConfigurations()
     {
         return getStorageStrategy().getIndexingConfigurations();
     }
@@ -264,7 +270,7 @@ public class Database extends DatabaseObject
     }
     
     private Object getSourceData(Metadata metadata,
-            MetadataMappingConfiguration mapper,
+            MetadataMappingConfigurationInterface mapper,
             PhotoFileMetadataTag source)
     {
         Object value = source.getDatatype().get(metadata, source.getFileMetadataDirectory(), source.getFileMetadataDirectoryTag());
@@ -331,7 +337,7 @@ public class Database extends DatabaseObject
         }
     }
     
-    public Photo indexPhoto(File f)
+    public Photo indexPhoto(File f, Iterable<IndexingConfigurationInterface> cfgs)
     {
         Photo photo = getPhoto(f);
         if (null == photo)
@@ -347,7 +353,7 @@ public class Database extends DatabaseObject
                 
     //            addDefaultTags(img, metadata);
                 
-                addTags(photo, metadata);
+                addTags(photo, metadata, cfgs);
                 
             }
             catch (ImageProcessingException e)
@@ -465,7 +471,7 @@ public class Database extends DatabaseObject
     }
 
     private void setTargetData(Photo img,
-            MetadataMappingConfiguration mapper,
+            MetadataMappingConfigurationInterface mapper,
             Object value) throws DatabaseStorageException
     {
         try

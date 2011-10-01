@@ -2,6 +2,7 @@ package info.photoorganizer.database.xml;
 
 import info.photoorganizer.database.DatabaseStorageException;
 import info.photoorganizer.database.DatabaseStorageStrategy;
+import info.photoorganizer.database.autoindexing.IndexingConfigurationInterface;
 import info.photoorganizer.database.xml.elementhandlers.DatabaseHandler;
 import info.photoorganizer.database.xml.elementhandlers.ElementHandler;
 import info.photoorganizer.metadata.IndexingConfiguration;
@@ -92,7 +93,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     private File _databaseFile = null;
     private Date _lastOperation = null;
 
-    private Collection<IndexingConfiguration> _indexingConfigurations = new LinkedHashSet<IndexingConfiguration>();
+    private Collection<IndexingConfigurationInterface> _indexingConfigurations = new LinkedHashSet<IndexingConfigurationInterface>();
     private Collection<Photo> _photos = new LinkedHashSet<Photo>();
     private Collection<TagDefinition> _tagDefinitions = new LinkedHashSet<TagDefinition>();
     
@@ -462,9 +463,12 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
                     {
                         context.storeDatabaseObject(o);
                     }
-                    for (IndexingConfiguration o : _indexingConfigurations)
+                    for (IndexingConfigurationInterface o : _indexingConfigurations)
                     {
-                        context.storeDatabaseObject(o);
+                        if (o instanceof IndexingConfiguration)
+                        {
+                            context.storeDatabaseObject((IndexingConfiguration)o);
+                        }
                     }
                 }
             }
@@ -586,11 +590,11 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public Collection<IndexingConfiguration> getIndexingConfigurations()
+    public Collection<IndexingConfigurationInterface> getIndexingConfigurations()
     {
         synchronized (_indexingConfigurations)
         {
-            Collection<IndexingConfiguration> currentCfgs = new ArrayList<IndexingConfiguration>(_indexingConfigurations);
+            Collection<IndexingConfigurationInterface> currentCfgs = new ArrayList<IndexingConfigurationInterface>(_indexingConfigurations);
             return Collections.unmodifiableCollection(currentCfgs);
         }
     }
@@ -609,13 +613,13 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public void addIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    public void addIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException
     {
         storeIndexingConfiguration(translator);
     }
 
     @Override
-    public void storeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    public void storeIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException
     {
         synchronized (_indexingConfigurations)
         {
@@ -625,7 +629,7 @@ public class XMLDatabaseStorageStrategy implements DatabaseStorageStrategy
     }
 
     @Override
-    public void removeIndexingConfiguration(IndexingConfiguration translator) throws DatabaseStorageException
+    public void removeIndexingConfiguration(IndexingConfigurationInterface translator) throws DatabaseStorageException
     {
         synchronized (_indexingConfigurations)
         {
