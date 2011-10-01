@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>photoorganizer-db.xml</name>
+			<type>1</type>
+			<location>C:/Documents and Settings/Mikael/photoorganizer-db.xml</location>
+		</link>
+	</linkedResources>
 </projectDescription>
