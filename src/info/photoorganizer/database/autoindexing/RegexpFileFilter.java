@@ -1,6 +1,5 @@
-package info.photoorganizer.metadata;
+package info.photoorganizer.database.autoindexing;
 
-import info.photoorganizer.database.autoindexing.POFileFilter;
 import info.photoorganizer.util.I18n;
 import info.photoorganizer.util.transform.SingleParameterFunction;
 

@@ -1,7 +1,7 @@
 package info.photoorganizer.database.xml;
 
+import info.photoorganizer.database.autoindexing.RegexpFileFilter;
 import info.photoorganizer.database.xml.elementhandlers.SingleParameterFunctionHandler;
-import info.photoorganizer.metadata.RegexpFileFilter;
 
 import org.w3c.dom.Element;
 
